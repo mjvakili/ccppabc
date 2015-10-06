@@ -41,6 +41,6 @@ def initial_pool_sampling(i_particle, eps0, data, model, distance, prior_obj, cp
     for i_param in xrange(n_params): 
         pool_list.append(theta_star[i_param])
         pool_list.append(1./np.float(N_particles))
-                                                                                                                pool_list.append(rho)
+        pool_list.append(rho)
                                                                                                                     
-                                                                                                                        return np.array(pool_list)
+    return np.array(pool_list)
