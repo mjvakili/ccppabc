@@ -1,10 +1,11 @@
 """
 PMC-ABC code 
 
-Important comment : now, we have written the sampling so that you can turn off the 
+Important comment : we have written the sampling in a way that you can turn off
 multiprocessing by setting the parameter N_threads to 1 and run the code
 in serial. This allows you to troubleshoot the fuck out of your simulator, 
-or distance metric if there is anything wrong with them. 
+or distance metric if there is anything wrong with them in which case you 
+should be ashamed of yourself. 
 Rule of thumb: First run the code in serial to make sure everything is fine, 
 and then take advantage of multiprocessing.
 """
@@ -12,27 +13,16 @@ and then take advantage of multiprocessing.
 from prior import Prior
 from my_simulator import model
 from interruptible_pool import InterruptiblePool
+import utils
+
+"""Wrapper functions for multiprocessing"""
 
 def unwrap_self_initial_pool_sampling(arg, **kwarg):
     return ABC.initial_pool_sampling(*arg, **kwarg)
 
-"""covariance matrix in abc sampler"""
+def unwrap_self_importance_sampling(arg, **kwarg):
+    return ABC.importance_sampling(*arg, **kwarg)
 
-def covariance(theta , w , type = 'weighted'):
-
-    if type == 'neutral':
-
-      return np.cov(theta)
-
-    if type == 'normalized neutral':
-
-      return np.corrcoef(theta)
-
-    if type == 'weighted':
-      mean = np.sum(theta*w[None,:] , axis = 1)/ np.sum(w)
-      tmm  = theta - mean.reshape(theta.shape[0] , 1)
-      sigma2 = 1./(w.sum()) * (tmm*w[None,:]).dot(tmm.T)
-      return sigma2  
 
 
 class ABC(object):
@@ -112,7 +102,7 @@ class ABC(object):
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
         rhos = results[n_params+2,:]
-        sig_t = covariance(theta_t , w_t)
+        sig_t = utils.covariance(theta_t , w_t)
     
         return theta_t, w_t, rhos, sig_t
 
