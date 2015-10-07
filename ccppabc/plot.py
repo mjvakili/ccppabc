@@ -3,6 +3,7 @@
 Plot the particles using DFM's Corner
 
 """
+import numpy as np
 import corner
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
