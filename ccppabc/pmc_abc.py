@@ -1,11 +1,20 @@
 """
-
 PMC-ABC code 
 
+Important comment : now, we have written the sampling so that you can turn off the 
+multiprocessing by setting the parameter N_threads to 1 and run the code
+in serial. This allows you to troubleshoot the fuck out of your simulator, 
+or distance metric if there is anything wrong with them. 
+Rule of thumb: First run the code in serial to make sure everything is fine, 
+and then take advantage of multiprocessing.
 """
+
 from prior import Prior
 from my_simulator import model
+from interruptible_pool import InterruptiblePool
 
+def unwrap_self_initial_pool_sampling(arg, **kwarg):
+    return ABC.initial_pool_sampling(*arg, **kwarg)
 
 """covariance matrix in abc sampler"""
 
@@ -26,18 +35,9 @@ def covariance(theta , w , type = 'weighted'):
       return sigma2  
 
 
-
-def pmc_abc(data, model, distance):
-    """
-    """
-
-    # initial pool 
-    pass
-
-
 class ABC(object):
 
-   def __init__(self, data, model, distance, prior_obj, eps0, N_threads = 1):
+   def __init__(self, data, model, distance, prior_obj, eps0, N_threads = 1 , N_particles):
        """
 
        eps0       : initial threshold
@@ -54,7 +54,7 @@ class ABC(object):
        self.prior_obj = prior_obj
        self.eps0 = eps0
        self.N_threads = N_threads	
-
+       self.N_particles = N_particles
 
     def initial_pool_sampling(self , i_particle):
         """ Sample theta_star from prior distribution for the initial pool 
@@ -84,35 +84,35 @@ class ABC(object):
     	pool_list = [np.int(i_particle)]
     	for i_param in xrange(n_params):
             pool_list.append(theta_star[i_param])
-    	pool_list.append(1./np.float(N_particles))
+    	pool_list.append(1./np.float(self.N_particles))
     	pool_list.append(rho)
 
     	return pool_list
 
-    def initial_pool(N_particles , N_threads = 1):
+    def initial_pool(self):
 
     
     	n_params = len(theta_star)
-    	if N_threads == 1 :
+    	if self.N_threads == 1 :
        
-            args_list = [i for i in xrange(N_particles)]
+            args_list = [i for i in xrange(self.N_particles)]
 	    results   = []
             for arg in args_list:
                 results.append(initial_pool_sampling(arg)
         else:
-            pool = InterruptiblePool(processes = N_threads)
+            pool = InterruptiblePool(processes = self.N_threads)
             mapfn = pool.map
-            args_list = [i for i in xrange(N_particles)]
-            results = mapfn(initial_pool_sampling, args_list)
-            pool.close()
+            args_list = [i for i in xrange(self.N_particles)]
+            results = mapfn(unwrap_self_initial_pool_sampling, zip([self]*len(args_list), args_list))
+	    pool.close()
             pool.terminate()
             pool.join()
     
         results = np.array(results).T
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
-    rhos = results[n_params+2,:]
-    sig_t = covariance(theta_t , w_t)
+        rhos = results[n_params+2,:]
+        sig_t = covariance(theta_t , w_t)
     
-    return theta_t, w_t, rhos, sig_t
+        return theta_t, w_t, rhos, sig_t
 
