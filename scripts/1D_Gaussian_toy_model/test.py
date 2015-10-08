@@ -43,7 +43,7 @@ def run_serial():
 def run_parallel(N=4):
 
     test_abc.N_threads = N
-    test_bc.basename = "test_abc_parallel"
+    test_abc.basename = "test_abc_parallel"
     test_abc.N_particles = 50
     print "testing ABC implementation in parallel..."
 

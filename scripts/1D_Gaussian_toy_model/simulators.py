@@ -6,4 +6,4 @@ def test_simulator(params):
 
     means = params
 
-    return multivariate_normal(mean=means).rvs(8)
+    return multivariate_normal(mean=means).rvs(1000)
