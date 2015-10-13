@@ -46,27 +46,25 @@ class _Initialpoolsampling(object):
 
 
 
-class importance_pool_sampling(object):
+class _Importancepoolsampling(object):
 
-    def __init__(self, data, model, distance, prior_obj, eps_t, theta_t, w_t, sig_t):
+    def __init__(self, eps_t, data, model, distance, prior_dict, theta_t, w_t, sig_t):
 
         self.data = data
 	self.model = model
 	self.distance = distance
-	self.prior_obj = prior_obj
+	self.prior_dict = prior_dict
 	self.eps_t = eps_t
 	self.theta_t = theta_t
 	self.w_t = w_t
 	self.sig_t = sig_t
-       
+        self.n_params = len(self.prior_dict)
 
-    def __call__(self , iparticle):
+    def __call__(self , i_particle):
 
         rho = 1.e37
-        n_params = len(self.theta_t)
-
+        prior_obj = Prior(self.prior_dict)
         while rho > self.eps_t:
-            
            theta_star = utils.weighted_sampling(self.theta_t, self.w_t)
            np.random.seed()
            theta_starstar = np.random.multivariate_normal(theta_star, self.sig_t, 1)[0]
@@ -74,6 +72,7 @@ class importance_pool_sampling(object):
            model_starstar = self.model(theta_starstar)
            rho = self.distance(self.data, model_starstar)
 
+        p_theta = prior_obj.pi_priors(theta_starstar)
         w_starstar = p_theta / np.sum(self.w_t * \
                                       utils.better_multinorm(theta_starstar,
                                                              self.theta_t,
@@ -81,49 +80,12 @@ class importance_pool_sampling(object):
 
         pool_list = [np.int(i_particle)]
         theta_starstar = np.atleast_1d(theta_starstar)
-        for i_p in xrange(n_params):
-           pool_list.append(theta_starstar[i_p])
+        for i_param in xrange(self.n_params):
+           pool_list.append(theta_starstar[i_param])
            pool_list.append(w_starstar)
            pool_list.append(rho)
 
         return pool_list
-
-"""
-def importance_pool_sampling(args):
-
-    abc_obj, i_particle = args
-
-    rho = 1e37
-
-    # perturbed theta (Double check)
-    while rho > abc_obj.eps_t:
-
-        theta_star = utils.weighted_sampling(abc_obj.theta_t, abc_obj.w_t)
-
-        np.random.seed()
-        theta_starstar = np.random.multivariate_normal(theta_star, abc_obj.sig_t, 1)[0]
-        #theta_starstar = multivariate_normal(theta_star, self.sig_t).rvs(size=1)
-        model_starstar = abc_obj.model(theta_starstar)
-
-        rho = abc_obj.distance(abc_obj.data, model_starstar)
-
-    p_theta = abc_obj.prior_obj.pi_priors(theta_starstar)
-
-    w_starstar = p_theta / np.sum(abc_obj.w_t * \
-                                  utils.better_multinorm(theta_starstar,
-                                                         abc_obj.theta_t,
-                                                         abc_obj.sig_t) )
-
-    pool_list = [np.int(i_particle)]
-    theta_starstar = np.atleast_1d(theta_starstar)
-    for i_p in xrange(abc_obj.n_params):
-        pool_list.append(theta_starstar[i_p])
-    pool_list.append(w_starstar)
-    pool_list.append(rho)
-
-    return pool_list
-"""
-
 
 class ABC(object):
 
@@ -151,13 +113,12 @@ class ABC(object):
 
         #if self.N_threads != 1 :
 
-        self.pool = Pool(self.N_threads)
-        self.mapfn  = self.pool.map
 
     def initial_pool(self):
 
         
-        wrapper = _Initialpoolsampling(self.eps0 , self.data, self.model, self.distance , self.prior_dict)
+        initial_wrapper = _Initialpoolsampling(self.eps0 , self.data, self.model, \
+                                               self.distance , self.prior_dict)
                                          
         #print wrapper
         #print wrapper(1)
@@ -166,13 +127,15 @@ class ABC(object):
             results   = []
             for i in range(self.N_particles):
 
-                results.append(wrapper(i))
+                results.append(initial_wrapper(i))
         else:
 
-            results = self.mapfn(wrapper , range(self.N_particles))
+            self.pool = Pool(self.N_threads)
+            self.mapfn  = self.pool.map
+            results = self.mapfn(initial_wrapper , range(self.N_particles))
 	    self.pool.close()
-            #pool.terminate()
-            #pool.join()
+            #self.pool.terminate()
+            #self.pool.join()
 
         results = np.array(results).T
         self.theta_t = results[1:self.n_params+1,:]
@@ -191,24 +154,29 @@ class ABC(object):
         self.initial_pool()
         t = 1
 
+        
         while t < self.T:
-            print t
-
+            
             self.eps_t = np.percentile(self.rhos, 75)
-
-            args_list = [[self, i] for i in xrange(self.N_particles)]
+            print "iteration= " , t , "threshold= " , self.eps_t
+           
+            importance_wrapper = _Importancepoolsampling(self.eps_t, self.data, self.model, \
+                                                         self.distance, self.prior_dict, \
+                                                         self.theta_t, self.w_t, self.sig_t) 
 
             if self.N_threads == 1 :
                 results   = []
-                for arg in args_list:
-                    results.append(importance_pool_sampling(arg))
+                for i in range(self.N_particles):
+
+                    results.append(importance_wrapper(i))
             else:
-                #pool = ProcessPool(nodes = self.N_threads)
-                #mapfn = pool.map
-                results = self.map(importance_pool_sampling, args_list)
-                pool.close()
-                pool.terminate()
-                pool.join()
+
+                self.pool = Pool(self.N_threads)
+                self.mapfn  = self.pool.map
+                results = self.mapfn(importance_wrapper, range(self.N_particles))
+                self.pool.close()
+                #self.pool.terminate()
+                #self.pool.join()
 
             results = np.array(results).T
 
@@ -217,8 +185,8 @@ class ABC(object):
             self.rhos = results[self.n_params+2,:]
             self.sig_t = utils.covariance(self.theta_t, self.w_t)
 
-            plot_thetas(self.theta_t, self.w_t, self.prior_obj.prior_dict, t,
+            plot_thetas(self.theta_t, self.w_t, self.prior_dict, t,
                         basename=self.basename,
                         fig_name="{0}_{1}.png".format(self.basename, str(t)))
 
-            t+= 1
+            t += 1
