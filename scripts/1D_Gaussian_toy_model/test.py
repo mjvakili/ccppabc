@@ -23,10 +23,14 @@ prior_dict = {
 
 test_prior = Prior(prior_dict)
 
+print prior_dict
+print test_prior
+
 eps = 0.2
 
-test_abc = ABC(testdat, test_simulator, test_dist, test_prior, eps)
+test_abc = ABC(testdat, test_simulator, test_dist, prior_dict , eps, N_threads = 10 , N_particles = 20 , T = 10)
 
+test_abc.run_abc()
 
 def run_serial():
 
@@ -53,4 +57,4 @@ def run_parallel(N=4):
     print "data val", "inferred val"
     print thetadat, inferred_theta
 
-
+run_parallel()
