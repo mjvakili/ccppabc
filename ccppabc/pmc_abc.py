@@ -11,14 +11,87 @@ and then take advantage of multiprocessing.
 """
 
 import numpy as np
-from pathos.multiprocessing import ProcessingPool as Pool
 import utils
 from plot import plot_thetas
+from multiprocessing.pool import Pool
 
-    
+class _Initialpoolsampling(object):
+
+    def __init__(self, eps_0, data, model, distance):#, prior_obj):
+
+        
+        self.data = data
+	self.model = model
+	self.distance = distance
+	#self.prior_obj = prior_obj
+	self.eps_0 = eps_0
+
+    def __call__(self, i_particle):
+        
+        rho = 1.e37
+        n_params = 1 #len(self.prior_obj)
+
+        while rho > self.eps_0:
+            theta_star = 0. #self.prior_obj.sampler()
+            model_theta = self.model(theta_star)
+            print model_theta
+            rho = self.distance(self.data, model_theta)
+
+        # pool_list = [np.int(i_particle)]
+        # for i_param in xrange(n_params):
+        #     pool_list.append(theta_star[i_param])
+        # pool_list.append(1.)
+        # pool_list.append(rho)
+        
+        return np.int(i_particle) , theta_star , 1. , rho
+
+
+
+class importance_pool_sampling(object):
+
+    def __init__(self, data, model, distance, prior_obj, eps_t, theta_t, w_t, sig_t):
+
+        self.data = data
+	self.model = model
+	self.distance = distance
+	self.prior_obj = prior_obj
+	self.eps_t = eps_t
+	self.theta_t = theta_t
+	self.w_t = w_t
+	self.sig_t = sig_t
+       
+
+    def __call__(self , iparticle):
+
+        rho = 1.e37
+        n_params = len(self.theta_t)
+
+        while rho > self.eps_t:
+            
+           theta_star = utils.weighted_sampling(self.theta_t, self.w_t)
+           np.random.seed()
+           theta_starstar = np.random.multivariate_normal(theta_star, self.sig_t, 1)[0]
+           #theta_starstar = multivariate_normal(theta_star, self.sig_t).rvs(size=1)
+           model_starstar = self.model(theta_starstar)
+           rho = self.distance(self.data, model_starstar)
+
+        w_starstar = p_theta / np.sum(self.w_t * \
+                                      utils.better_multinorm(theta_starstar,
+                                                             self.theta_t,
+                                                             self.sig_t) )
+
+        pool_list = [np.int(i_particle)]
+        theta_starstar = np.atleast_1d(theta_starstar)
+        for i_p in xrange(n_params):
+           pool_list.append(theta_starstar[i_p])
+           pool_list.append(w_starstar)
+           pool_list.append(rho)
+
+        return pool_list
+
+"""
 def importance_pool_sampling(args):
-    """
-    """
+
     abc_obj, i_particle = args
 
     rho = 1e37
@@ -50,12 +123,12 @@ def importance_pool_sampling(args):
     pool_list.append(rho)
 
     return pool_list
-
+"""
 
 
 class ABC(object):
 
-    def __init__(self, data, model, distance, prior_obj, eps0, N_threads=1,
+    def __init__(self, data, model, distance, prior_obj, eps0 , N_threads=1,
                  N_particles=100, T=20, basename="abc_run"):
         """
 
@@ -77,45 +150,20 @@ class ABC(object):
         self.T = T
         self.n_params = len(self.prior_obj.prior_dict)
 
-        self.map = Pool(self.N_threads).map
+        #if self.N_threads != 1 :
 
-    def initial_pool_sampling(self, i_partcile):
-        """
-        Sample theta_star from prior distribution for the initial pool
-        returns [i_particle, theta_star, weights, rho]
-
-        Parameters
-        ----------
-        args : [abc_obj, i_particle]
-        abc_obj : ABC class object
-        i_particle : index of particle
-
-        returns    : particle , weight, and its corresponding distance
-
-        """
-
-        rho = 1e37
-
-        while rho > self.eps0:
-            theta_star = self.prior_obj.sampler()
-            model_theta = self.model(theta_star)
-
-            rho = self.distance(self.data, model_theta)
-
-        pool_list = [np.int(i_particle)]
-        for i_param in xrange(self.n_params):
-            pool_list.append(theta_star[i_param])
-        pool_list.append(1./np.float(self.N_particles))
-        pool_list.append(rho)
-
-        return pool_list
+        self.pool = Pool(self.N_threads)
+        self.mapfn  = self.pool.map
+        print self.mapfn
 
     def initial_pool(self):
 
-        abc_obj = self
-
+        
+        wrapper = _Initialpoolsampling(self.eps0 , self.data, self.model, self.distance)#, self.prior_obj)
+                                         
+        print wrapper
+        print wrapper(1)
         args_list = range(self.N_particles)
-        #[i for i in xrange(self.N_particles)]
 
         if self.N_threads == 1:
             results   = []
@@ -123,12 +171,10 @@ class ABC(object):
                 results.append(initial_pool_sampling(arg))
         else:
 
-            #pool = ProcessPool(nodes = self.N_threads)
-            #mapfn = pool.map
-            results = self.map(self.initial_pool_sampling, args_list)
+            results = self.mapfn(wrapper , range(self.N_particles))  #zip([self]*len(args_list), args_list))
 	    pool.close()
-            pool.terminate()
-            pool.join()
+            #pool.terminate()
+            #pool.join()
 
         results = np.array(results).T
         self.theta_t = results[1:self.n_params+1,:]
@@ -145,7 +191,7 @@ class ABC(object):
         """
 
         self.initial_pool()
-
+        print "meh"
         t = 1
 
         while t < self.T:
