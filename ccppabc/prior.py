@@ -46,8 +46,8 @@ class Prior(object):
 
                 priorz.append( norm(loc, scale) )
 
-            else:
-                raise ValueError("Not specified")
+            #else:
+            #    raise ValueError("Not specified")
 
         return priorz
 

@@ -32,7 +32,7 @@ def plot_thetas(theta, w, prior_dict, iterno, basename="abc_run",
                         (prior_dict[key]['min'], prior_dict[key]['max'])
                         )
 
-            elif prior_dict[key]['shape'] == 'gaussian':
+            elif prior_dict[key]['shape'] == 'gauss':
                 param_range.append(
                         (prior_dict[key]['mean'] - 3.0 * prior_dict[key]['stddev'],
                             prior_dict[key]['mean'] + 3.0 * prior_dict[key]['stddev'])
