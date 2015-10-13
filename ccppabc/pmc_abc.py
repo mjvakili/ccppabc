@@ -1,11 +1,10 @@
 """
 PMC-ABC code
 
-Important comment : we have written the sampling in a way that you can turn off
+you can turn off
 multiprocessing by setting the parameter N_threads to 1 and run the code
-in serial. This allows you to troubleshoot the fuck out of your simulator,
-or distance metric if there is anything wrong with them in which case you
-should be ashamed of yourself.
+in serial. This allows you to troubleshoot your simulator,
+or distance metric if there is anything wrong with them.
 Rule of thumb: First run the code in serial to make sure everything is fine,
 and then take advantage of multiprocessing.
 """
