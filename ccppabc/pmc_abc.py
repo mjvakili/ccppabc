@@ -13,36 +13,36 @@ import numpy as np
 import utils
 from plot import plot_thetas
 from multiprocessing.pool import Pool
+from prior import Prior
 
 class _Initialpoolsampling(object):
 
-    def __init__(self, eps_0, data, model, distance):#, prior_obj):
+    def __init__(self, eps_0, data, model, distance, prior_dict):
 
         
         self.data = data
 	self.model = model
 	self.distance = distance
-	#self.prior_obj = prior_obj
+	self.prior_dict = prior_dict
 	self.eps_0 = eps_0
-
+        self.n_params = len(self.prior_dict)
+ 
     def __call__(self, i_particle):
         
         rho = 1.e37
-        n_params = 1 #len(self.prior_obj)
-
+        prior_obj = Prior(self.prior_dict)
         while rho > self.eps_0:
-            theta_star = 0. #self.prior_obj.sampler()
+            theta_star = prior_obj.sampler()
             model_theta = self.model(theta_star)
-            print model_theta
             rho = self.distance(self.data, model_theta)
 
-        # pool_list = [np.int(i_particle)]
-        # for i_param in xrange(n_params):
-        #     pool_list.append(theta_star[i_param])
-        # pool_list.append(1.)
-        # pool_list.append(rho)
+        pool_list = [np.int(i_particle)]
+        for i_param in xrange(self.n_params):
+             pool_list.append(theta_star[i_param])
+        pool_list.append(1.)
+        pool_list.append(rho)
         
-        return np.int(i_particle) , theta_star , 1. , rho
+        return pool_list
 
 
 
@@ -127,51 +127,50 @@ def importance_pool_sampling(args):
 
 class ABC(object):
 
-    def __init__(self, data, model, distance, prior_obj, eps0 , N_threads=1,
+    def __init__(self, data, model, distance, prior_dict, eps0 , N_threads=1,
                  N_particles=100, T=20, basename="abc_run"):
         """
-
         eps0       : initial threshold
         data       : observation or the summary statistcs of the observations
         model      : forward model (simulator function)  of the observation. It takes one particle "theta"
-                  as an input and returns the value of the forward model for that particle.
+                     as an input and returns the value of the forward model for that particle.
         distance   : distance function between the data and the model evaluated at a given theta
-
-        prior_obj  : Prior class object
+        prior_dict : dictionary of model parameters and their priors
         """
+
         self.data = data
         self.model = model
         self.distance = distance
-        self.prior_obj = prior_obj
+        self.prior_dict = prior_dict
         self.eps0 = eps0
         self.N_threads = N_threads
         self.N_particles = N_particles
         self.T = T
-        self.n_params = len(self.prior_obj.prior_dict)
+        self.basename = basename
+        self.n_params = len(self.prior_dict)
 
         #if self.N_threads != 1 :
 
         self.pool = Pool(self.N_threads)
         self.mapfn  = self.pool.map
-        print self.mapfn
 
     def initial_pool(self):
 
         
-        wrapper = _Initialpoolsampling(self.eps0 , self.data, self.model, self.distance)#, self.prior_obj)
+        wrapper = _Initialpoolsampling(self.eps0 , self.data, self.model, self.distance , self.prior_dict)
                                          
-        print wrapper
-        print wrapper(1)
-        args_list = range(self.N_particles)
+        #print wrapper
+        #print wrapper(1)
 
         if self.N_threads == 1:
             results   = []
-            for arg in args_list:
-                results.append(initial_pool_sampling(arg))
+            for i in range(self.N_particles):
+
+                results.append(wrapper(i))
         else:
 
-            results = self.mapfn(wrapper , range(self.N_particles))  #zip([self]*len(args_list), args_list))
-	    pool.close()
+            results = self.mapfn(wrapper , range(self.N_particles))
+	    self.pool.close()
             #pool.terminate()
             #pool.join()
 
@@ -179,9 +178,9 @@ class ABC(object):
         self.theta_t = results[1:self.n_params+1,:]
         self.w_t = results[self.n_params+1,:]
         self.rhos = results[self.n_params+2,:]
-        self.sig_t = utils.covariance(self.theta_t , self.w_t)
+        self.sig_t = 2. * utils.covariance(self.theta_t , self.w_t)
 
-        plot_thetas(self.theta_t, self.w_t, self.prior_obj.prior_dict, 0,
+        plot_thetas(self.theta_t, self.w_t, self.prior_dict, 0,
                     basename=self.basename)
 
     def run_abc(self):
@@ -190,7 +189,6 @@ class ABC(object):
         """
 
         self.initial_pool()
-        print "meh"
         t = 1
 
         while t < self.T:

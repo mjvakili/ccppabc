@@ -52,10 +52,8 @@ class Prior(object):
         return priorz
 
     def set_prior(self, func, arg_list):
-        """ If you want to set your own priors, snobby motherfucker
-        """
 
-        raise NotImplementedError("go fuck yourself")
+        raise NotImplementedError("not implemented yet")
 
     def sampler(self):
         """ Samples the prior distribution to return a vector theta of parameters
