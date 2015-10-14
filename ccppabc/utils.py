@@ -28,18 +28,18 @@ def better_multinorm(theta_stst, theta_before, cov):
     return multinorm
 
 
-def covariance(theta , w , type = 'weighted'):
-
+def covariance(theta , w , type = 'neutral'):
+ 
     if type == 'neutral':
-
-      return np.cov(theta)
-
-    if type == 'normalized neutral':
-
-      return np.corrcoef(theta)
+      if len(theta) == 1:
+        covar =  np.array([[np.cov(theta)]])
+      else:
+        covar =  np.cov(theta)
 
     if type == 'weighted':
       mean = np.sum(theta*w[None,:] , axis = 1)/ np.sum(w)
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
       sigma2 = 1./(w.sum()) * (tmm*w[None,:]).dot(tmm.T)
-      return sigma2
+      covar = sigma2
+    print covar
+    return covar

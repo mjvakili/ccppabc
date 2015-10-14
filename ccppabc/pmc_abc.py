@@ -183,7 +183,7 @@ class ABC(object):
             self.theta_t = results[1:self.n_params+1,:]
             self.w_t = results[self.n_params+1,:]
             self.rhos = results[self.n_params+2,:]
-            self.sig_t = utils.covariance(self.theta_t, self.w_t)
+            self.sig_t = 2. * utils.covariance(self.theta_t, self.w_t)
 
             plot_thetas(self.theta_t, self.w_t, self.prior_dict, t,
                         basename=self.basename,
