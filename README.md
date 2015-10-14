@@ -1,11 +1,7 @@
 # ccppabc
-==========
 
+Approximate Baysian Computation in Python
 
-To run the test suite, simply execute
+## Usage
 
-```
-python scripts/run_tests.py
-```
-
-from this directory
+You can find examples in the scripts directory.
