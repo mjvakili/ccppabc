@@ -63,6 +63,9 @@ histograms = np.loadtxt("group_rich.dat")
 covar_nz = np.cov(nz)
 covar_gr = np.cov(histograms)
 
+#print covar_nz
+#print np.diag(covar_gr)
+
 snr_gr   = 1./np.diag(covar_gr)
 
 avg_nz = np.mean(nz)
@@ -70,7 +73,7 @@ avg_gr  = np.mean(histograms.T , axis = 0)
 
 data = [avg_nz, avg_gr]
 
-print "data=" , data
+#print "data=" , data
 
 data_hod = np.array([1.15 , 0.39, 12.79])
 
@@ -133,9 +136,11 @@ def covariance(theta , w , type = 'weighted'):
       return np.cov(theta)
 
     if type == 'weighted':
+      ww = w.sum() / (w.sum()**2 - (w**2).sum()) 
       mean = np.sum(theta*w[None,:] , axis = 1)/ np.sum(w)
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
-      sigma2 = 1./(w.sum()) * (tmm*w[None,:]).dot(tmm.T)
+      sigma2 = ww * (tmm*w[None,:]).dot(tmm.T)
+      
       return sigma2  
 
 
@@ -174,12 +179,6 @@ class Prior(object):
         return priorz
 
 
-#prior_dict = { 
-#    'alpha': {'shape': 'uniform', 'min': 0.8, 'max': 1.2},
-#    'm_1'  : {'shape': 'uniform', 'min': 13., 'max': 14.},   
-#    'm_min': {'shape': 'uniform', 'min': 11.5, 'max': 12.5}
-#}
-
 prior_dict = { 
     'alpha': {'shape': 'uniform', 'min': 1.05,  'max': 1.25},
     'm_min'  : {'shape': 'uniform', 'min': 12.5,  'max': 13.},   
@@ -215,8 +214,8 @@ import seaborn as seabreeze
 plot_range = []
 for key in ['alpha', 'sigma', 'm_min']: 
 	plot_range.append([prior_dict[key]['min'], prior_dict[key]['max']])
-print plot_range
-#[(0.7, 1.6), (11.0 , 13.0), (0.1, 0.5) , (11. , 13.0) , (12.5 , 14.)], 
+
+print "prior range is = " plot_range
 
 def plot_thetas(theta , w , t): 
     fig = corner.corner(
@@ -233,14 +232,12 @@ def plot_thetas(theta , w , t):
     
     np.savetxt("/home/mj/public_html/weighted_l2_w_hod3_flat_t"+str(t)+".dat" , w.T)
 
-#plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], 
-#                color='b', bins=80, smooth=1.0
 
-
-N_threads = 20 
-N_particles = 100 
-N_iter = 10
+N_threads = 16 
+N_particles = 200 
+N_iter = 20
 eps0 = np.array([1.e34 , 1.e34])
+
 
 def initial_pool_sampling(i_particle): 
     """ Sample theta_star from prior distribution for the initial pool
