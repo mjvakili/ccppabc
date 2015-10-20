@@ -44,6 +44,25 @@ Our ABC analysis also successfully constrains HOD parameters for these same
 measurements made in SDSS data and our constrained values are consistent with
 previous attempts in the literature.
 
+The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies populate 
+dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding
+galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have 
+so far been imposed using the standard practice of Bayesian inference with likelihood estimation that 
+assumes a functional (often times Gaussian) form of the likelihood. Likelihood free inference methods such 
+as the Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever having to calculate the likelihood. 
+
+In this work, we present ABC in the context of constraining the parameters of the HOD model. For a mock 
+galaxy catalog with known HOD parameters, we use ABC on measurements of a set of observables generated
+through HALOTOOLs, a publicly available ..., to infer tight constraints that reproduce the known HOD paramters. 
+Since ABC does not require computing the likelihood, we include observables beyond galaxy clustering such as 
+the galaxy number density and the galaxy group richness, for which accurately constructing a likelihood is intractable. 
+We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
+specifically the ones that govern the satellite galaxy population. Moreover, the constraints we infer that 
+reproduce the known HOD parameters illustrate the success of ABC in the context of constraining HOD parameters. 
+
+We further extend our ABC method with the above set of observables to constrain HOD parameters for the Sloan 
+Digital Sky Survey Data Release 7 observed galaxy catalog. The constraints we find on the HOD parameters are consistent with 
+(or stronger than) previous constraints in the literature. (Ultimately include more interesting results).
 
 \end{abstract}
 
