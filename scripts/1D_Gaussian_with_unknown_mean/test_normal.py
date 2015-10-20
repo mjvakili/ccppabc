@@ -32,7 +32,7 @@ class ABC_class(object):
         return np.random.normal(post_mean , post_stdev , size=size)
 
     def dist(self,x,y):
-        return np.abs(np.mean(x) - np.mean(y)) + np.abs(np.std(x) - np.std(y))
+        return np.array([np.abs((np.mean(x) - np.mean(y))/np.mean(x)) , np.abs((np.std(x) - np.std(y))/np.std(x))])
     
 
 n = 500
@@ -56,7 +56,7 @@ prior_dict = {
              }
 
 
-test_abc = ABC(test_data, test_simulator, test_dist, prior_dict , eps0 = .2 , T = 20)
+test_abc = ABC(test_data, test_simulator, test_dist, prior_dict , eps0 = [10 ,10] , T = 1)
 
 def run_serial():
 

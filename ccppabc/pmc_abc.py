@@ -1,5 +1,5 @@
 """
-PMC-ABC code
+ABC code
 
 you can turn off
 multiprocessing by setting the parameter N_threads to 1 and run the code
@@ -31,7 +31,8 @@ class _Initialpoolsampling(object):
         
         rho = 1.e37
         prior_obj = Prior(self.prior_dict)
-        while rho > self.eps_0:
+        while np.all(rho > self.eps_0):
+
             theta_star = prior_obj.sampler()
             model_theta = self.model(theta_star)
             rho = self.distance(self.data, model_theta)
@@ -40,9 +41,10 @@ class _Initialpoolsampling(object):
         for i_param in xrange(self.n_params):
              pool_list.append(theta_star[i_param])
         pool_list.append(1.)
-        pool_list.append(rho)
+        for r in rho:
+            pool_list.append(r)
         
-        return pool_list
+        return np.array(pool_list)
 
 
 
@@ -64,7 +66,7 @@ class _Importancepoolsampling(object):
 
         rho = 1.e37
         prior_obj = Prior(self.prior_dict)
-        while rho > self.eps_t:
+        while np.all(rho > self.eps_t):
            theta_star = utils.weighted_sampling(self.theta_t, self.w_t)
            np.random.seed()
            theta_starstar = np.random.multivariate_normal(theta_star, self.sig_t, 1)[0]
@@ -82,10 +84,11 @@ class _Importancepoolsampling(object):
         theta_starstar = np.atleast_1d(theta_starstar)
         for i_param in xrange(self.n_params):
            pool_list.append(theta_starstar[i_param])
-           pool_list.append(w_starstar)
-           pool_list.append(rho)
+        pool_list.append(w_starstar)
+        for r in rho:
+            pool_list.append(r)
 
-        return pool_list
+        return np.array(pool_list)
 
 class ABC(object):
 
@@ -104,7 +107,7 @@ class ABC(object):
         self.model = model
         self.distance = distance
         self.prior_dict = prior_dict
-        self.eps0 = eps0
+        self.eps0 = np.array(eps0)
         self.N_threads = N_threads
         self.N_particles = N_particles
         self.T = T
@@ -139,8 +142,8 @@ class ABC(object):
 
         results = np.array(results).T
         self.theta_t = results[1:self.n_params+1,:]
-        self.w_t = results[self.n_params+1,:]
-        self.rhos = results[self.n_params+2,:]
+        self.w_t = results[self.n_params+1,:] / self.N_particles
+        self.rhos = results[self.n_params+2:,:]
         self.sig_t = 2. * utils.covariance(self.theta_t , self.w_t)
 
         plot_thetas(self.theta_t, self.w_t, self.prior_dict, 0,
@@ -157,7 +160,7 @@ class ABC(object):
         
         while t < self.T:
             
-            self.eps_t = np.percentile(self.rhos, 75)
+            self.eps_t = np.percentile(np.atleast_2d(self.rhos), 75, axis=1)
             print "iteration= " , t , "threshold= " , self.eps_t
            
             importance_wrapper = _Importancepoolsampling(self.eps_t, self.data, self.model, \
@@ -182,7 +185,7 @@ class ABC(object):
 
             self.theta_t = results[1:self.n_params+1,:]
             self.w_t = results[self.n_params+1,:]
-            self.rhos = results[self.n_params+2,:]
+            self.rhos = results[self.n_params+2:,:]
             self.sig_t = 2. * utils.covariance(self.theta_t, self.w_t)
 
             plot_thetas(self.theta_t, self.w_t, self.prior_dict, t,

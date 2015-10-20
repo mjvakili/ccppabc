@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.linalg import cho_factor, cho_solve
 
 def weighted_sampling(theta, w):
 
@@ -28,7 +28,7 @@ def better_multinorm(theta_stst, theta_before, cov):
     return multinorm
 
 
-def covariance(theta , w , type = 'neutral'):
+def covariance(theta , w , type = 'weighted'):
  
     if type == 'neutral':
       if len(theta) == 1:
@@ -37,9 +37,9 @@ def covariance(theta , w , type = 'neutral'):
         covar =  np.cov(theta)
 
     if type == 'weighted':
+      ww = w.sum() / (w.sum()**2. - (w**2.).sum())
       mean = np.sum(theta*w[None,:] , axis = 1)/ np.sum(w)
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
-      sigma2 = 1./(w.sum()) * (tmm*w[None,:]).dot(tmm.T)
-      covar = sigma2
-    print covar
+      covar = ww * (tmm*w[None,:]).dot(tmm.T)
+  
     return covar
