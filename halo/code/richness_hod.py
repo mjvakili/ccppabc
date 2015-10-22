@@ -14,7 +14,7 @@ print 'Data HOD Parameters ', model.param_dict
 
 
 N_threads = 20 
-N_particles = 500 
+N_particles = 100 
 N_iter = 20
 eps0 = np.array([1.e3 , 1.e3])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
@@ -237,6 +237,14 @@ def weighted_sampling(theta, w):
     
     return closest_theta
 
+from scipy import spatial
+
+def knn_sigma(theta, k = 3):
+        tree = spatial.cKDTree(theta.T)
+        _, idxs = tree.query(theta.T , p=2)
+        sigma = np.cov(theta[: , idxs])
+        return sigma
+
 def better_multinorm(theta_stst, theta_before, cov): 
     n_par, n_part = theta_before.shape
     
@@ -260,17 +268,17 @@ print "prior range is = "  , prior_range
 def plot_thetas(theta , w , t): 
     fig = corner.corner(
         theta.T, weights = w.flatten() , truths= data_hod,
-        truth_color="red", plot_datapoints=True, fill_contours=True, levels=[0.68], 
+        truth_color="red", plot_datapoints=True, fill_contours=False, levels=[0.68], 
                 color='k', bins=25, smooth= True, 
         range=plot_range, 
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/richness_hod5_flat_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/richness_hod5_flat_t"+str(t)+".dat" , theta.T)
+    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , theta.T)
     
-    np.savetxt("/home/mj/public_html/weighted_l2_w_hod3_flat_t"+str(t)+".dat" , w.T)
+    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , w.T)
 
 
 
@@ -279,7 +287,7 @@ def initial_pool_sampling(i_particle):
     """ Sample theta_star from prior distribution for the initial pool
     """
     rho = 1.e100
-    while np.all(rho > eps0):
+    while np.all(rho < eps0)==False:
         
         theta_star = prior_sampler()
         model_theta = simz(theta_star)
@@ -315,7 +323,7 @@ def initial_pool():
     theta_t = results[1:n_params+1,:]
     w_t = results[n_params+1,:]
     rhos = results[n_params+2:,:]
-    sig_t = covariance(theta_t , w_t)
+    sig_t = knn_sigma(theta_t , k = 20)
     
     return theta_t, w_t, rhos, sig_t
 
@@ -329,7 +337,7 @@ def importance_pool_sampling(args):
     eps_t = args[4]
     
     rho = 1.e100    
-    while np.all(rho > eps_t):
+    while np.all(rho < eps_t)==False:
         
         theta_star = weighted_sampling(theta_t_1, w_t_1)
         theta_starstar = multivariate_normal( theta_star, sig_t_1 ).rvs(size=1)
@@ -368,7 +376,7 @@ def pmc_abc(N_threads = N_threads):
     
     while t < N_iter: 
         
-        eps_t = np.percentile(np.atleast_2d(rhos), 25, axis=1)
+        eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
         print 'New Distance Threshold Eps_t = ', eps_t , "t=" , t
         
         theta_t_1 = theta_t.copy()
@@ -394,7 +402,7 @@ def pmc_abc(N_threads = N_threads):
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
         rhos = results[n_params+2:,:]
-        sig_t = covariance(theta_t , w_t)
+        sig_t = knn_sigma(theta_t , k = 20)
         
         t += 1
         

@@ -29,9 +29,9 @@ class _Initialpoolsampling(object):
  
     def __call__(self, i_particle):
         
-        rho = 1.e37
+        rho = 1.e100
         prior_obj = Prior(self.prior_dict)
-        while np.all(rho > self.eps_0):
+        while np.all(rho < self.eps_0)==False:
 
             theta_star = prior_obj.sampler()
             model_theta = self.model(theta_star)
@@ -64,13 +64,19 @@ class _Importancepoolsampling(object):
 
     def __call__(self , i_particle):
 
-        rho = 1.e37
+        rho = 1.e100
         prior_obj = Prior(self.prior_dict)
-        while np.all(rho > self.eps_t):
+
+        while np.all(rho < self.eps_t)==False:
+        
            theta_star = utils.weighted_sampling(self.theta_t, self.w_t)
-           np.random.seed()
            theta_starstar = np.random.multivariate_normal(theta_star, self.sig_t, 1)[0]
-           #theta_starstar = multivariate_normal(theta_star, self.sig_t).rvs(size=1)
+        
+           while np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))==False:
+
+              theta_star = utils.weighted_sampling(self.theta_t, self.w_t)
+              theta_starstar = np.random.multivariate_normal(theta_star, self.sig_t).rvs(size=1)
+        
            model_starstar = self.model(theta_starstar)
            rho = self.distance(self.data, model_starstar)
 
