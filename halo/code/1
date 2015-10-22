@@ -6,17 +6,11 @@ plt.switch_backend("Agg")
 from halotools.empirical_models import Zheng07
 from astropy.table import Table
 import corner 
-#import seaborn as seabreeze
+import seaborn as seabreeze
 from scipy.stats import multivariate_normal
 
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
-
-
-N_threads = 20 
-N_particles = 500 
-N_iter = 20
-eps0 = np.array([1.e3 , 1.e3])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
 def richness(group_id): 
     gals = Table() 
@@ -97,19 +91,19 @@ class HODsim(object):
         self.model.param_dict['sigma_logM'] = theta_star[1]
         self.model.param_dict['logM0'] = theta_star[0]
         self.model.param_dict['logM1'] = theta_star[4]
-        #print self.model.param_dict
+        print self.model.param_dict
         a = time.time()
         self.model.populate_mock()
-        #print "pop time", time.time() - a
+        print "pop time", time.time() - a
         a = time.time()
         nz = self.model.mock.number_density
-        #print "nz time" , time.time() - a
+        print "nz time" , time.time() - a
         a = time.time()
         group_id =self. model.mock.compute_fof_group_ids()
-        #print "fof time" , time.time() - a
+        print "fof time" , time.time() - a
         a = time.time()
         group_richness = richness(group_id)
-        #print "rich time" , time.time() - a
+        print "rich time" , time.time() - a
         a = time.time()
         
         
@@ -260,10 +254,10 @@ print "prior range is = "  , prior_range
 def plot_thetas(theta , w , t): 
     fig = corner.corner(
         theta.T, weights = w.flatten() , truths= data_hod,
-        truth_color="red", plot_datapoints=True, fill_contours=True, levels=[0.68], 
-                color='k', bins=25, smooth= True, 
+        truth_color="red", plot_datapoints=True, fill_contours=False, levels=[0.68], 
+                color='k', bins=20, smooth= False, 
         range=plot_range, 
-        labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
+        labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , "$\log M_{1}" ]
         )
     
     plt.savefig("/home/mj/public_html/richness_hod5_flat_t"+str(t)+".png")
@@ -273,12 +267,18 @@ def plot_thetas(theta , w , t):
     np.savetxt("/home/mj/public_html/weighted_l2_w_hod3_flat_t"+str(t)+".dat" , w.T)
 
 
+N_threads = 16 
+N_particles = 10 
+N_iter = 20
+eps0 = np.array([1.e34 , 1.e34])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
 
 def initial_pool_sampling(i_particle): 
     """ Sample theta_star from prior distribution for the initial pool
     """
-    rho = 1.e100
+    theta_star = prior_sampler()
+    model_theta = simz(theta_star)
+    rho = distance(data, model_theta)
     while np.all(rho > eps0):
         
         theta_star = prior_sampler()
@@ -300,16 +300,16 @@ def initial_pool():
 
     args_list = np.arange(N_particles)
     """serial"""
-    #results = [] 
-    #for arg in args_list:  	
-    #    results.append(initial_pool_sampling(arg))
+    results = [] 
+    for arg in args_list:  	
+        results.append(initial_pool_sampling(arg))
     """parallel"""
-    pool = InterruptiblePool(processes = N_threads)
-    mapfn = pool.map
-    results = mapfn(initial_pool_sampling, args_list)
-    pool.close()
-    pool.terminate()
-    pool.join()
+    #pool = InterruptiblePool(processes = N_threads)
+    #mapfn = pool.map
+    #results = mapfn(initial_pool_sampling, args_list)
+    #pool.close()
+    #pool.terminate()
+    #pool.join()
     
     results = np.array(results).T
     theta_t = results[1:n_params+1,:]
@@ -333,10 +333,10 @@ def importance_pool_sampling(args):
         
         theta_star = weighted_sampling(theta_t_1, w_t_1)
         theta_starstar = multivariate_normal( theta_star, sig_t_1 ).rvs(size=1)
-        #print theta_starstar
-        #print prior_range
-        #print np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))        
-        while np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))==False:
+        print theta_starstar
+        print prior_range
+        print np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1])        
+        while np.any((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1])):
           
               theta_star = weighted_sampling(theta_t_1, w_t_1)
               np.random.seed()
@@ -368,28 +368,27 @@ def pmc_abc(N_threads = N_threads):
     
     while t < N_iter: 
         
-        eps_t = np.percentile(np.atleast_2d(rhos), 25, axis=1)
-        print 'New Distance Threshold Eps_t = ', eps_t , "t=" , t
+        eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
+        print 'New Distance Threshold Eps_t = ', eps_t
         
         theta_t_1 = theta_t.copy()
         w_t_1 = w_t.copy()
         sig_t_1 = sig_t.copy()
     
 
+        #pool = InterruptiblePool(processes = N_threads)
+        #mapfn = pool.map
         args_list = [[i, theta_t_1, w_t_1, sig_t_1, eps_t] for i in xrange(N_particles)]
-        """serial"""
-        #results = [] 
-        #for args in args_list: 
-        #    pool_sample = importance_pool_sampling(args)
-        #    results.append( pool_sample )
-        """parallel"""
-        pool = InterruptiblePool(processes = N_threads)
-        mapfn = pool.map
-        results = mapfn(importance_pool_sampling, args_list)
-        pool.close()
-        pool.terminate()
-        pool.join()
+        results = [] 
+        for args in args_list: 
+            pool_sample = importance_pool_sampling(args)
+            results.append( pool_sample )
+        #results = mapfn(importance_pool_sampling, args_list)
+        #pool.close()
+        #pool.terminate()
+        #pool.join()
         
+                 
         results = np.array(results).T
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
