@@ -14,9 +14,9 @@ print 'Data HOD Parameters ', model.param_dict
 
 
 N_threads = 10 
-N_particles = 100 
+N_particles = 500 
 N_iter = 20
-eps0 = np.array([1.e2 , 1.e2])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
+eps0 = np.array([1.e2])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
 def richness(group_id): 
     gals = Table() 
@@ -26,6 +26,11 @@ def richness(group_id):
     grp_richness = grouped_table['dummy'].groups.aggregate(np.sum)
     return grp_richness
 
+#generate data
+
+model.populate_mock()
+group_id = model.mock.compute_fof_group_ids()
+data = richness(group_id)
 
 n_mocks = 1000
 n_bins = 12
@@ -60,7 +65,7 @@ hist_bins[-1] = 10000
 #np.savetxt("nz.dat", avg_nz)
 
 """data and covariance """
-
+"""
 nz = np.loadtxt("nz.dat")
 histograms = np.loadtxt("group_rich.dat")
 
@@ -78,9 +83,8 @@ avg_gr  = np.mean(histograms.T , axis = 0)
 data = [avg_nz, avg_gr]
 
 #alpha , logMmin , sigma_logM , logM0 , logM1
-
+"""
 data_hod = np.array([11.92 , 0.39 , 12.79 , 1.15 , 13.94])
-
 """simulator"""
 
 class HODsim(object): 
@@ -98,33 +102,36 @@ class HODsim(object):
         self.model.param_dict['logM0'] = theta_star[0]
         self.model.param_dict['logM1'] = theta_star[4]
         #print self.model.param_dict
-        a = time.time()
-        self.model.populate_mock()
-        #print "pop time", time.time() - a
-        a = time.time()
-        nz = self.model.mock.number_density
-        #print "nz time" , time.time() - a
-        hist = np.zeros((12))
-        for i in range(1):
-          a = time.time()
-          group_id =self. model.mock.compute_fof_group_ids()
-        #print "fof time" , time.time() - a
-          a = time.time()
-          group_richness = richness(group_id)
-        #print "rich time" , time.time() - a
-          a = time.time()
-          hist_temp, bin_edge = np.histogram(group_richness, bins=hist_bins)
-	  #print hist , hist_temp
-          hist += hist_temp
-          #self.model.populate_mock()          
-        return [nz, hist/1.]
+        #a = time.time()
+        try:
+            self.model.populate_mock()
+            #print "pop time", time.time() - a
+            #a = time.time()
+            #nz = self.model.mock.number_density
+            #print "nz time" , time.time() - a
+            #hist = np.zeros((12))
+            
+            #a = time.time()
+            group_id =self. model.mock.compute_fof_group_ids()
+            #print "fof time" , time.time() - a
+            #a = time.time()
+            group_richness = richness(group_id)
+            #print "rich time" , time.time() - a
+            #a = time.time()
+            #hist_temp, bin_edge = np.histogram(group_richness, bins=hist_bins)
+    	#print hist , hist_temp
+            #hist += hist_temp
+            #self.model.populate_mock()          
+            return group_richness
+        except ValueError:
+            return np.zeros(1000)
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
-
+from scipy.stats import ks_2samp
 """distance"""
 
-def distance(d_data, d_model, type = 'separate distance'): 
+def distance(d_data, d_model, type = 'group distance'): 
     
     if type == 'added distance': 
         dist_nz = np.abs(d_data[0] - d_model[0])/d_data[0]
@@ -137,7 +144,10 @@ def distance(d_data, d_model, type = 'separate distance'):
         dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
         dist_xi = np.sum((d_data[1] - d_model[1])**2. * snr_gr)
         
-        dist = np.array([dist_nz , dist_xi]) 
+        dist = np.array([dist_nz , dist_xi])
+    elif type == 'group distance':
+
+        dist = 1. - ks_2samp(d_data , d_model)[1] 
         
         
     return np.atleast_1d(dist)
@@ -191,11 +201,11 @@ class Prior(object):
 
 prior_dict = {
  
-    'logM0'  : {'shape': 'uniform', 'min': 11  ,  'max': 13},
-    'sigma_logM': {'shape': 'uniform', 'min': 0.1 ,  'max': .6},
-    'logMmin': {'shape': 'uniform', 'min': 12.5,  'max': 13.},   
-    'alpha': {'shape': 'uniform', 'min': 1.05 ,  'max': 1.2},
-    'logM1'  : {'shape': 'uniform', 'min': 13  ,  'max': 15},
+    'logM0'  : {'shape': 'uniform', 'min': 9.  ,  'max': 15.},
+    'sigma_logM': {'shape': 'uniform', 'min': 0. ,  'max': 1.},
+    'logMmin': {'shape': 'uniform', 'min': 12.5,  'max': 13.09},   
+    'alpha': {'shape': 'uniform', 'min': .9 ,  'max': 1.45},
+    'logM1'  : {'shape': 'uniform', 'min': 13.6  ,  'max': 14.25},
 }
 n_params = len(prior_dict.keys())
 prior_obj = Prior(prior_dict) 
@@ -283,7 +293,7 @@ def plot_thetas(theta , w , t):
 def initial_pool_sampling(i_particle): 
     """ Sample theta_star from prior distribution for the initial pool
     """
-    rho = 1.e100
+    rho = eps0 + 1.
     while np.all(rho < eps0)==False:
         
         theta_star = prior_sampler()
