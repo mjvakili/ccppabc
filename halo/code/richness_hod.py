@@ -13,10 +13,10 @@ model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
 
-N_threads = 20 
+N_threads = 10 
 N_particles = 100 
 N_iter = 20
-eps0 = np.array([1.e3 , 1.e3])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
+eps0 = np.array([1.e2 , 1.e2])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
 def richness(group_id): 
     gals = Table() 
@@ -104,18 +104,20 @@ class HODsim(object):
         a = time.time()
         nz = self.model.mock.number_density
         #print "nz time" , time.time() - a
-        a = time.time()
-        group_id =self. model.mock.compute_fof_group_ids()
+        hist = np.zeros((12))
+        for i in range(1):
+          a = time.time()
+          group_id =self. model.mock.compute_fof_group_ids()
         #print "fof time" , time.time() - a
-        a = time.time()
-        group_richness = richness(group_id)
+          a = time.time()
+          group_richness = richness(group_id)
         #print "rich time" , time.time() - a
-        a = time.time()
-        
-        
-        hist, bin_edge = np.histogram(group_richness, bins=hist_bins)
-        
-        return [nz, hist]
+          a = time.time()
+          hist_temp, bin_edge = np.histogram(group_richness, bins=hist_bins)
+	  #print hist , hist_temp
+          hist += hist_temp
+          #self.model.populate_mock()          
+        return [nz, hist/1.]
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
@@ -154,12 +156,7 @@ def covariance(theta , w , type = 'weighted'):
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
       sigma2 = ww * (tmm*w[None,:]).dot(tmm.T)
       
-      return sigma2  
-
-
-def KNN_covariance(theta , w):
-
-    return np.cov(theta)
+      return np.diag(np.diag(sigma2))  
 
 """Prior"""
 
@@ -197,7 +194,7 @@ prior_dict = {
     'logM0'  : {'shape': 'uniform', 'min': 11  ,  'max': 13},
     'sigma_logM': {'shape': 'uniform', 'min': 0.1 ,  'max': .6},
     'logMmin': {'shape': 'uniform', 'min': 12.5,  'max': 13.},   
-    'alpha': {'shape': 'uniform', 'min': 1.0 ,  'max': 1.2},
+    'alpha': {'shape': 'uniform', 'min': 1.05 ,  'max': 1.2},
     'logM1'  : {'shape': 'uniform', 'min': 13  ,  'max': 15},
 }
 n_params = len(prior_dict.keys())
@@ -241,7 +238,7 @@ from scipy import spatial
 
 def knn_sigma(theta, k = 3):
         tree = spatial.cKDTree(theta.T)
-        _, idxs = tree.query(theta.T , p=2)
+        _, idxs = tree.query(theta.T , k , p=2)
         sigma = np.cov(theta[: , idxs])
         return sigma
 
@@ -274,11 +271,11 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , theta.T)
+    np.savetxt("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".dat" , theta.T)
     
-    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , w.T)
+    np.savetxt("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".dat" , w.T)
 
 
 
@@ -323,8 +320,8 @@ def initial_pool():
     theta_t = results[1:n_params+1,:]
     w_t = results[n_params+1,:]
     rhos = results[n_params+2:,:]
-    sig_t = knn_sigma(theta_t , k = 20)
-    
+    #sig_t = knn_sigma(theta_t , k = 10)
+    sig_t = covariance(theta_t , w_t)  
     return theta_t, w_t, rhos, sig_t
 
 
@@ -375,8 +372,10 @@ def pmc_abc(N_threads = N_threads):
     
     
     while t < N_iter: 
-        
-        eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
+        if t < 4 :
+           eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
+        else:
+           eps_t = np.percentile(np.atleast_2d(rhos), 75, axis=1)
         print 'New Distance Threshold Eps_t = ', eps_t , "t=" , t
         
         theta_t_1 = theta_t.copy()
@@ -402,8 +401,8 @@ def pmc_abc(N_threads = N_threads):
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
         rhos = results[n_params+2:,:]
-        sig_t = knn_sigma(theta_t , k = 20)
-        
+        #sig_t = knn_sigma(theta_t , k = 10)
+        sig_t = covariance(theta_t , w_t) 
         t += 1
         
         plot_thetas(theta_t, w_t , t)
