@@ -8,7 +8,7 @@ from astropy.table import Table
 import corner 
 #import seaborn as seabreeze
 from scipy.stats import multivariate_normal
-
+from scipy.spatial import cKDtree
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
@@ -168,6 +168,15 @@ def covariance(theta , w , type = 'weighted'):
       
       return np.diag(np.diag(sigma2))  
 
+def knn_cov(x , theta, w,  k):
+
+    tree = cKDtree(theta.T)
+    index = tree.query(x, k, p=2)[1]
+    knn_x = theta.T[index , :]
+    sigma2 = np.cov(knn_x.T)
+    return sigma2
+    
+
 """Prior"""
 
 from scipy.stats import uniform
@@ -243,14 +252,6 @@ def weighted_sampling(theta, w):
     closest_theta = theta[:,index] 
     
     return closest_theta
-
-from scipy import spatial
-
-def knn_sigma(theta, k = 3):
-        tree = spatial.cKDTree(theta.T)
-        _, idxs = tree.query(theta.T , k , p=2)
-        sigma = np.cov(theta[: , idxs])
-        return sigma
 
 def better_multinorm(theta_stst, theta_before, cov): 
     n_par, n_part = theta_before.shape
