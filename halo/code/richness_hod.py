@@ -6,15 +6,14 @@ plt.switch_backend("Agg")
 from halotools.empirical_models import Zheng07
 from astropy.table import Table
 import corner 
-#import seaborn as seabreeze
 from scipy.stats import multivariate_normal
-from scipy.spatial import cKDtree
+from scipy.spatial import cKDTree
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
 
 N_threads = 10 
-N_particles = 500 
+N_particles = 50 
 N_iter = 20
 eps0 = np.array([1.e2])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
 
@@ -36,6 +35,7 @@ n_mocks = 1000
 n_bins = 12
 hist_bins = np.rint(3 * np.logspace(0., 1.2, n_bins+1 ))
 hist_bins[-1] = 10000
+
 #print hist_bins
 
 #histograms = np.zeros((n_mocks , n_bins))
@@ -147,7 +147,7 @@ def distance(d_data, d_model, type = 'group distance'):
         dist = np.array([dist_nz , dist_xi])
     elif type == 'group distance':
 
-        dist = 1. - ks_2samp(d_data , d_model)[1] 
+        dist = ks_2samp(d_data , d_model)[0] 
         
         
     return np.atleast_1d(dist)
@@ -168,13 +168,17 @@ def covariance(theta , w , type = 'weighted'):
       
       return np.diag(np.diag(sigma2))  
 
-def knn_cov(x , theta, w,  k):
+def knn_cov(x , theta,  k):
 
-    tree = cKDtree(theta.T)
+    tree = cKDTree(theta.T)
     index = tree.query(x, k, p=2)[1]
     knn_x = theta.T[index , :]
-    sigma2 = np.cov(knn_x.T)
+    sigma2 = np.cov(knn_x.T) + np.diag(1.e-16*np.ones(x.shape[0]))
     return sigma2
+
+def transition_kernel(x, sigma):
+
+    return multivariate_normal(mean = x , cov = sigma).rvs(1)
     
 
 """Prior"""
@@ -282,11 +286,11 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".dat" , theta.T)
+    np.savetxt("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".dat" , theta.T)
     
-    np.savetxt("/home/mj/public_html/knn5_hod5_flat_t"+str(t)+".dat" , w.T)
+    np.savetxt("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".dat" , w.T)
 
 
 
@@ -331,7 +335,6 @@ def initial_pool():
     theta_t = results[1:n_params+1,:]
     w_t = results[n_params+1,:]
     rhos = results[n_params+2:,:]
-    #sig_t = knn_sigma(theta_t , k = 10)
     sig_t = covariance(theta_t , w_t)  
     return theta_t, w_t, rhos, sig_t
 
@@ -348,16 +351,15 @@ def importance_pool_sampling(args):
     while np.all(rho < eps_t)==False:
         
         theta_star = weighted_sampling(theta_t_1, w_t_1)
-        theta_starstar = multivariate_normal( theta_star, sig_t_1 ).rvs(size=1)
-        #print theta_starstar
-        #print prior_range
-        #print np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))        
+        sigma_star = knn_cov(theta_star , theta_t_1, k = 10)
+        theta_starstar = transition_kernel(theta_star , sigma_star)
+
         while np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))==False:
           
               theta_star = weighted_sampling(theta_t_1, w_t_1)
-              np.random.seed()
-              theta_starstar = multivariate_normal( theta_star, sig_t_1 ).rvs(size=1)
-        
+              sigma_star = knn_cov(theta_star , theta_t_1, k = 10)
+              theta_starstar = transition_kernel(theta_star , sigma_star)
+
         model_starstar = simz(theta_starstar)
         rho = distance(data, model_starstar)
     
