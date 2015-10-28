@@ -12,9 +12,9 @@ model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
 
-N_threads = 10 
-N_particles = 50 
-N_iter = 20
+N_threads = 10
+N_particles = 500 
+N_iter = 40
 eps0 = np.array([1.e34 , 1.e34])#, 1.e34, 1.e34, 1.e34, 1.e34])
 
 def richness(group_id): 
@@ -30,7 +30,7 @@ def richness(group_id):
 model.populate_mock()
 group_id = model.mock.compute_fof_group_ids()
 data_richness = richness(group_id)
-
+np.savetxt("richness.dat" , data_richness)
 nz = np.loadtxt("nz.dat")
 covar_nz = np.cov(nz)
 avg_nz = np.mean(nz)
@@ -130,7 +130,7 @@ class HODsim(object):
             #self.model.populate_mock()          
             return [nz , group_richness]
         except ValueError:
-            return np.zeros(1000)
+            return [0 , np.zeros(10000)]
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
