@@ -15,7 +15,7 @@ print 'Data HOD Parameters ', model.param_dict
 N_threads = 10 
 N_particles = 50 
 N_iter = 20
-eps0 = np.array([1.e2])# , 1.e34, 1.e34, 1.e34, 1.e34, 1.e34])
+eps0 = np.array([1.e34 , 1.e34])#, 1.e34, 1.e34, 1.e34, 1.e34])
 
 def richness(group_id): 
     gals = Table() 
@@ -29,12 +29,18 @@ def richness(group_id):
 
 model.populate_mock()
 group_id = model.mock.compute_fof_group_ids()
-data = richness(group_id)
+data_richness = richness(group_id)
 
-n_mocks = 1000
-n_bins = 12
-hist_bins = np.rint(3 * np.logspace(0., 1.2, n_bins+1 ))
-hist_bins[-1] = 10000
+nz = np.loadtxt("nz.dat")
+covar_nz = np.cov(nz)
+avg_nz = np.mean(nz)
+
+data = [avg_nz , data_richness]
+print data[0]
+print data[1]
+
+#n_mocks = 1000
+#n_bins = 12
 
 #print hist_bins
 
@@ -107,7 +113,7 @@ class HODsim(object):
             self.model.populate_mock()
             #print "pop time", time.time() - a
             #a = time.time()
-            #nz = self.model.mock.number_density
+            nz = self.model.mock.number_density
             #print "nz time" , time.time() - a
             #hist = np.zeros((12))
             
@@ -122,7 +128,7 @@ class HODsim(object):
     	#print hist , hist_temp
             #hist += hist_temp
             #self.model.populate_mock()          
-            return group_richness
+            return [nz , group_richness]
         except ValueError:
             return np.zeros(1000)
 
@@ -147,8 +153,9 @@ def distance(d_data, d_model, type = 'group distance'):
         dist = np.array([dist_nz , dist_xi])
     elif type == 'group distance':
 
-        dist = ks_2samp(d_data , d_model)[0] 
-        
+        dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
+        dist_ri = ks_2samp(d_data[1] , d_model[1])[0] 
+        dist = np.array([dist_nz , dist_ri])
         
     return np.atleast_1d(dist)
 
@@ -166,7 +173,7 @@ def covariance(theta , w , type = 'weighted'):
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
       sigma2 = ww * (tmm*w[None,:]).dot(tmm.T)
       
-      return np.diag(np.diag(sigma2))  
+      return sigma2  
 
 def knn_cov(x , theta,  k):
 
@@ -251,7 +258,7 @@ def weighted_sampling(theta, w):
     #rand1 = np.random.random(1)
     #cdf_closest_index = np.argmin( np.abs(w_cdf - rand1) )
     #closest_theta = theta[:, cdf_closest_index]
-    
+    np.random.seed()    
     index = np.random.choice(range(N_particles), 1, p = w/np.sum(w))[0]
     closest_theta = theta[:,index] 
     
@@ -334,6 +341,7 @@ def initial_pool():
     results = np.array(results).T
     theta_t = results[1:n_params+1,:]
     w_t = results[n_params+1,:]
+    w_t = w_t / np.sum(w_t)
     rhos = results[n_params+2:,:]
     sig_t = covariance(theta_t , w_t)  
     return theta_t, w_t, rhos, sig_t
@@ -347,7 +355,7 @@ def importance_pool_sampling(args):
     sig_t_1 = args[3]
     eps_t = args[4]
     
-    rho = 1.e100    
+    rho = eps_t + 1.   
     while np.all(rho < eps_t)==False:
         
         theta_star = weighted_sampling(theta_t_1, w_t_1)
@@ -365,7 +373,7 @@ def importance_pool_sampling(args):
     
     p_theta = pi_priors(theta_starstar)
     w_starstar = p_theta/np.sum( w_t_1 * better_multinorm(theta_starstar, theta_t_1, sig_t_1) )    
-    
+     
     pool_list = [np.int(i_particle)]
     for i_p in xrange(n_params): 
         pool_list.append(theta_starstar[i_p])
@@ -379,6 +387,7 @@ def pmc_abc(N_threads = N_threads):
     
     # initial pool
     theta_t, w_t, rhos, sig_t = initial_pool()
+    w_t = w_t/np.sum(w_t)
     t = 0 # iternation number
     
     plot_thetas(theta_t , w_t, t)
@@ -398,24 +407,25 @@ def pmc_abc(N_threads = N_threads):
 
         args_list = [[i, theta_t_1, w_t_1, sig_t_1, eps_t] for i in xrange(N_particles)]
         """serial"""
-        #results = [] 
-        #for args in args_list: 
-        #    pool_sample = importance_pool_sampling(args)
-        #    results.append( pool_sample )
+        results = [] 
+        for args in args_list: 
+            pool_sample = importance_pool_sampling(args)
+            results.append( pool_sample )
         """parallel"""
-        pool = InterruptiblePool(processes = N_threads)
-        mapfn = pool.map
-        results = mapfn(importance_pool_sampling, args_list)
-        pool.close()
-        pool.terminate()
-        pool.join()
+        #pool = InterruptiblePool(processes = N_threads)
+        #mapfn = pool.map
+        #results = mapfn(importance_pool_sampling, args_list)
+        #pool.close()
+        #pool.terminate()
+        #pool.join()
         
         results = np.array(results).T
         theta_t = results[1:n_params+1,:]
         w_t = results[n_params+1,:]
+        w_t = w_t/np.sum(w_t)
         rhos = results[n_params+2:,:]
         #sig_t = knn_sigma(theta_t , k = 10)
-        sig_t = covariance(theta_t , w_t) 
+        sig_t = 2. * covariance(theta_t , w_t) 
         t += 1
         
         plot_thetas(theta_t, w_t , t)
