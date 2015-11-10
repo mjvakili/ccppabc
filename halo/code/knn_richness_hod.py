@@ -12,8 +12,8 @@ model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
 
-N_threads = 20
-N_particles = 500 
+N_threads = 10
+N_particles = 100 
 N_iter = 40
 eps0 = np.array([1.e34 , 1.e34])#, 1.e34, 1.e34, 1.e34, 1.e34])
 
@@ -168,11 +168,10 @@ def covariance(theta , w , type = 'weighted'):
       return np.cov(theta)
 
     if type == 'weighted':
-      #ww = w.sum() / (w.sum()**2 - (w**2).sum()) 
+      ww = w.sum() / (w.sum()**2 - (w**2).sum()) 
       mean = np.sum(theta*w[None,:] , axis = 1)/ np.sum(w)
       tmm  = theta - mean.reshape(theta.shape[0] , 1)
-      #sigma2 = ww*(tmm*w[None,:]).dot(tmm.T)
-      sigma2 = (tmm*w[None,:]).dot(tmm.T)
+      sigma2 = ww * (tmm*w[None,:]).dot(tmm.T)
       
       return sigma2  
 
@@ -294,11 +293,11 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".dat" , theta.T)
+    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , theta.T)
     
-    np.savetxt("/home/mj/public_html/ksdistant_hod5_flat_t"+str(t)+".dat" , w.T)
+    np.savetxt("/home/mj/public_html/knn_hod5_flat_t"+str(t)+".dat" , w.T)
 
 
 
@@ -344,7 +343,7 @@ def initial_pool():
     w_t = results[n_params+1,:]
     w_t = w_t / np.sum(w_t)
     rhos = results[n_params+2:,:]
-    sig_t = 2. * covariance(theta_t , w_t)  
+    sig_t = covariance(theta_t , w_t)  
     return theta_t, w_t, rhos, sig_t
 
 
@@ -360,19 +359,18 @@ def importance_pool_sampling(args):
     while np.all(rho < eps_t)==False:
         
         theta_star = weighted_sampling(theta_t_1, w_t_1)
-        #sigma_star = knn_cov(theta_star , theta_t_1, k = 10)                 #knn stuff
-        #theta_starstar = transition_kernel(theta_star , sigma_star)          #knn stuff
-        theta_starstar = transition_kernel(theta_star , sig_t_1)
+        sigma_star = knn_cov(theta_star , theta_t_1, k = 10)
+        theta_starstar = transition_kernel(theta_star , sigma_star)
 
         while np.all((prior_range[:,0] < theta_starstar)&(theta_starstar < prior_range[:,1]))==False:
           
               theta_star = weighted_sampling(theta_t_1, w_t_1)
-              #sigma_star = knn_cov(theta_star , theta_t_1, k = 10)           #knn stuff
-              theta_starstar = transition_kernel(theta_star , sig_t_1)
+              sigma_star = knn_cov(theta_star , theta_t_1, k = 10)
+              theta_starstar = transition_kernel(theta_star , sigma_star)
 
         model_starstar = simz(theta_starstar)
         rho = distance(data, model_starstar)
-    #print "pass" 
+    
     p_theta = pi_priors(theta_starstar)
     w_starstar = p_theta/np.sum( w_t_1 * better_multinorm(theta_starstar, theta_t_1, sig_t_1) )    
      
@@ -397,9 +395,9 @@ def pmc_abc(N_threads = N_threads):
     
     while t < N_iter: 
         if t < 4 :
-           eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
+           eps_t = np.percentile(np.atleast_2d(rhos), 20, axis=1)
         else:
-           eps_t = np.percentile(np.atleast_2d(rhos), 75, axis=1)
+           eps_t = np.percentile(np.atleast_2d(rhos), 50, axis=1)
         print 'New Distance Threshold Eps_t = ', eps_t , "t=" , t
         
         theta_t_1 = theta_t.copy()
@@ -409,7 +407,7 @@ def pmc_abc(N_threads = N_threads):
 
         args_list = [[i, theta_t_1, w_t_1, sig_t_1, eps_t] for i in xrange(N_particles)]
         """serial"""
-        #results = [] 
+        results = [] 
         #for args in args_list: 
         #    pool_sample = importance_pool_sampling(args)
         #    results.append( pool_sample )
