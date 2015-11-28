@@ -19,38 +19,12 @@ from scipy.stats import ks_2samp
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
-def richness(group_id): 
-    gals = Table() 
-    gals['groupid'] = group_id
-    gals['dummy'] = 1
-    grouped_table = gals.group_by('groupid')
-    grp_richness = grouped_table['dummy'].groups.aggregate(np.sum)
-    return grp_richness
 
-""" data and covariance matrix"""
+mocks = np.loadtxt("xir.dat")
+data = np.mean(mocks , axis = 0)
 
-n_avg = 20
-avg_corr = np.zeros((14))
 
-for i in xrange(n_avg):
-
-    model.populate_mock()
-
-    # number density
-    avg_nz += model.mock.number_density
-
-    # 6th element of xi(r) array
-    r, xi_r = model.mock.compute_galaxy_clustering(N_threads=1)
-
-    try:
-        avg_corr += xi_r
-    except NameError:
-        avg_corr = xi_r
-
-avg_corr /= np.float(n_avg)
-data = avg_corr
-
-zhengcorr = np.array([3.46285183e+03, 1.64749125e+03, 7.80527281e+02,
+zhengerror = np.array([3.46285183e+03, 1.64749125e+03, 7.80527281e+02,
                       3.30492728e+02, 1.38927882e+02, 5.91026616e+01,
                       2.45091664e+01, 1.10830722e+01, 5.76577829e+00,
                       3.14415063e+00, 1.88664838e+00, 1.07786531e+00,
@@ -79,7 +53,6 @@ plot_range = []
 for key in ['logM0', 'sigma_logM', 'logMmin','alpha','logM1']: 
 	plot_range.append([prior_dict[key]['min'], prior_dict[key]['max']])
 prior_range = np.array(plot_range)
-print prior_range[:,0] , prior_range[:,1]
 
 """simulator"""
 
@@ -96,24 +69,21 @@ class HODsim(object):
         self.model.param_dict['logM0'] = theta[0]
         self.model.param_dict['logM1'] = theta[4]
         if np.all((prior_range[:,0] < theta)&(theta < prior_range[:,1])):
-          #print "lame"
           try:
             self.model.populate_mock()
-            #group_id =self. model.mock.compute_fof_group_ids()
-            #group_richness = richness(group_id)
-            self.model.clustering
-            return group_richness
+            r , xi_r = self.model.mock.compute_galaxy_clustering()
+            return xi_r
           except ValueError:
-            return np.ones(1000)*1000.
+            return np.zeros(14)
         else:
-            return np.ones(1000)*1000.
+            return np.zeros(14)
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
 
 """distance"""
 
-def distance(d_data, d_model, type = 'group distance'): 
+def distance(data, model, type = 'cluster distance'): 
     
     if type == 'added distance': 
         dist_nz = np.abs(d_data[0] - d_model[0])/d_data[0]
@@ -123,17 +93,17 @@ def distance(d_data, d_model, type = 'group distance'):
 
     elif type == 'cluster distance':
         
-        dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
-        dist_xi = np.sum((d_data[1] - d_model[1])**2. * snr_gr)
-        
-        dist = np.array([dist_nz , dist_xi])
+        #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
+        dist_xi = np.sum((data - model)**2./zhengerror**2.)
+        dist = dist_xi
+        #print dist
     elif type == 'group distance':
 
         #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
-        dist_ri = ks_2samp(d_data , d_model)[0]**2. 
+        dist = ks_2samp(d_data , d_model)[0]**2. 
         #dist = np.array([dist_nz , dist_ri])
         
-    return dist_ri
+    return dist
 
 
 
@@ -148,7 +118,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/mpi_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/clustering_noerrort"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -158,10 +128,10 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/clustering_now_t"+str(t)+".png")
-
-    np.savetxt("/home/mj/public_html/clustering_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/clustering_w_t"+str(t)+".dat" , w)
+    plt.savefig("/home/mj/public_html/clustering_now_noerrort"+str(t)+".png")
+    plt.close()
+    np.savetxt("/home/mj/public_html/clustering_theta_noerrort"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/clustering_w_noerrort"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
@@ -187,47 +157,6 @@ def sample(T, eps_val, eps_min):
     return pools
 
 T=40
-eps=3.
-pools = sample(T, eps, 1.e-16)
-
-#print pools[-1]
-
-#mpi_pool = mpi_util.MpiPool()
-#sampler = abcpmc.Sampler(N=10, Y=data, postfn=simz, dist=distance, thre)
-#sampler.particle_proposal_cls = abcpmc.ParticleProposal
-
-
-
-
-"""
-if mpi_pool.isMaster():
-       print("start sampling")    
-       pools = []
-for pool in sampler.sample(prior, eps):
-       ##print pool
-       #eps.eps = mpi_util.mpiBCast(pool.eps)
-       ##print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, pool.eps, pool.ratio))
-
-          #for i, (mean, std) in enumerate(zip(np.mean(pool.thetas, axis=0), np.std(pool.thetas, axis=0))):
-          #    print(u"    theta[{0}]: {1:>.4f} \u00B1 {2:>.4f}".format(i, mean,std))
-
-       eps.eps = np.percentile(pool.dists, alpha) # reduce eps value
-       if mpi_pool.isMaster():
-         pools.append(pool)
-         print "apped" 
-
-"""
-"""   
-if mpi_pool.isMaster():
-      print pools
-      thetas = np.vstack([pool.thetas for pool in pools])
-      ws = np.vstack([pool.ws for pool in pools])
-      dists = np.vstack([pool.dists for pool in pools])
-      time = pools.t
-      plot_thetas(thetas , ws , time)
-"""     
-
-
-
- #print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, pool.eps, pool.ratio))
+eps=1.e12
+pools = sample(T, eps, .05)
 

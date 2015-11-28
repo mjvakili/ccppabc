@@ -16,8 +16,8 @@ from abcpmc import mpi_util
 from scipy.stats import ks_2samp
 
 
-model = Zheng07(threshold = -21.)
-print 'Data HOD Parameters ', model.param_dict
+#model = Zheng07(threshold = -21.)
+#print 'Data HOD Parameters ', model.param_dict
 
 def richness(group_id): 
     gals = Table() 
@@ -29,59 +29,31 @@ def richness(group_id):
 
 #generate data
 
-model.populate_mock()
-group_id = model.mock.compute_fof_group_ids()
-data_richness = richness(group_id)
-np.savetxt("richness.dat" , data_richness)
-nz = np.loadtxt("nz.dat")
-covar_nz = np.cov(nz)
-avg_nz = np.mean(nz)
+#model.populate_mock()
+#group_id = model.mock.compute_fof_group_ids()
 
-data = data_richness
-print data.shape
-#n_mocks = 1000
-#n_bins = 12
+"""Load data and variance"""
 
-#print hist_bins
+data = np.loadtxt("data_richness.dat")
+variance = np.loadtxt("variance_richness.dat") - 1.e-11 + 1.e-19
+bins = np.arange(1,61,1)   #binning choice for the group richness distribution
 
-#histograms = np.zeros((n_mocks , n_bins))
-
-#avg_nz = []
-
-#for i in xrange(n_mocks): 
-    
-#    model.populate_mock()
-    
-    # number density
-#    avg_nz.append(model.mock.number_density)
-    
-#     # richness histogram
-#     group_id = model.mock.compute_fof_group_ids()
-#     group_richness = richness(group_id)
-# 
-#     #print 'Group Richness computation takes ', time.time() - hod_time, ' seconds'
-#     hist, bin_edge = np.histogram(group_richness, bins=hist_bins)
-# 
-#     #bin_mid = 0.5 * (bin_edge[1:] + bin_edge[:-1])
-#    
-#     histograms[i,:] = hist
-
-# np.savetxt("group_rich.dat", histograms)
-
-#np.savetxt("nz.dat", avg_nz)
+"""True HOD parameters"""
 
 data_hod = np.array([11.92 , 0.39 , 12.79 , 1.15 , 13.94])
 
-
 """Prior"""
 
-prior = abcpmc.TophatPrior([9.,.1,12.5,.9,13.6],[15.,1.,13.09,1.45,14.25])
+prior = abcpmc.TophatPrior([11.,.1,12.5,1.,13.6],[14.,.6,13.09,1.3,14.25])
+
+#prior = abcpmc.TophatPrior([11.91,.38,12.78,1.1,13.9],[11.92,.4,12.8,1.2,14.])
+
 prior_dict = {
  
-    'logM0'  : {'shape': 'uniform', 'min': 9.  ,  'max': 15.},
-    'sigma_logM': {'shape': 'uniform', 'min': 0. ,  'max': 1.},
+    'logM0'  : {'shape': 'uniform', 'min': 11.  ,  'max': 14.},
+    'sigma_logM': {'shape': 'uniform', 'min': .1 ,  'max': .6},
     'logMmin': {'shape': 'uniform', 'min': 12.5,  'max': 13.09},   
-    'alpha': {'shape': 'uniform', 'min': .9 ,  'max': 1.45},
+    'alpha': {'shape': 'uniform', 'min': 1. ,  'max': 1.3},
     'logM1'  : {'shape': 'uniform', 'min': 13.6  ,  'max': 14.25},
 }
 
@@ -108,23 +80,23 @@ class HODsim(object):
         self.model.param_dict['logM0'] = theta[0]
         self.model.param_dict['logM1'] = theta[4]
         if np.all((prior_range[:,0] < theta)&(theta < prior_range[:,1])):
-          #print "lame"
           try:
             self.model.populate_mock()
             group_id =self. model.mock.compute_fof_group_ids()
             group_richness = richness(group_id)
-            return group_richness
+            y = np.histogram(group_richness ,bins , normed="True")[0]
+            return y
           except ValueError:
-            return np.ones(1000)*1000.
+            return np.ones(59)*1000.
         else:
-            return np.ones(1000)*1000.
+            return np.ones(59)*1000.
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
 
 """distance"""
 
-def distance(d_data, d_model, type = 'group distance'): 
+def distance(data, model, type = 'group distance'): 
     
     if type == 'added distance': 
         dist_nz = np.abs(d_data[0] - d_model[0])/d_data[0]
@@ -140,8 +112,9 @@ def distance(d_data, d_model, type = 'group distance'):
         dist = np.array([dist_nz , dist_xi])
     elif type == 'group distance':
 
-        #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
-        dist_ri = ks_2samp(d_data , d_model)[0]**2. 
+        dist_ri = np.sqrt(np.sum(((data - model)**2. / variance)))
+        #print dist_ri
+        #dist_ri = ks_2samp(d_data[d_data>4] , d_model[d_model>4])[0]**2. 
         #dist = np.array([dist_nz , dist_ri])
         
     return dist_ri
@@ -154,12 +127,12 @@ def plot_thetas(theta , w , t):
     fig = corner.corner(
         theta, weights = w.flatten() , truths= data_hod,
         truth_color="red", plot_datapoints=True, fill_contours=False, levels=[0.68], 
-                color='k', bins=25, smooth= True, 
+                color='k', bins=20, smooth= True, 
         range=plot_range, 
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/mpi_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/mpi_knnd_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -169,10 +142,10 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/mpi_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/mpi_knnd_now_t"+str(t)+".png")
 
-    np.savetxt("/home/mj/public_html/richness_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/richness_w_t"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/richness_knnd_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/richness_knnd_w_t"+str(t)+".dat" , w)
 
 
 #alpha = 75
@@ -181,15 +154,21 @@ def plot_thetas(theta , w , t):
 #eps_min = 10.**-6.
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N=500, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N = 500, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
+    #abcpmc.Sampler.particle_proposal_kwargs = {'k': 50}
+    #abcpmc_sampler.particle_proposal_cls = abcpmc.KNNParticleProposal
     eps = abcpmc.ConstEps(T, eps_val)
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
         print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, eps(pool.t), pool.ratio))
         plot_thetas(pool.thetas , pool.ws,pool.t)
-        
-        eps.eps = np.percentile(pool.dists, 75)
+        if pool.t<3: 
+            eps.eps = np.percentile(pool.dists, 90)
+            #abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
+        elif pool.t>2:
+            eps.eps = np.percentile(pool.dists, 75)
+            #abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
         if eps.eps < eps_min:
             eps.eps = eps_min
             
@@ -199,48 +178,6 @@ def sample(T, eps_val, eps_min):
     
     return pools
 
-T=40
-eps=3.
-pools = sample(T, eps, 1.e-16)
-
-#print pools[-1]
-
-#mpi_pool = mpi_util.MpiPool()
-#sampler = abcpmc.Sampler(N=10, Y=data, postfn=simz, dist=distance, thre)
-#sampler.particle_proposal_cls = abcpmc.ParticleProposal
-
-
-
-
-"""
-if mpi_pool.isMaster():
-       print("start sampling")    
-       pools = []
-for pool in sampler.sample(prior, eps):
-       ##print pool
-       #eps.eps = mpi_util.mpiBCast(pool.eps)
-       ##print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, pool.eps, pool.ratio))
-
-          #for i, (mean, std) in enumerate(zip(np.mean(pool.thetas, axis=0), np.std(pool.thetas, axis=0))):
-          #    print(u"    theta[{0}]: {1:>.4f} \u00B1 {2:>.4f}".format(i, mean,std))
-
-       eps.eps = np.percentile(pool.dists, alpha) # reduce eps value
-       if mpi_pool.isMaster():
-         pools.append(pool)
-         print "apped" 
-
-"""
-"""   
-if mpi_pool.isMaster():
-      print pools
-      thetas = np.vstack([pool.thetas for pool in pools])
-      ws = np.vstack([pool.ws for pool in pools])
-      dists = np.vstack([pool.dists for pool in pools])
-      time = pools.t
-      plot_thetas(thetas , ws , time)
-"""     
-
-
-
- #print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, pool.eps, pool.ratio))
-
+T = 40
+eps = 60
+pools = sample(T, eps, 5.)
