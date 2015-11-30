@@ -19,19 +19,24 @@ from scipy.stats import ks_2samp
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
+"""data and covariance"""
+mock_nbar = np.loadtxt("mock_nbar.dat")
+data_nbar = np.mean(mock_nbar)
 
-mocks = np.loadtxt("xir.dat")
-data = np.mean(mocks , axis = 0)
+mocks_xir = np.loadtxt("xir.dat")
+data_xir = np.mean(mocks_xir , axis = 0)
 
+data = [data_nbar , data_xir]
 
-zhengerror = np.array([3.46285183e+03, 1.64749125e+03, 7.80527281e+02,
-                      3.30492728e+02, 1.38927882e+02, 5.91026616e+01,
-                      2.45091664e+01, 1.10830722e+01, 5.76577829e+00,
-                      3.14415063e+00, 1.88664838e+00, 1.07786531e+00,
-                      5.54622962e-01, 2.87849970e-01])
+#zhengerror = np.array([3.46285183e+03, 1.64749125e+03, 7.80527281e+02,
+#                      3.30492728e+02, 1.38927882e+02, 5.91026616e+01,
+#                      2.45091664e+01, 1.10830722e+01, 5.76577829e+00,
+#                      3.14415063e+00, 1.88664838e+00, 1.07786531e+00,
+#                      5.54622962e-01, 2.87849970e-01])
 
 covariance = np.loadtxt("clustering_covariance.dat")
 cii = np.diag(covariance)
+covar_nz = np.var(mock_nbar)
 
 """list of true parameters"""
 
@@ -74,12 +79,13 @@ class HODsim(object):
         if np.all((prior_range[:,0] < theta)&(theta < prior_range[:,1])):
           try:
             self.model.populate_mock()
+	    nbar = self.model.mock.number_density
             r , xi_r = self.model.mock.compute_galaxy_clustering()
-            return xi_r
+            return nbar , xi_r
           except ValueError:
-            return np.zeros(14)
+            return 10. , np.zeros(14)
         else:
-            return np.zeros(14)
+            return 10. , np.zeros(14)
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
@@ -96,12 +102,9 @@ def distance(data, model, type = 'cluster distance'):
 
     elif type == 'cluster distance':
         
-        #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
-        #res = data - model
-        
-        dist_xi = np.sum((data - model)**2. / cii)
-
-        dist = dist_xi
+        dist_nbar = (data[0] - model[0])**2. / covar_nz
+        dist_xi = np.sum((data[1] - model[1])**2. / cii)
+        dist = dist_nbar , dist_xi
         #print dist
     elif type == 'group distance':
 
@@ -124,7 +127,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/clustering_min2covariancet"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_clustering_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -134,25 +137,27 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/clustering_now_min2covariancet"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_clustering_now_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/clustering_theta_min2covariancet"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/clustering_w_min2covariancet"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/nbar_clustering_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_clustering_w_t"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
     abcpmc_sampler = abcpmc.Sampler(N=1000, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
-    eps = abcpmc.ConstEps(T, eps_val)
+    eps = abcpmc.MultiExponentialEps(T , [eps_val , eps_min] , [eps_val , eps_min])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
         print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, eps(pool.t), pool.ratio))
         plot_thetas(pool.thetas , pool.ws, pool.t)
+        """
         if (pool.t < 5):
             eps.eps = np.percentile(pool.dists, 50)
         else:
             eps.eps = np.percentile(pool.dists, 75)
+        """
         if eps.eps < eps_min:
             eps.eps = eps_min
             
@@ -163,6 +168,6 @@ def sample(T, eps_val, eps_min):
     return pools
 
 T=40
-eps=1.e12
-pools = sample(T, eps, 15.)
+eps=1.e9
+pools = sample(T, eps, 10.)
 
