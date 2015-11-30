@@ -124,7 +124,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/clustering_min2covariancet"+str(t)+".png")
+    #plt.savefig("/home/mj/public_html/clustering_min2covariancet"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -134,15 +134,15 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/clustering_now_min2covariancet"+str(t)+".png")
+    #plt.savefig("/home/mj/public_html/clustering_now_min2covariancet"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/clustering_theta_min2covariancet"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/clustering_w_min2covariancet"+str(t)+".dat" , w)
+    #np.savetxt("/home/mj/public_html/clustering_theta_min2covariancet"+str(t)+".dat" , theta)
+    #np.savetxt("/home/mj/public_html/clustering_w_min2covariancet"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N=1000, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N=20, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
     eps = abcpmc.ConstEps(T, eps_val)
     pools = []

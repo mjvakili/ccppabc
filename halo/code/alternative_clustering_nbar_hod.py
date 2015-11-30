@@ -22,7 +22,7 @@ print 'Data HOD Parameters ', model.param_dict
 """data and covariance"""
 mock_nbar = np.loadtxt("mock_nbar.dat")
 data_nbar = np.mean(mock_nbar)
-
+print "nbar=", data_nbar
 mocks_xir = np.loadtxt("xir.dat")
 data_xir = np.mean(mocks_xir , axis = 0)
 
@@ -81,11 +81,11 @@ class HODsim(object):
             self.model.populate_mock()
 	    nbar = self.model.mock.number_density
             r , xi_r = self.model.mock.compute_galaxy_clustering()
-            return nbar , xi_r
+            return [nbar , xi_r]
           except ValueError:
-            return 10. , np.zeros(14)
+            return [10. , np.zeros(14)]
         else:
-            return 10. , np.zeros(14)
+            return [10. , np.zeros(14)]
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
@@ -104,8 +104,8 @@ def distance(data, model, type = 'cluster distance'):
         
         dist_nbar = (data[0] - model[0])**2. / covar_nz
         dist_xi = np.sum((data[1] - model[1])**2. / cii)
-        dist = dist_nbar , dist_xi
-        #print dist
+        dist = [dist_nbar , dist_xi]
+        print dist
     elif type == 'group distance':
 
         #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
@@ -145,21 +145,25 @@ def plot_thetas(theta , w , t):
 
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N=1000, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+
+    abcpmc_sampler = abcpmc.Sampler(N=50, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
-    eps = abcpmc.MultiExponentialEps(T , [eps_val , eps_min] , [eps_val , eps_min])
+    eps = abcpmc.MultiConstEps(T , [1.e41 , 1.e12])
+    #eps = abcpmc.MultiExponentialEps(T,[1.e41 , 1.e12] , [eps_min , eps_min])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
-        print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, eps(pool.t), pool.ratio))
+        print("T: {0}, ratio: {1:>.4f}".format(pool.t, pool.ratio))
+        print eps(pool.t)
+        
         plot_thetas(pool.thetas , pool.ws, pool.t)
-        """
+        
         if (pool.t < 5):
-            eps.eps = np.percentile(pool.dists, 50)
+            eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
         else:
-            eps.eps = np.percentile(pool.dists, 75)
-        """
-        if eps.eps < eps_min:
-            eps.eps = eps_min
+            eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
+        
+        #if eps.eps < eps_min:
+        #    eps.eps = eps_min
             
         pools.append(pool)
         
