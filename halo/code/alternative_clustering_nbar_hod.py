@@ -22,17 +22,10 @@ print 'Data HOD Parameters ', model.param_dict
 """data and covariance"""
 mock_nbar = np.loadtxt("mock_nbar.dat")
 data_nbar = np.mean(mock_nbar)
-print "nbar=", data_nbar
 mocks_xir = np.loadtxt("xir.dat")
 data_xir = np.mean(mocks_xir , axis = 0)
 
 data = [data_nbar , data_xir]
-
-#zhengerror = np.array([3.46285183e+03, 1.64749125e+03, 7.80527281e+02,
-#                      3.30492728e+02, 1.38927882e+02, 5.91026616e+01,
-#                      2.45091664e+01, 1.10830722e+01, 5.76577829e+00,
-#                      3.14415063e+00, 1.88664838e+00, 1.07786531e+00,
-#                      5.54622962e-01, 2.87849970e-01])
 
 covariance = np.loadtxt("clustering_covariance.dat")
 cii = np.diag(covariance)
@@ -92,20 +85,19 @@ simz = ourmodel.sum_stat
 
 """distance"""
 
-def distance(data, model, type = 'cluster distance'): 
+def distance(data, model, type = 'multiple distance'): 
     
     if type == 'added distance': 
         dist_nz = np.abs(d_data[0] - d_model[0])/d_data[0]
         dist_xi = np.sum(np.abs(d_data[1] - d_model[1])/d_data[1])
-        
         dist = dist_nz + dist_xi 
 
-    elif type == 'cluster distance':
+    elif type == 'multiple distance':
         
         dist_nbar = (data[0] - model[0])**2. / covar_nz
         dist_xi = np.sum((data[1] - model[1])**2. / cii)
         dist = [dist_nbar , dist_xi]
-        print dist
+        #print dist
     elif type == 'group distance':
 
         #dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
@@ -146,9 +138,9 @@ def plot_thetas(theta , w , t):
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
 
-    abcpmc_sampler = abcpmc.Sampler(N=50, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N=600, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
-    eps = abcpmc.MultiConstEps(T , [1.e41 , 1.e12])
+    eps = abcpmc.MultiConstEps(T , [1.e42 , 1.e12])
     #eps = abcpmc.MultiExponentialEps(T,[1.e41 , 1.e12] , [eps_min , eps_min])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
