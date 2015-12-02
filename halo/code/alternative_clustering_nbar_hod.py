@@ -119,7 +119,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/nbar_clustering_v3_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_clustering_v4_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -129,10 +129,10 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/nbar_clustering_v3_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_clustering_v4_now_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/nbar_clustering_v3_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/nbar_clustering_v3_w_t"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/nbar_clustering_v4_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_clustering_v4_w_t"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
@@ -140,7 +140,7 @@ def sample(T, eps_val, eps_min):
 
     abcpmc_sampler = abcpmc.Sampler(N=1200, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
-    eps = abcpmc.MultiConstEps(T , [1.e10 , 1.e12])
+    eps = abcpmc.MultiConstEps(T , [1.e13 , 1.e13])
     #eps = abcpmc.MultiExponentialEps(T,[1.e41 , 1.e12] , [eps_min , eps_min])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
@@ -149,15 +149,14 @@ def sample(T, eps_val, eps_min):
         
         plot_thetas(pool.thetas , pool.ws, pool.t)
         
-        if (pool.t < 2):
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
-        elif (pool.t < 3):
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 60 , axis = 0)
+        if (pool.t < 5):
+            #eps.eps = np.percentile(np.atleast_2d(pool.dists), 60 , axis = 0)
+	    eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
         else:
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
-        for i in xrange(len(eps.eps)):
-            if eps.eps[i] < eps_min[i]:
-                eps.eps[i] = eps_min[i]
+            eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
+        #for i in xrange(len(eps.eps)):
+        #    if eps.eps[i] < eps_min[i]:
+        #        eps.eps[i] = eps_min[i]
             
         pools.append(pool)
         

@@ -81,9 +81,9 @@ class HODsim(object):
           try:
             self.model.populate_mock()
 	    nbar = self.model.mock.number_density
-            pos = three_dim_pos_bundle(table=model.mock.galaxy_table,
+            pos = three_dim_pos_bundle(table=self.model.mock.galaxy_table,
                                key1='x', key2='y', key3='z')
-            w_p = wp(pos, rbins, p_bins , period = np.array([L,L,L]))
+            w_p = wp(pos, rbins, pi_bins , period = np.array([L,L,L]))
             return [nbar , w_p]
           except ValueError:
             return [10. , np.zeros(14)]
@@ -129,7 +129,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/nbar_wp_v0_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_wp_v1_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -139,18 +139,18 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/nbar_wp_v0_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_wp_v1_now_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/nbar_wp_v0_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/nbar_wp_v0_w_t"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/nbar_wp_v1_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_wp_v1_w_t"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
 
-    abcpmc_sampler = abcpmc.Sampler(N=1200, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
-    abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
-    eps = abcpmc.MultiConstEps(T , [1.e10 , 1.e12])
+    abcpmc_sampler = abcpmc.Sampler(N=100, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
+    eps = abcpmc.MultiConstEps(T , [1.e6 , 1.e6])
     #eps = abcpmc.MultiExponentialEps(T,[1.e41 , 1.e12] , [eps_min , eps_min])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
@@ -159,15 +159,16 @@ def sample(T, eps_val, eps_min):
         
         plot_thetas(pool.thetas , pool.ws, pool.t)
         
-        if (pool.t < 2):
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
-        elif (pool.t < 3):
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 60 , axis = 0)
+        if (pool.t < 7):
+            eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
+        #elif (pool.t < 3):
+        #    eps.eps = np.percentile(np.atleast_2d(pool.dists), 60 , axis = 0)
         else:
-            eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
-        for i in xrange(len(eps.eps)):
-            if eps.eps[i] < eps_min[i]:
-                eps.eps[i] = eps_min[i]
+            #abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
+            eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
+        #for i in xrange(len(eps.eps)):
+        #    if eps.eps[i] < eps_min[i]:
+        #        eps.eps[i] = eps_min[i]
             
         pools.append(pool)
         
@@ -177,5 +178,5 @@ def sample(T, eps_val, eps_min):
 
 T=40
 eps=1.e9
-pools = sample(T, eps, [1., 13.8])
+pools = sample(T, eps, [.9, 13.])
 
