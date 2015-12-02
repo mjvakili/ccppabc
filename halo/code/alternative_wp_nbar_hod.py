@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 plt.switch_backend("Agg")
-from halotools.empirical_models import Zheng07
+from halotools.empirical_models import Zheng07 , model_defaults
 from astropy.table import Table
 import corner
 from scipy.stats import norm , gamma 
@@ -14,20 +14,28 @@ sns.set_style("white")
 np.random.seed()
 from abcpmc import mpi_util
 from scipy.stats import ks_2samp
+from halotools.sim_manager import supported_sims
+from halotools.empirical_models.mock_helpers import (three_dim_pos_bundle,
+                                                     infer_mask_from_kwargs)
+from halotools.mock_observables.clustering import wp
 
 
+cat = supported_sims.HaloCatalog()
+L = cat.Lbox
+rbins = model_defaults.default_rbins
+pi_bins = np.linspace(0,125,200)
 model = Zheng07(threshold = -21.)
 print 'Data HOD Parameters ', model.param_dict
 
 """data and covariance"""
 mock_nbar = np.loadtxt("mock_nbar.dat")
 data_nbar = np.mean(mock_nbar)
-mocks_xir = np.loadtxt("xir.dat")
-data_xir = np.mean(mocks_xir , axis = 0)
+mocks_wp = np.loadtxt("wps.dat")
+data_wp = np.mean(mocks_wp , axis = 0)
 
-data = [data_nbar , data_xir]
+data = [data_nbar , data_wp]
 
-covariance = np.loadtxt("clustering_covariance.dat")
+covariance = np.loadtxt("wp_covariance.dat")
 cii = np.diag(covariance)
 covar_nz = np.var(mock_nbar)
 
@@ -73,8 +81,10 @@ class HODsim(object):
           try:
             self.model.populate_mock()
 	    nbar = self.model.mock.number_density
-            r , xi_r = self.model.mock.compute_galaxy_clustering()
-            return [nbar , xi_r]
+            pos = three_dim_pos_bundle(table=model.mock.galaxy_table,
+                               key1='x', key2='y', key3='z')
+            w_p = wp(pos, rbins, p_bins , period = np.array([L,L,L]))
+            return [nbar , w_p]
           except ValueError:
             return [10. , np.zeros(14)]
         else:
@@ -119,7 +129,7 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
     
-    plt.savefig("/home/mj/public_html/nbar_clustering_v3_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_wp_v0_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -129,10 +139,10 @@ def plot_thetas(theta , w , t):
         labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
         )
 
-    plt.savefig("/home/mj/public_html/nbar_clustering_v3_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_wp_v0_now_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/nbar_clustering_v3_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/nbar_clustering_v3_w_t"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/nbar_wp_v0_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_wp_v0_w_t"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
@@ -167,5 +177,5 @@ def sample(T, eps_val, eps_min):
 
 T=40
 eps=1.e9
-pools = sample(T, eps, [1., 14.])
+pools = sample(T, eps, [1., 13.8])
 
