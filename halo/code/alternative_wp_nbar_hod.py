@@ -159,7 +159,7 @@ def sample(T, eps_val, eps_min):
         
         plot_thetas(pool.thetas , pool.ws, pool.t)
         
-        if (pool.t < 7):
+        if (pool.t < 6):
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
         #elif (pool.t < 3):
         #    eps.eps = np.percentile(np.atleast_2d(pool.dists), 60 , axis = 0)
