@@ -105,7 +105,7 @@ def distance(data, model, type = 'chisq distance'):
         dist = np.array([dist_nz , dist_xi])
     elif type == 'chisq distance':
 
-        dist_ri = np.sqrt(np.sum(((data - model)**2. / sigma **2.)))
+        dist_ri = np.sum((data - model)**2. / sigma **2.)
         
     return dist_ri
 
@@ -141,7 +141,7 @@ def plot_thetas(theta , w , t):
 #eps_min = 10.**-6.
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N = 500, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N = 100, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
     #abcpmc.Sampler.particle_proposal_kwargs = {'k': 50}
     #abcpmc_sampler.particle_proposal_cls = abcpmc.KNNParticleProposal
