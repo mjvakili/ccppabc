@@ -2,7 +2,7 @@
 \usepackage{graphicx}	% For figures
 \usepackage{natbib}	% For citep and citep
 \usepackage{amsmath}	% for \iint
-\usepackage{bbm}
+\usepackage{bm}
 \usepackage[breaklinks]{hyperref}	% for blackboard bold numbers
 \usepackage{hyperref}
 \hypersetup{colorlinks}
@@ -21,62 +21,37 @@ citecolor=darkblue }
 
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\vep}{\bm{\epsilon}}
+\newcommand{\ep}{\epsilon}
+
 
 \begin{document}
 
-\title{Likelihood free inference with measurements of galaxy clustering, group richness, and number denisty }
+\title{Likelihood free inference of the halo model parameters with simulations of galaxy mock catalogs}
 
 \begin{abstract}
-
-The Halo Occupation Distribution model (HOD) is a powerful prescription for 
-understanding how galaxies populate dark matter halos.
-In this work, we use the Approximate Bayesian Computation method, 
-ABC, in order to explore the parameters of the halo model with mock
-measurements of galaxy number denisty, galaxy clustering, 
-and group richness. These observables are forward-modeled in the ABC
-by populating halo catalogs in the Bolshoi N-body dark matter simulation 
-with the HOD model and making the above measurements on the generated
-galaxy catalogs. We use the publicly available software, 
-HALOTOOLS to perform the forward-modeling and make the mock measurements.
-We find that including group richness in our set of observables leads to stronger
-constraints on the HOD parameters that govern the population of satellite galaxies.
-Our ABC analysis also successfully constrains HOD parameters for these same
-measurements made in SDSS data and our constrained values are consistent with
-previous attempts in the literature.
 
 The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies populate 
 dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding
 galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have 
-so far been imposed using the standard practice of Bayesian inference with likelihood estimation that 
-assumes a functional (often times Gaussian) form of the likelihood. Likelihood free inference methods such 
-as the Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever having to calculate the likelihood. 
-
-In this work, we present ABC in the context of constraining the parameters of the HOD model. For a mock 
-galaxy catalog with known HOD parameters, we use ABC on measurements of a set of observables generated
-through HALOTOOLs, a publicly available ..., to infer tight constraints that reproduce the known HOD paramters. 
+so far been infered using a likelihood function that assumes, \emph{First} a functional (often times Gaussian) form of the likelihood, 
+\emph{Second} analytical model for the galaxy clustering statistics. We use Approximate Bayesian Computation (ABC) 
+in order to infer the HOD parameters by assuming a prior over the parameters and a distance function between 
+statistical summaries of the data and statistical summaries of the simulations.
+Using a mock galaxy catalog created with known HOD parameters, we obtain precise constraints on the HOD parameters that 
+reproduces the summary statistics of the mock galaxy catalog accurately. 
 Since ABC does not require computing the likelihood, we include observables beyond galaxy clustering such as 
 the galaxy number density and the galaxy group richness, for which accurately constructing a likelihood is intractable. 
 We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
 specifically the ones that govern the satellite galaxy population. Moreover, the constraints we infer that 
 reproduce the known HOD parameters illustrate the success of ABC in the context of constraining HOD parameters. 
 
-We further extend our ABC method with the above set of observables to constrain HOD parameters for the Sloan 
-Digital Sky Survey Data Release 7 observed galaxy catalog. The constraints we find on the HOD parameters are consistent with 
-(or stronger than) previous constraints in the literature. (Ultimately include more interesting results).
-
 \end{abstract}
 
 \section{Introduction}
 
-Parameter estimation in cosomlogy is commonly done with Bayesian inference. 
-In the Bayesian framework, constraints on cosmological parameters are achieved by 
-sampling from the posterior distribution, the probability of the parameters of the 
-model given the data. Posteriors are evaluated by multiplying the prior probability 
-distribution of the paramters of the model with the likelihood function, the probability 
-of the observed data given the parameters of the model.
-Therefore, Bayesian inference relies on the evaluation of the likelihood function.
- 
-Evaluation of the likelihood requires on making assumption about the functional 
 form of the likelihood. It is often assumed that the likelihood is Gaussian distribution 
 with a given covariance matrix that needs to be evaluated from simulating a large set of 
 mock catalogs, or other techniques such as bootstrap. In order to 
@@ -119,24 +94,62 @@ employing adaptive importance sampling...
 
 \subsection{Approximate Bayesian Computation}
 
-\subsubsection{basics}
+ABC is a likelihood free method for inference of a set of parameters that are required for the simulation of a 
+physical system, through a forward model, a distance function, and a prior probability distribution over the parameters. 
+Let us denote the the data by $\mathcal{D}$. We assume that there exist a forward model $\mathcal{M}$ that 
+produces a simulation of the data $\bar{\mathcal{D}}$ for a given set of parameters $\bm{\theta}$
+\beq
+\bar{\mathcal{D}}_{\theta} = \mathcal{M}(\bm{\theta})
+\eeq
 
-Talk about generic abc ...
+Furthermore, ABC requires adopting a distance function between the data $\mathcal{D}$ and the simulation $\bar{\mathcal{D}}_{\theta}$.
+The distance function, in general, can be a vector $\bm{d}(\mathcal{D},\bar{\mathcal{D}}_{\theta})$
+\begin{eqnarray}
+\bm{d}(\mathcal{D},\bar{\mathcal{D}}_{\theta}) &=& [d_{1,\theta}, ... , d_{M,\theta}], \\
+d_{i,\theta} &=& d_{i}(\mathcal{S}_{i}(\mathcal{D}), \mathcal{S}_{i}(\bar{\mathcal{D}}_{\theta}))  ~~\mbox{for $i=\{1,...,M\}$},
+\end{eqnarray}
+where $d_{i}(\dot,\dot)$ is a scalar function that defines a distance 
+between $i$-$th$ summary statistics of the data $\mathcal{S}_{i}(\mathcal{D})$ and the same summary statistics of 
+the simulation $\mathcal{S}_{i}(\bar{\mathcal{D}}_{\theta})$, and $M$ is the total number of statistical summaries 
+used in the analysis.
 
-\subsubsection{ABC with adaptive importance sampling}
+ABC algorithm draws a large number of samples from the prior distribution over parameter space, 
+and rejects every sample for which the distance between the data and the simulation corresponding to that 
+sample is not less than a certain threshold $\bm{\epsilon}$. This requirement is satisfied \emph{if and only if}
+every component of the distance vector is less than its corresponding threshold. Note that, each summary statistics 
+has a separate threshold. This procedure is deone iteratively untill, an investigator is left with a certain number 
+of samples that satisfy the distance criteria. The final ensemble approximates the posterior pdf over 
+the paramters of the forward model of the data. This sampling method is called \emph{rejected sampling}.
+
+In practice however, rejected sampling is not desirable because $(i)$ it requires fine tuning of the threshold 
+$\bm{\epsilon}$ whose elements are small, and $(ii)$ finding a large number of samples that pass the threshold 
+criteria is computationally expensive. Alternatively, we draw a large number of proposals from the prior pdf over 
+the HOD parameters with the only requirement that they pass the distance criterion. But since we select an 
+arbitrarily large initial threhold, all th proposals pass the test. Moreover, we assign simillar weights to all 
+the proposals in the initial pool. In the next steps, we draw new proposals from the previos pool through 
+weighted sampling, and we perturb the particles by a kernel that is twice the covariance matrix of the proposals 
+in the previous pool.   
+
+blaalalalal
+
+\subsection{Halo Occupation Distribution}
+
+Halo Occupation distribution is a powerful tool for description of galaxy/halo relation.
 
 
+\section{Summary statistics}
+
+\section{Forward modeling of the galaxy population with HALOTOOLS}
 
 
+\section{Mock data}
 
-
-\section{Data}
-
-
+We use HALOTOOLS to populate halos with galaxies above a certain luminosity threshold $M_r>-20$.
 
 
 \section{Results}
 
+Hello World!
 
 \begin{thebibliography}{70}
 
