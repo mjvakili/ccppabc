@@ -27,9 +27,15 @@ def richness(group_id):
 
 
 """Load data and variance"""
-data = np.loadtxt("gmf_Mr20.dat")
+data_gmf = np.loadtxt("gmf_Mr20.dat")
 sigma = np.loadtxt("gmf_noise_Mr20.dat")
 bins = np.loadtxt("gmf_bins_Mr20.dat")
+
+mock_nbar = np.loadtxt("nbar_Mr20.dat")
+data_nbar = np.mean(mock_nbar)
+covar_nz = np.var(mock_nbar)
+
+data = [data_nbar , data_gmf]
 
 """True HOD parameters"""
 
@@ -75,21 +81,23 @@ class HODsim(object):
         if np.all((prior_range[:,0] < theta)&(theta < prior_range[:,1])):
           try:
             self.model.populate_mock()
+	    nbar = self.model.mock.number_density
             group_id =self. model.mock.compute_fof_group_ids()
             group_richness = richness(group_id)
             y = plt.hist(group_richness , bins)[0] / 250.**3.
-            return y
+            plt.close()
+            return [nbar , y]       
           except ValueError:
-            return np.ones_like(bins)[:-1]*1000.
+            return [10. , np.ones_like(bins)[:-1]*1000.]
         else:
-            return np.ones_like(bins)[:-1]*1000.
+            return [10. , np.ones_like(bins)[:-1]*1000.]
 
 ourmodel = HODsim()
 simz = ourmodel.sum_stat
 
-"""distance"""
 
-def distance(data, model, type = 'chisq distance'): 
+
+def distance(data, model, type = 'multiple distance'): 
     
     if type == 'added distance': 
         dist_nz = np.abs(d_data[0] - d_model[0])/d_data[0]
@@ -97,17 +105,17 @@ def distance(data, model, type = 'chisq distance'):
         
         dist = dist_nz + dist_xi 
 
-    elif type == 'separate distance':
+    elif type == 'multiple distance':
         
-        dist_nz = (d_data[0] - d_model[0])**2. / covar_nz
-        dist_xi = np.sum((d_data[1] - d_model[1])**2. * snr_gr)
+        dist_nz = (data[0] - model[0])**2. / covar_nz
+        dist_gr = np.sum((data[1] - model[1])**2. / sigma**2.)
         
-        dist = np.array([dist_nz , dist_xi])
+        dist = np.array([dist_nz , dist_gr])
     elif type == 'chisq distance':
 
-        dist_ri = np.sum((data - model)**2. / sigma **2.)
+        dist = np.sum((data - model)**2. / sigma **2.)
         
-    return dist_ri
+    return dist
 
 
 def plot_thetas(theta , w , t): 
@@ -119,7 +127,7 @@ def plot_thetas(theta , w , t):
                 plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], 
                 color='b', bins=20, smooth=1.0)
     
-    plt.savefig("/home/mj/public_html/gmf_v0_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_gmf_Mr20_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -129,10 +137,10 @@ def plot_thetas(theta , w , t):
                 plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], 
                 color='b', bins=20, smooth=1.0)
 
-    plt.savefig("/home/mj/public_html/gmf_v0_now_t"+str(t)+".png")
-
-    np.savetxt("/home/mj/public_html/gmf_v0_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/gmf_v0_w_t"+str(t)+".dat" , w)
+    plt.savefig("/home/mj/public_html/nbar_gmf_Mr20_now_t"+str(t)+".png")
+    plt.close()
+    np.savetxt("/home/mj/public_html/nbar_gmf_Mr20_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_gmf_Mr20_w_t"+str(t)+".dat" , w)
 
 
 #alpha = 75
@@ -141,22 +149,24 @@ def plot_thetas(theta , w , t):
 #eps_min = 10.**-6.
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N = 100, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N = 1200, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
     #abcpmc.Sampler.particle_proposal_kwargs = {'k': 50}
     #abcpmc_sampler.particle_proposal_cls = abcpmc.KNNParticleProposal
-    eps = abcpmc.ConstEps(T, 1.e13)
+    eps = abcpmc.ConstEps(T, [1.e13,1.e13])
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
-        print("T: {0}, eps: {1:>.4f}, ratio: {2:>.4f}".format(pool.t, eps(pool.t), pool.ratio))
+        print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
+        print eps(pool.t)
+
         plot_thetas(pool.thetas , pool.ws , pool.t)
         if pool.t<3: 
-            eps.eps = np.percentile(pool.dists, 50)
-        elif pool.t<16:
-            eps.eps = np.percentile(pool.dists, 75)
+            eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
+        elif (pool.t>2)and(pool.t<20):
+            eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
             abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
         else:
-            eps.eps = np.percentile(pool.dists, 85)
+            eps.eps = np.percentile(np.atleast_2d(pool.dists), 90 , axis = 0)
             abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
         #if eps.eps < eps_min:
         #    eps.eps = eps_min

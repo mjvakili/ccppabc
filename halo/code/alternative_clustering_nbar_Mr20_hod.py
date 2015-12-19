@@ -22,7 +22,7 @@ print 'Data HOD Parameters ', model.param_dict
 """data and covariance"""
 #We shouldn't treat a mean of mocks as a data!
 
-#mock_nbar = np.loadtxt("nbar_Mr20.dat")
+mock_nbar = np.loadtxt("nbar_Mr20.dat")
 #data_nbar = np.mean(mock_nbar)
 #mocks_xir = np.loadtxt("xir.dat")
 #data_xir = np.mean(mocks_xir , axis = 0)
@@ -39,19 +39,19 @@ covar_nbar = np.var(mock_nbar)
 
 """list of true parameters"""
 
-data_hod = np.array([11.92 , 0.39 , 12.79 , 1.15 , 13.94])
+data_hod = np.array([11.38 , 0.26 , 12.02 , 1.06 , 13.31])
 
 
 """Prior"""
 
-prior = abcpmc.TophatPrior([9.,.1,12.5,.9,13.6],[15.,1.,13.09,1.45,14.25])
+prior = abcpmc.TophatPrior([10.,.1,11.02,.8,13.],[13.,.5,13.02,1.3,14.])
 prior_dict = {
  
-    'logM0'  : {'shape': 'uniform', 'min': 9.  ,  'max': 15.},
-    'sigma_logM': {'shape': 'uniform', 'min': 0. ,  'max': 1.},
-    'logMmin': {'shape': 'uniform', 'min': 12.5,  'max': 13.09},   
-    'alpha': {'shape': 'uniform', 'min': .9 ,  'max': 1.45},
-    'logM1'  : {'shape': 'uniform', 'min': 13.6  ,  'max': 14.25},
+    'logM0'  : {'shape': 'uniform', 'min': 10.  ,  'max': 13.},
+    'sigma_logM': {'shape': 'uniform', 'min': .1 ,  'max': .5},
+    'logMmin': {'shape': 'uniform', 'min': 11.02,  'max': 13.02},   
+    'alpha': {'shape': 'uniform', 'min': .8 ,  'max': 1.3},
+    'logM1'  : {'shape': 'uniform', 'min': 13.  ,  'max': 14.},
 }
 
 """Plot range"""
@@ -66,7 +66,7 @@ prior_range = np.array(plot_range)
 class HODsim(object): 
     
     def __init__(self): 
-        self.model = Zheng07(threshold = -21.)
+        self.model = Zheng07()
     
     def sum_stat(self, theta):
         
@@ -100,7 +100,7 @@ def distance(data, model, type = 'multiple distance'):
 
     elif type == 'multiple distance':
         
-        dist_nbar = (data[0] - model[0])**2. / covar_nz
+        dist_nbar = (data[0] - model[0])**2. / covar_nbar
         dist_xi = np.sum((data[1] - model[1])**2. / cii)
         dist = [dist_nbar , dist_xi]
         #print dist
@@ -115,32 +115,25 @@ def distance(data, model, type = 'multiple distance'):
 def plot_thetas(theta , w , t): 
     fig = corner.corner(
         theta, weights = w.flatten() , truths= data_hod,
-        truth_color="red", plot_datapoints=True, fill_contours=False, levels=[0.68], 
-                color='k', bins=25, smooth= True, 
-        range=plot_range, 
-        labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
-        )
-    
-    plt.savefig("/home/mj/public_html/nbar_clustering_vmean_t"+str(t)+".png")
-    plt.close()
-    fig = corner.corner(
-        theta , truths= data_hod,
-        truth_color="red", plot_datapoints=True, fill_contours=False, levels=[0.68],
-                color='k', bins=25, smooth= True,
-        range=plot_range,
-        labels=[r"$\log M_{0}$", r"$\sigma_{log M}$", r"$\log M_{min}$" , r"$\alpha$" , r"$\log M_{1}$" ]
-        )
+        labels=[r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'], range=plot_range , quantiles=[0.16,0.5,0.84], show_titles=True, title_args={"fontsize": 12},plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], color = 'b' , bins =20 , smooth = 1.)
 
-    plt.savefig("/home/mj/public_html/nbar_clustering_vmean_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_clustering_Mr20_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/nbar_clustering_vmean_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/nbar_clustering_vmean_w_t"+str(t)+".dat" , w)
+
+    fig = corner.corner(
+        theta, truths= data_hod,
+        labels=[r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'], range=plot_range , quantiles=[0.16,0.5,0.84], show_titles=True, title_args={"fontsize": 12},plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], color = 'b' , bins =20 , smooth = 1.)
+
+    plt.savefig("/home/mj/public_html/nbar_clustering_Mr20_now_t"+str(t)+".png")
+    plt.close()
+    np.savetxt("/home/mj/public_html/nbar_clustering_Mr20_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_clustering_Mr20_w_t"+str(t)+".dat" , w)
 
 
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
 
-    abcpmc_sampler = abcpmc.Sampler(N=1200, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler = abcpmc.Sampler(N=1000, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
     abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
     eps = abcpmc.MultiConstEps(T , [1.e13 , 1.e13])
     #eps = abcpmc.MultiExponentialEps(T,[1.e41 , 1.e12] , [eps_min , eps_min])
@@ -154,7 +147,7 @@ def sample(T, eps_val, eps_min):
         if (pool.t < 3):
             eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
 	    #eps.eps = np.mean(np.atleast_2d(pool.dists), axis = 0)
-        elif (pool.t < 6):
+        elif (pool.t > 2)and(pool.t<20):
             eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
             abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
         else:
