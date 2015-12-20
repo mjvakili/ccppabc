@@ -33,62 +33,23 @@ citecolor=darkblue }
 
 \begin{abstract}
 
-The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies populate 
+The Halo Occupation Distribution model is a powerful prescription of how galaxies populate 
 dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding
 galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have 
-so far been infered using a likelihood function that assumes, \emph{First} a functional (often times Gaussian) form of the likelihood, 
-\emph{Second} analytical model for the galaxy clustering statistics. We use Approximate Bayesian Computation (ABC) 
+so far been infered using a likelihood function that assumes, first a functional---often times Gaussian---form of the likelihood, 
+and Second, an analytical model for the galaxy clustering statistics. We use Approximate Bayesian Computation 
 in order to infer the HOD parameters by assuming a prior over the parameters and a distance function between 
 statistical summaries of the data and statistical summaries of the simulations.
 Using a mock galaxy catalog created with known HOD parameters, we obtain precise constraints on the HOD parameters that 
 reproduces the summary statistics of the mock galaxy catalog accurately. 
 Since ABC does not require computing the likelihood, we include observables beyond galaxy clustering such as 
-the galaxy number density and the galaxy group richness, for which accurately constructing a likelihood is intractable. 
+the galaxy number density and the galaxy group multiplicity function. 
 We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
-specifically the ones that govern the satellite galaxy population. Moreover, the constraints we infer that 
-reproduce the known HOD parameters illustrate the success of ABC in the context of constraining HOD parameters. 
+specifically the ones that govern the population of the satelite galaxies.
 
 \end{abstract}
 
 \section{Introduction}
-
-form of the likelihood. It is often assumed that the likelihood is Gaussian distribution 
-with a given covariance matrix that needs to be evaluated from simulating a large set of 
-mock catalogs, or other techniques such as bootstrap. In order to 
-compute the likelihood funciton, one needs to invert a high dimensional covariance 
-matrix which makes the likelihood evaluation and therefore sampling from the posterior 
-computationally intractable.
-
-Approximate Bayesian Computation, ABC, is a method that eliminates the need for likelihood. 
-In recent years, this technique has been used in a number of cosmological studies, such as 
-the inference of cosmological parameters from modelling of the distances of supernovae type Ia, 
-and modelling of weak lensing peak maps. Exploring the parameter space with ABC algorithm 
-requires three essential ingredients: (1) a prior pdf on the parameters that we wish to estimate, 
-(2) a forward model (simulator) of the observations, and (3) a distance metric for comparing 
-the model and the observed data. In problems where likelihood evaluation is not analytically or 
-computationally tractable, this algorithm bypasses the need for likelihood evaluation.
-
-To date, different variations of ABC algorithm have been introduced  and implemented 
-in the literature. One of the earliest methods is likelihood free Markov Chain Monte 
-Carlo. In this algorithm, an initial draw from the prior is kept, if the distance between 
-the simulated model corresponding to that parameter and the observed data is less than a threshold. 
-In the consequent steps, the proposed parameters are accepted if \emph{first} they satisfy the 
-distance requirement, and \emph{second} the Metropolis-Hasting (MH) acceptance ratio evaluated for the 
-proposal is less than one. In the MH acceptance ratio, the likelihood is replaced with some transition 
-kernel. 
-
-Based on importance sampling, several modifications to this algorithm have been proposed. 
-These methods are called ABC Sequential Monte Carlo (ABC-SMC), or ABC Population Monte Carlo 
-(ABC-PMC). These algorithms rely on sampling a large set of parameters from the prior pdf, and assigning 
-equal weights to them as an initial step. In the subsequent steps, sampling is modified by 
-proposing intermediate distribution built from the previous sample of parameters and their 
-corresponding weights. Parameters are updated by sampling from the intermediate distribution 
-and are accepted if they pass the distance requirements. Furthermore, weights are updated according 
-to the intermediate distribution. 
-
-Talk about importance sampling here ...
-Sampling from the parameter space in ABC algorithm can become more efficient by 
-employing adaptive importance sampling... 
 
 \section{Method}
 
@@ -97,7 +58,7 @@ employing adaptive importance sampling...
 ABC is a likelihood free method for inference of a set of parameters that are required for the simulation of a 
 physical system, through a forward model, a distance function, and a prior probability distribution over the parameters. 
 Let us denote the the data by $\mathcal{D}$. We assume that there exist a forward model $\mathcal{M}$ that 
-produces a simulation of the data $\bar{\mathcal{D}}$ for a given set of parameters $\bm{\theta}$
+simulates the data $\bar{\mathcal{D}}$ for a given set of parameters $\bm{\theta}$
 \beq
 \bar{\mathcal{D}}_{\theta} = \mathcal{M}(\bm{\theta})
 \eeq
@@ -113,43 +74,72 @@ between $i$-$th$ summary statistics of the data $\mathcal{S}_{i}(\mathcal{D})$ a
 the simulation $\mathcal{S}_{i}(\bar{\mathcal{D}}_{\theta})$, and $M$ is the total number of statistical summaries 
 used in the analysis.
 
-ABC algorithm draws a large number of samples from the prior distribution over parameter space, 
-and rejects every sample for which the distance between the data and the simulation corresponding to that 
-sample is not less than a certain threshold $\bm{\epsilon}$. This requirement is satisfied \emph{if and only if}
+We draw a large number of proposals from the prior distribution over the parameter space, 
+and reject the samples for which the distance between the data and the simulation corresponding to that 
+sample is more than a certain threshold $\bm{\epsilon}$. This requirement is satisfied \emph{if and only if}
 every component of the distance vector is less than its corresponding threshold. Note that, each summary statistics 
-has a separate threshold. This procedure is deone iteratively untill, an investigator is left with a certain number 
+has a separate threshold. This procedure is done iteratively untill, we are left with a certain number
 of samples that satisfy the distance criteria. The final ensemble approximates the posterior pdf over 
 the paramters of the forward model of the data. This sampling method is called \emph{rejected sampling}.
 
-In practice however, rejected sampling is not desirable because $(i)$ it requires fine tuning of the threshold 
-$\bm{\epsilon}$ whose elements are small, and $(ii)$ finding a large number of samples that pass the threshold 
-criteria is computationally expensive. Alternatively, we draw a large number of proposals from the prior pdf over 
-the HOD parameters with the only requirement that they pass the distance criterion. But since we select an 
-arbitrarily large initial threhold, all th proposals pass the test. Moreover, we assign simillar weights to all 
-the proposals in the initial pool. In the next steps, we draw new proposals from the previos pool through 
-weighted sampling, and we perturb the particles by a kernel that is twice the covariance matrix of the proposals 
-in the previous pool.   
+Recected sampling is expensive. Instead we use population monte carlo, adaptive importance sampling, ....
 
-blaalalalal
-
-\subsection{Halo Occupation Distribution}
+\subsection{Halo Model}
 
 Halo Occupation distribution is a powerful tool for description of galaxy/halo relation.
 
+...
 
-\section{Summary statistics}
+\subsection{Summary statistics}
+
+Talk about 2pcf, group multiplicity function, and number density ...
 
 \section{Forward modeling of the galaxy population with HALOTOOLS}
+
+Hello World!
+Talk about why it is better to simulate the mock and compute the summary statistics of the mock instead of 
+using analytical formulas...
+
+Talk about all the assumptions that go into analytic formulas...
+
+Talk about why we do not want to write down likelihood function for gmf, 2pcf, ...
+
+...
 
 
 \section{Mock data}
 
-We use HALOTOOLS to populate halos with galaxies above a certain luminosity threshold $M_r>-20$.
+Hello World!
 
+Plots showing 2pcf, gmf, ... of the mock data.
+How we compute the covariance matrix from mocks...
+Talk about error bars. Talk about poisson errors in group populations ...
 
 \section{Results}
 
-Hello World!
+Show the posteriors...
+Show evolution of the posterior errorbars with iteration. Show epsilon. Convice that we are converging ...
+Draw samples from the posterior, populate the mock catalogs with those samples, and compute the summary statistcs with them 
+and demonstrate that they match the data...
+
+\section{Discussion}
+
+talk about cosmological infeence and why this is good first step for likelihood free inference in large scale ...
+
+talk about why it is hard to do cosmology ...
+
+talk about halo model ...
+
+talk about HOD and why it is too simple to be the right model ...
+
+talk about assembly bias perhaps ... and how we can use the same machinery for detection of assemblt bias ... 
+
+talk about writing down a likelihood for gmf, tpcf, ... , and the gaussianity assumption ....
+
+talk about are results ...
+
+
+talk about future directions ...
 
 \begin{thebibliography}{70}
 
