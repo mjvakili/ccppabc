@@ -7,13 +7,11 @@ from astropy.table import Table
 import corner
 from scipy.stats import norm , gamma 
 from scipy.stats import multivariate_normal
-from scipy.spatial import cKDTree
 import abcpmc
 import seaborn as sns
 sns.set_style("white")
 np.random.seed()
 from abcpmc import mpi_util
-from scipy.stats import ks_2samp
 
 
 def richness(group_id): 
@@ -28,8 +26,8 @@ def richness(group_id):
 
 """Load data and variance"""
 data_gmf = np.loadtxt("gmf_Mr20.dat")
-sigma = np.loadtxt("gmf_noise_Mr20.dat")
-bins = np.loadtxt("gmf_bins_Mr20.dat")
+sigma = np.loadtxt("gmf_noise_Mr20_2.dat")
+bins = np.loadtxt("gmf_bins_Mr20_2.dat")
 
 mock_nbar = np.loadtxt("nbar_Mr20.dat")
 data_nbar = np.mean(mock_nbar)
@@ -39,18 +37,18 @@ data = [data_nbar , data_gmf]
 
 """True HOD parameters"""
 
-data_hod = np.array([11.38 , 0.26 , 12.02 , 1.06 , 13.31])
+data_hod = np.array([11.38 , np.log(0.26) , 12.02 , 1.06 , 13.31])
 
 """Prior"""
 
-prior = abcpmc.TophatPrior([10.,.1,11.02,.8,13.],[13.,.5,13.02,1.3,14.])
+prior = abcpmc.TophatPrior([10.,np.log(.1),11.02,.8,13.],[13.,np.log(.7),13.02,1.3,14.])
 
 #prior = abcpmc.TophatPrior([11.91,.38,12.78,1.1,13.9],[11.92,.4,12.8,1.2,14.])
 
 prior_dict = {
  
     'logM0'  : {'shape': 'uniform', 'min': 10.  ,  'max': 13.},
-    'sigma_logM': {'shape': 'uniform', 'min': .1 ,  'max': .5},
+    'sigma_logM': {'shape': 'uniform', 'min': np.log(.1) ,  'max': np.log(.7)},
     'logMmin': {'shape': 'uniform', 'min': 11.02,  'max': 13.02},   
     'alpha': {'shape': 'uniform', 'min': .8 ,  'max': 1.3},
     'logM1'  : {'shape': 'uniform', 'min': 13.  ,  'max': 14.},
@@ -74,7 +72,7 @@ class HODsim(object):
     def sum_stat(self, theta):
         
         self.model.param_dict['logM0'] = theta[0]
-        self.model.param_dict['sigma_logM'] = theta[1]
+        self.model.param_dict['sigma_logM'] = np.exp(theta[1])
         self.model.param_dict['logMmin'] = theta[2]     
         self.model.param_dict['alpha'] = theta[3]
         self.model.param_dict['logM1'] = theta[4]
@@ -84,8 +82,7 @@ class HODsim(object):
 	    nbar = self.model.mock.number_density
             group_id =self. model.mock.compute_fof_group_ids()
             group_richness = richness(group_id)
-            y = plt.hist(group_richness , bins)[0] / 250.**3.
-            plt.close()
+            y = np.histogram(group_richness , bins)[0] / 250.**3.
             return [nbar , y]       
           except ValueError:
             return [10. , np.ones_like(bins)[:-1]*1000.]
@@ -127,7 +124,7 @@ def plot_thetas(theta , w , t):
                 plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], 
                 color='b', bins=20, smooth=1.0)
     
-    plt.savefig("/home/mj/public_html/nbar_gmf_Mr20_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_gmf5_Mr20_t"+str(t)+".png")
     plt.close()
     fig = corner.corner(
         theta , truths= data_hod,
@@ -135,12 +132,12 @@ def plot_thetas(theta , w , t):
                 range=plot_range , quantiles=[0.16,0.5,0.84],
                 show_titles=True, title_args={"fontsize": 12},
                 plot_datapoints=True, fill_contours=True, levels=[0.68, 0.95], 
-                color='b', bins=20, smooth=1.0)
+                color='b', bins=16, smooth=1.0)
 
-    plt.savefig("/home/mj/public_html/nbar_gmf_Mr20_now_t"+str(t)+".png")
+    plt.savefig("/home/mj/public_html/nbar_gmf5_Mr20_now_t"+str(t)+".png")
     plt.close()
-    np.savetxt("/home/mj/public_html/nbar_gmf_Mr20_theta_t"+str(t)+".dat" , theta)
-    np.savetxt("/home/mj/public_html/nbar_gmf_Mr20_w_t"+str(t)+".dat" , w)
+    np.savetxt("/home/mj/public_html/nbar_gmf5_Mr20_theta_t"+str(t)+".dat" , theta)
+    np.savetxt("/home/mj/public_html/nbar_gmf5_Mr20_w_t"+str(t)+".dat" , w)
 
 
 #alpha = 75
@@ -149,8 +146,8 @@ def plot_thetas(theta , w , t):
 #eps_min = 10.**-6.
 mpi_pool = mpi_util.MpiPool()
 def sample(T, eps_val, eps_min):
-    abcpmc_sampler = abcpmc.Sampler(N = 1200, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
-    abcpmc_sampler.particle_proposal_cls = abcpmc.OLCMParticleProposal
+    abcpmc_sampler = abcpmc.Sampler(N = 1000, Y=data, postfn=simz, dist=distance, pool=mpi_pool)
+    abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
     #abcpmc.Sampler.particle_proposal_kwargs = {'k': 50}
     #abcpmc_sampler.particle_proposal_cls = abcpmc.KNNParticleProposal
     eps = abcpmc.ConstEps(T, [1.e13,1.e13])
