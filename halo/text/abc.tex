@@ -29,27 +29,41 @@ citecolor=darkblue }
 
 \begin{document}
 
-\title{Likelihood free inference of the halo model parameters with simulations of galaxy mock catalogs}
+\title{Likelihood free inference of the halo model parameters with group and clustering 
+       statistics of the simulations of galaxy mock catalogs}
 
 \begin{abstract}
 
 The Halo Occupation Distribution model is a powerful prescription of how galaxies populate 
 dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding
 galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have 
-so far been infered using a likelihood function that assumes, first a functional---often times Gaussian---form of the likelihood, 
+so far been infered using a likelihood function that assumes, first a functional---Gaussian---form of the likelihood, 
 and Second, an analytical model for the galaxy clustering statistics. We use Approximate Bayesian Computation 
-in order to infer the HOD parameters by assuming a prior over the parameters and a distance function between 
-statistical summaries of the data and statistical summaries of the simulations.
+in order to infer the HOD parameters by assuming a prior over the parameters, and a distance function between 
+statistical summaries of the data and those of the simulations.
 Using a mock galaxy catalog created with known HOD parameters, we obtain precise constraints on the HOD parameters that 
 reproduces the summary statistics of the mock galaxy catalog accurately. 
 Since ABC does not require computing the likelihood, we include observables beyond galaxy clustering such as 
 the galaxy number density and the galaxy group multiplicity function. 
-We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
-specifically the ones that govern the population of the satelite galaxies.
+We demonstrate that adding these measurements leads to stronger constraints on the HOD parameters, specifically the parameters 
+that control the population of the satellite galaxies.
 
 \end{abstract}
 
 \section{Introduction}
+
+Hogg writes here...
+
+Inference of the cosmological parameters and understanding the formation of galaxies whitihn the context of large scale 
+structure, requires understanding of the Galaxy-Halo connection. Halos are biased tracers of the large scale structure 
+and galaxies reside dark matter Halos. Halo occupation distribution---HOD---is a probabilistic framework that describes how 
+galaxies populate dark matter halos. The central tenet of HOD modeling is that the probability of $N$ galaxies residing a 
+dark matter halo is determined by the mass of the host halo. This statistical prescription for connection of galaxies and halos 
+has been successful in reproducing the galaxy two-point clustring as well as the galaxy-matter cross correlation---galaxy-galaxy 
+lensing---within the context of the halo model, and has been used in understanding teh co-evolution of galaxies and halos and putting 
+constraints on th relation between the stellar mass and halo mass of galaxies.
+
+
 
 \section{Method}
 
