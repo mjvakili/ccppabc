@@ -54,7 +54,7 @@ that control the population of the satellite galaxies.
 
 Hogg writes here...
 
-Inference of the cosmological parameters and understanding the formation of galaxies whitihn the context of large scale 
+Inference of the cosmological parameters and understanding the formation of galaxies within the context of large scale 
 structure, requires understanding of the Galaxy-Halo connection. Halos are biased tracers of the large scale structure 
 and galaxies reside dark matter Halos. Halo occupation distribution---HOD---is a probabilistic framework that describes how 
 galaxies populate dark matter halos. The central tenet of HOD modeling is that the probability of $N$ galaxies residing a 
@@ -62,6 +62,24 @@ dark matter halo is determined by the mass of the host halo. This statistical pr
 has been successful in reproducing the galaxy two-point clustring as well as the galaxy-matter cross correlation---galaxy-galaxy 
 lensing---within the context of the halo model, and has been used in understanding teh co-evolution of galaxies and halos and putting 
 constraints on th relation between the stellar mass and halo mass of galaxies.
+
+In the context of large scale clustering of galaxies, inference of the cosmological and halo model parameters are performed assuming 
+an analytical model for the two-point correlation function of the galaxies, and a gaussian likehood. This Gaussian likelihood approximates 
+the probability of observing the data---observed positions of the galaxies in the configuration space---given the halo model by computing 
+the squared difference of the two-point correlation function measured from the observations and the analytical model for the galaxy 
+clustering, weighted by a covariance matrix. The weighted difference of the number density of the observed galaxies and the analytical 
+number density is often added to this. 
+
+Hogg writes why we do not want to do this .....
+
+
+Approximate bayesian computation (ABC) provides a framework that alleviates the issues arising from approximating the likelihood of 
+observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior 
+probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and 
+their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting 
+the proposals for which the distance between the data and the simulation (measured by a metric) is less than a certain threshold. The 
+procedure described here is rejected sampling. In practice rejected sampling is expensive and instead, investigators change start 
+by sampling from the prior with a large ..........
 
 
 
