@@ -46,9 +46,12 @@ class HODsim(object):
                 if obv == 'nbar': 
                     obvs.append(self.model.mock.number_density)       # nbar of the galaxy catalog
                 elif obv == 'gmf': 
-                    group_id = self. model.mock.compute_fof_group_ids() 
+                    group_id = self.model.mock.compute_fof_group_ids() 
                     group_richness = richness(group_id)         # group richness of the galaxies
                     obvs.append(gmf(group_richness))                 # calculate GMF
+                elif obv == 'xi': 
+                    r, xi_r = self.model.mock.compute_galaxy_clustering()
+                    obvs.append(xi_r)
                 else: 
                     raise NotImplementedError('Only nbar and GMF implemented so far')
 
@@ -68,6 +71,9 @@ class HODsim(object):
                             group_id = self. model.mock.compute_fof_group_ids()
                             group_richness = richness(group_id)         # group richness of the galaxies
                             obvs.append(gmf(group_richness))                 # calculate GMF
+                        elif obv == 'xi': 
+                            r, xi_r = self.model.mock.compute_galaxy_clustering()
+                            obvs.append(xi_r)
                         else: 
                             raise NotImplementedError('Only nbar and GMF implemented so far')
 
@@ -79,4 +85,3 @@ class HODsim(object):
                 else:
                     bins = data_gmf_bins(Mr=20)
                     return [10. , np.ones_like(bins)[:-1]*1000.]
-

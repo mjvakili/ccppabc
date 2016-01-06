@@ -3,12 +3,12 @@
 Plotting modules 
 
 '''
+import util
 import corner
-
 import matplotlib.pyplot as plt
 plt.switch_backend("Agg")
 
-def plot_thetas(theta, w , t, truths=None, plot_range=None): 
+def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=None): 
     '''
     Corner plots of input theta values 
     '''
@@ -29,7 +29,10 @@ def plot_thetas(theta, w , t, truths=None, plot_range=None):
             bins=20,
             smooth=1.0)
     
-    plt.savefig("nbar_gmf5_Mr20_t"+str(t)+".png")
+    fig_file = ''.join([util.fig_dir(), 
+        util.observable_id_flag(observables), 
+        '_Mr', str(Mr), '_t', str(t), '.png'])
+    plt.savefig(fig_file)
     plt.close()
     
     # not weighted
@@ -47,5 +50,8 @@ def plot_thetas(theta, w , t, truths=None, plot_range=None):
             color='b', 
             bins=16, 
             smooth=1.0)
-    plt.savefig("nbar_gmf5_Mr20_now_t"+str(t)+".png")
+    fig_file = ''.join([util.fig_dir(), 
+        util.observable_id_flag(observables), 
+        '_Mr', str(Mr), '_now_t', str(t), '.png'])
+    plt.savefig(fig_file)
     plt.close()
