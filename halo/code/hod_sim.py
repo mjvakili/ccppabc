@@ -4,7 +4,7 @@ HaloTools HOD Simulation
 
 '''
 import numpy as np
-from halotools.empirical_models import Zheng07
+from halotools.empirical_models import PrebuiltHodModelFactory
 
 from data import data_gmf_bins
 from group_richness import gmf 
@@ -19,7 +19,8 @@ class HODsim(object):
         Our model forward models the galaxy catalog using HOD parameters using HaloTools. 
         '''
 
-        self.model = Zheng07()      # Zheng et al. (2007) model
+        #self.model = zheng07()      # Zheng et al. (2007) model
+        self.model = PrebuiltHodModelFactory('zheng07')
     
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         '''

@@ -1,9 +1,6 @@
 import time
 import numpy as np
 
-from scipy.stats import norm , gamma 
-from scipy.stats import multivariate_normal
-
 import abcpmc
 from abcpmc import mpi_util
 
@@ -16,7 +13,7 @@ from group_richness import richness
 # --- Plotting ---
 from plotting import plot_thetas
 
-def abcpmc_nbar_gmf(T, eps_val, N_part=1000): 
+def abcpmc_nbar_gmf(T, eps_val, N_part=1000, threads=1): 
     '''
     '''
     # data observables
@@ -54,6 +51,7 @@ def abcpmc_nbar_gmf(T, eps_val, N_part=1000):
             Y=data,         # data
             postfn=simz,    # simulator 
             dist=multivariate_rho,       # distance function  
+            threads=threads,
             pool=mpi_pool)  
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
 
@@ -84,4 +82,4 @@ def abcpmc_nbar_gmf(T, eps_val, N_part=1000):
     return pools
 
 if __name__=="__main__": 
-    abcpmc_nbar_gmf(2, 60, N_part=10)
+    abcpmc_nbar_gmf(10, 60, N_part=100)
