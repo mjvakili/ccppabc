@@ -5,6 +5,9 @@ Plotting modules
 '''
 import corner
 
+import matplotlib.pyplot as plt
+plt.switch_backend("Agg")
+
 def plot_thetas(theta, w , t, truths=None, plot_range=None): 
     '''
     Corner plots of input theta values 
@@ -26,7 +29,7 @@ def plot_thetas(theta, w , t, truths=None, plot_range=None):
             bins=20,
             smooth=1.0)
     
-    plt.savefig("/home/mj/public_html/nbar_gmf5_Mr20_t"+str(t)+".png")
+    plt.savefig("nbar_gmf5_Mr20_t"+str(t)+".png")
     plt.close()
     
     # not weighted
@@ -44,5 +47,5 @@ def plot_thetas(theta, w , t, truths=None, plot_range=None):
             color='b', 
             bins=16, 
             smooth=1.0)
-    plt.savefig("/home/mj/public_html/nbar_gmf5_Mr20_now_t"+str(t)+".png")
+    plt.savefig("nbar_gmf5_Mr20_now_t"+str(t)+".png")
     plt.close()

@@ -64,8 +64,8 @@ def abcpmc_nbar_gmf(T, eps_val, N_part=1000):
         print eps(pool.t)
 
         plot_thetas(pool.thetas , pool.ws , pool.t, truths=data_hod, plot_range=prior_range)
-        np.savetxt("/../dat/nbar_gmf5_Mr20_theta_t"+str(t)+".dat" , theta)
-        np.savetxt("/../dat/nbar_gmf5_Mr20_w_t"+str(t)+".dat" , w)
+        np.savetxt("/../dat/nbar_gmf5_Mr20_theta_t"+str(pool.t)+".dat" , theta)
+        np.savetxt("/../dat/nbar_gmf5_Mr20_w_t"+str(pool.t)+".dat" , w)
 
         if pool.t < 3: 
             eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
@@ -84,4 +84,4 @@ def abcpmc_nbar_gmf(T, eps_val, N_part=1000):
     return pools
 
 if __name__=="__main__": 
-    abcpmc_nbar_gmf(40, 60, N_part=10)
+    abcpmc_nbar_gmf(2, 60, N_part=10)
