@@ -42,3 +42,24 @@ def data_nbar(Mr=20):
     mock_nbar = np.loadtxt(nbar_dat_file)
 
     return [np.mean(mock_nbar), np.var(mock_nbar)]
+
+def data_xi(Mr=20): 
+    '''
+    Observed xi (2PCF) from 'data'
+    '''
+    xi_dat_file = ''.join([
+        '../dat/', 
+        'xir_Mr', str(Mr), '.dat'
+        ])
+
+    xi = np.loadtxt(xi_dat_file, unpack=True)
+
+    # load covariance of xi 
+    cov_dat_file = ''.join([
+        '../dat/', 
+        'clustering_covariance_Mr', str(Mr), '.dat'
+        ])
+    cov = np.loadtxt(cov_dat_file)
+    cii = np.diag(covariance)   # diagonal elements
+
+    return [xi, cii]
