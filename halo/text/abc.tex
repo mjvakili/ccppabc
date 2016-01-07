@@ -16,7 +16,7 @@
 linkcolor=darkblue,
 filecolor=darkgreen,
 urlcolor=darkred,
-citecolor=darkblue }
+citecolor=darkblue}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
@@ -35,24 +35,34 @@ citecolor=darkblue }
        statistics of the simulations of galaxy mock catalogs}
 
 \begin{abstract}
-{\bf other abstract for reference}\\
-The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies populate dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have so far been imposed using the standard practice of Bayesian inference with likelihood estimation that assumes a functional (often times Gaussian) form of the likelihood. Likelihood free inference methods such as the Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever having to calculate the likelihood. 
+The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies
+populate dark matter halos that has had much success in reproducing large scale galaxy
+clustering and understanding galaxy evolution within the context of the halo model.
+Constraints on the parameters that describe the HOD model have so far been inferred using 
+the standard practice of Bayesian inference with likelihood estimation that assumes a
+functional Gaussian form of the likelihood.\todo{(Do we want to include analytic models for clustering statistics here?)} Likelihood free inference methods such as the
+Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever 
+having to calculate the likelihood. 
 
-In this work, we present ABC in the context of constraining the parameters of the HOD model. For a mock galaxy catalog with known HOD parameters, we use ABC on measurements of a set of observables generated through {\it Halotools}, a publicly available ..., to infer tight constraints that reproduce the known HOD paramters. Since ABC does not require computing the likelihood, we include observables beyond galaxy clustering such as the galaxy number density and the galaxy group richness, for which accurately constructing a likelihood is intractable. We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
- specifically the ones that govern the satellite galaxy population. Moreover, the constraints we infer that reproduce the known HOD parameters illustrate the success of ABC in the context of constraining HOD parameters.
-
-
-
-The Halo Occupation Distribution model is a powerful prescription of how galaxies populate 
-dark matter halos that has had much success in reproducing large scale galaxy clustering and understanding
-galaxy evolution within the context of the halo model. Constraints on the parameters of the HOD model have 
-so far been inferred using a likelihood function that assumes a functional--Gaussian--form of the likelihood
-and an analytic model for the galaxy clustering statistics. Likelihood free inference methods such as the Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever having to calculate the likelihood. 
+In this work, we present ABC in the context of constraining the parameters of the HOD model.
+For a mock galaxy catalog created with HOD parameters selected from literature
+\todo{(Should we specify Zheng07?)}, we use ABC on measurements of a set of observables
+generated through {\it Halotools}, a publicly available \todo{insert description about
+forward modeling of galaxy positions}, to infer precise constraints that reproduce the 
+known HOD parameters. 
 
 In this work, we use ABC in order to infer the HOD parameters by assuming a prior over the parameters, and a distance function between 
 statistical summaries of the data and those of the simulations.
 Using a mock galaxy catalog created with known HOD parameters, we obtain precise constraints on the HOD parameters that 
 reproduces the summary statistics of the mock galaxy catalog accurately. 
+
+
+
+Furthermore, since ABC does not require computing the likelihood, we include observables
+beyond galaxy clustering such as the galaxy number density and the galaxy group 
+multiplicity function, for which accurately constructing a likelihood is intractable. We demonstrate that adding these measurements to our set of observables leads to stronger constraints on the HOD parameters, 
+ specifically the ones that govern the satellite galaxy population. Moreover, the constraints we infer that reproduce the known HOD parameters illustrate the success of ABC in the context of constraining HOD parameters.
+ 
 Since ABC does not require computing the likelihood, we include observable beyond galaxy clustering such as 
 the galaxy number density and the galaxy group multiplicity function. 
 We demonstrate that adding these measurements leads to stronger constraints on the HOD parameters, specifically the parameters 
@@ -75,9 +85,11 @@ In the context of large scale clustering of galaxies, inference of the cosmologi
 
 Furthermore, the likelihood of observing the data---observed positions of the galaxies in the configuration space---given the cosmological and halo model parameters is approximated by a Gaussian function whose argument is the squared difference of the two-point correlation function measured from the observations and the analytic model for the galaxy clustering, weighted by a covariance matrix. The weighted difference of the number density of the observed galaxies and the analytic number density is also added to this. In this work, we investigate the how accurately we can infer the model parameters by relaxing the underlying assumptions of the parameter inference methods. 
 
-Approximate bayesian computation (ABC) provides a \emph{rejected sampling} framework framework that alleviates the issues arising from approximating the likelihood of observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting the proposals for which the distance between the data and the simulation (measured by a metric) is less than a certain small threshold. 
+Approximate bayesian computation (ABC) provides a \emph{rejected sampling} framework framework that alleviates the issues arising from approximating the likelihood of observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting the proposals for which the distance between the data and the simulation (measured by a metric) is less than a certain small threshold.
 
-Furthermore, This sampling formalism permits us to sample the posterior of the model by simulating the data via a forward generative model that accounts for all the complications and uncertainties associated with the survey data that are difficult to take into account in approximating the likelihood function. In the context of the large galaxy surveys, these complications include masks, nontrivial survey geometry, and missing data as a result of fiber collision.
+In practice, the rejected sampling method is replaced by a more efficient adaptive importance sampling operation called Population Monte Carlo (PMC). Initially, PMC rejects the draws from prior pdf with a relatively large threshold. In the consequent steps, importance sampling from the previous samples that passed the distance criteria is performed, and the threshold is updated adaptively. That is, after each iteration, the threshold is lowered according to the distribution of the distances.  
+ 
+Furthermore, This sampling formalism permits us to sample the posterior of the model by simulating the data via a forward generative model that accounts for all the complications and uncertainties associated with the survey data that are difficult to take into account in approximating the likelihood function. In the context of the large galaxy surveys, these complications may include masks, nontrivial survey geometry, and missing data as a result of fiber collision.
 
 Rejected sampling in ABC requires a distance function that quantifies the closeness of the simulation (e.g. fiber collided galaxies) to the data (observed positions of the galaxies in the survey). In principle, this distance metric is a positive definite function  that compares various summary statistics of the data and those of the simulations. In this investigation, we focus on the two-point correlation, number density, and the group statistics (more specifically the abundance of the galaxy group richnesses). 
 
@@ -87,11 +99,13 @@ Computationally, this process is extremely demanding. One way to make this probl
 
 In this work however, we narrow our focus on inferring the posterior probability over the parameters of the halo model using an already existing halo catalog of a dark matter particle N-body simulation with a fixed cosmology. That is we simplify the problem by leaving the problem of emulation for future investigations.
 
-In practice, this rejected sampling method is replaced by a more efficient procedure. Instead, we start by sampling from the prior with a relatively large threshold. In the consequent steps, we iteratively perform importance sampling from the previous samples, and lower the threshold adaptively. 
+The calculations regarding populating the dark matter halos, computing the clustering statistics and finding groups in the galaxy mock catalogs are performed using ({\fontfamily{cmss}\selectfont Halotools}) which is an open-source package tailored for modeling galaxy-halo connection in large scale structure modeling ({\fontfamily{cmss}\selectfont http://halotools.readthedocs.org}).
 
-This method requires a simulator or a forward model of the positions of galaxies given the model parameters. We use the publicly available code Halotools in order to populate the halo catalogs with galaxies brighter than a certain luminosity threshold.
+This paper is structured as follows. In Section \ref{sec:method},
+we discuss the components of the Halo occupation modeling, and the ABC sampling method. We also give a brief overview of the summary statistics used in this investigation. In Section \ref{sec:halo} we give a brief overview of the forward modeling of the galaxy mock catalogs using Halotools as well as generating a mock galaxy catalog as data. In Section \ref{sec:results} we explore the results of our parameter inference using different summary statistics. Finally, we discuss and conclude in Section \ref{sec:discussion}.
 
-\section{Method}
+
+\section{Method}\label{sec:method}
 
 \subsection{Approximate Bayesian Computation}
 
@@ -136,7 +150,7 @@ Halo Occupation distribution is a powerful tool for description of galaxy/halo r
 
 \end{itemize}
 
-\section{Forward modeling of the galaxy population with HALOTOOLS}
+\section{Forward modeling of the galaxy population with HALOTOOLS}\label{sec:halo}
 
 \begin{itemize}
 \item \todo{Halotools allows us to forward model galaxy positions from HOD parameters. From the galaxy positions, we can calculate observable summary statistics such as the 2PCF, Group Multiplicity Function (GMF) and the number density $\bar{n}$.}
@@ -152,12 +166,12 @@ Talk about why we do not want to write down likelihood function for gmf, 2pcf, .
 ...
 
 
-\section{Mock data}
+\subsection{Mock data}
 Plots showing 2pcf, gmf, ... of the mock data.
 How we compute the covariance matrix from mocks...
 Talk about error bars. Talk about poisson errors in group populations ... 
 
-\section{Results}
+\section{Results}\label{sec:results}
 Show the posteriors...
 Show evolution of the posterior errorbars with iteration. Show epsilon. Convice that we are converging ...
 Draw samples from the posterior, populate the mock catalogs with those samples, and compute the summary statistcs with them 
@@ -173,8 +187,8 @@ and demonstrate that they match the data...
 \subsection{ABC Including GMF}
 ABC-PMC results using observables beyond galaxy clustering and nbar(z) GMF
 
-\section{Discussion}
-\todo{talk about cosmological infeence and why this is good first step for likelihood free inference in large scale ...}
+\section{Discussion}\label{sec:discussion}
+\todo{talk about cosmological inference and why this is good first step for likelihood free inference in large scale ...}
 
 \todo{talk about why it is hard to do cosmology ...}
 
@@ -184,7 +198,7 @@ talk about HOD and why it is too simple to be the right model ...
 
 talk about assembly bias perhaps ... and how we can use the same machinery for detection of assemblt bias ... 
 
-talk about writing down a likelihood for gmf, tpcf, ... , and the gaussianity assumption ....
+talk about writing down a likelihood for gmf, tpcf, ... , and the Gaussianity assumption ....
 
 talk about are results ...
 
