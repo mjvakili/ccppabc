@@ -46,17 +46,29 @@ def data_xi(Mr=20, Nmock=500):
 
 # Build observables ---------------
 
-def build_xi(Mr=20): 
+def build_xi_nbar_gmf(Mr=20): 
     '''
-    Build "data" xi values 
+    Build "data" xi, nbar, GMF values and write to file 
     '''
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-    model.populate_mock() 
-    data_xir  = model.mock.compute_galaxy_clustering()[1]
-    
-    output_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
+    model.populate_mock() # population mock realization 
 
+    # write xi 
+    data_xir  = model.mock.compute_galaxy_clustering()[1]
+    output_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, data_xir)
+
+    # write nbar values 
+    nbar = model.mock.number_density
+    output_file = ''.join(['../dat/nbar.Mr', str(Mr), '.dat'])
+    np.savetxt(output_file, [nbar]) 
+    
+    # write GMF 
+    rich = richness(model.mock.compute_fof_group_ids())
+    gmf = GMF(rich)  # GMF
+    output_file = ''.join(['../dat/gmf.Mr', str(Mr), '.dat'])
+    np.savetxt(output_file, gmf) 
+
     return None 
 
 def build_xi_cov(Mr=20, Nmock=500): 
@@ -77,18 +89,6 @@ def build_xi_cov(Mr=20, Nmock=500):
     
     return None
 
-def build_nbar(Mr=20): 
-    ''' Build observed nbar value
-    '''
-    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-    model.populate_mock() 
-    nbar = model.mock.number_density
-    
-    # save nbar values 
-    output_file = ''.join(['../dat/nbar.Mr', str(Mr), '.dat'])
-    np.savetxt(output_file, [nbar]) 
-    return None 
-
 def build_nbar_cov(Mr=20, Nmock=500): 
     ''' Build observed nbar value
     '''
@@ -102,22 +102,9 @@ def build_nbar_cov(Mr=20, Nmock=500):
 
     # save nbar values 
     output_file = ''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, nbar_cov) 
+    np.savetxt(output_file, [nbar_cov]) 
     return None
 
-def build_gmf(Mr=20): 
-    ''' Build 'observed' GMF. This is from a single realization of the mock 
-    '''
-    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-    
-    model.populate_mock() 
-    rich = richness(model.mock.compute_fof_group_ids())
-    gmf = GMF(rich)  # GMF
-
-    # save to file 
-    output_file = ''.join(['../dat/gmf.Mr', str(Mr), '.dat'])
-    np.savetxt(output_file, np.array(gmf)) 
-    return None
     
 def build_gmf_sigma(Mr=20, Nmock=500): 
     ''' Build 'observed' uncertainty in GMF from Nmock simulated realizations. 
@@ -131,7 +118,7 @@ def build_gmf_sigma(Mr=20, Nmock=500):
         model.populate_mock() 
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
-        gmf_counts.append(gmf(rich, counts=True))   # Group counts 
+        gmf_counts.append(GMF(rich, counts=True))   # Group counts 
 
     gmf_counts_mean = np.mean(gmf_counts, axis=0)
     poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
@@ -147,20 +134,17 @@ def build_gmf_sigma(Mr=20, Nmock=500):
 def build_observations(Mr=20, Nmock=500): 
     ''' Build all the fake observations
     '''
-    # xi 
-    print 'Building xi(r) ... ' 
-    build_xi(Mr=Mr)
+    # xi, nbar, gmf
+    print 'Building xi(r), nbar, GMF ... ' 
+    build_xi_nbar_gmf(Mr=Mr)
+    
+    # covariances
+    print 'Building xi covariance ... ' 
     build_xi_cov(Mr=Mr, Nmock=Nmock)
     # nbar
-    print 'Building nbar ... ' 
-    build_nbar(Mr=Mr)
+    print 'Building nbar covariance ... ' 
     build_nbar_cov(Mr=Mr, Nmock=Nmock)
     # gmf
-    print 'Building gmf ... ' 
-    build_gmf(Mr=Mr)
+    print 'Building gmf covariance ... ' 
     build_gmf_sigma(Mr=Mr, Nmock=Nmock)
     return None
-
-
-if __name__=='__main__': 
-    build_observations(Mr=20, Nmock=5)
