@@ -166,5 +166,5 @@ def build_observations(Mr=20, Nmock=500):
     build_xi_nbar_gmf_cov(Mr=Mr, Nmock=Nmock)
 
 if __name__=='__main__': 
-    build_observations(Nmock=2)
+    build_observations(Nmock=5)
 
