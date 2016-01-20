@@ -98,65 +98,60 @@ def build_xi_bin(Mr=20):
     output_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, r_bin)
 
-def build_xi_cov(Mr=20, Nmock=500): 
+def build_xi_nbar_gmf_cov(Mr=20, Nmock=500): 
     '''
-    Build covariance matrix for xi, using Nmock simulations 
+    Build covariance matrix for xi, variance for nbar, and a bunch of stuff for gmf 
+    ...  
+    using Nmock realizations of halotool mocks  
     ''' 
     xir = [] 
-    for i in xrange(Nmock): 
-        model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-        model.populate_mock() 
-
-        xir.append(model.mock.compute_galaxy_clustering()[1])
-
-    covar = np.cov(np.array(xir).T)
-    output_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-
-    np.savetxt(output_file, covar)
-    
-    return None
-
-def build_nbar_cov(Mr=20, Nmock=500): 
-    ''' Build observed nbar value
-    '''
-    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     nbars = [] 
-    for i in xrange(Nmock): 
-        model.populate_mock() 
-        nbars.append(model.mock.number_density)
-    
-    nbar_cov = np.var(nbars, axis=0) 
-
-    # save nbar values 
-    output_file = ''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, [nbar_cov]) 
-    return None
-
-    
-def build_gmf_sigma(Mr=20, Nmock=500): 
-    ''' Build 'observed' uncertainty in GMF from Nmock simulated realizations. 
-    Uncertainty is the quadruture of poisson errors and stddev. 
-    '''
-    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-    
     gmfs = [] 
     gmf_counts = [] 
     for i in xrange(Nmock): 
+        model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
         model.populate_mock() 
+        
+        # xi(r)
+        xir.append(model.mock.compute_galaxy_clustering()[1])
+        # nbar
+        nbars.append(model.mock.number_density)
+        # gmf
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts 
 
+    # save xi covariance 
+    xi_covar = np.cov(np.array(xir).T)
+    output_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, xi_covar)
+
+    # save nbar values 
+    nbar_cov = np.var(nbars, axis=0) 
+    output_file = ''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, [nbar_cov]) 
+    
+    # write GMF covariance 
+    gmf_cov = np.cov(np.array(gmfs).T)
+    output_file = ''.join(['../dat/gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, gmf_cov) 
+    # write GMF Poisson
     gmf_counts_mean = np.mean(gmf_counts, axis=0)
     poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
+    output_file = ''.join(['../dat/gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, poisson_gmf) 
+    # write GMF standard dev 
     sigma_gmf = np.std(gmfs, axis=0)                    # sample variance 
-
+    output_file = ''.join(['../dat/gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, sigma_gmf) 
+    # write GMF total noise 
     sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
-
-    # save to file  
     output_file = ''.join(['../dat/gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, sigma_tot) 
+
+    
     return None
+
 
 def build_observations(Mr=20, Nmock=500): 
     ''' Build all the fake observations
@@ -167,12 +162,9 @@ def build_observations(Mr=20, Nmock=500):
     build_xi_bin(Mr=Mr)
     
     # covariances
-    print 'Building xi covariance ... ' 
-    build_xi_cov(Mr=Mr, Nmock=Nmock)
-    # nbar
-    print 'Building nbar covariance ... ' 
-    build_nbar_cov(Mr=Mr, Nmock=Nmock)
-    # gmf
-    print 'Building gmf covariance ... ' 
-    build_gmf_sigma(Mr=Mr, Nmock=Nmock)
-    return None
+    print 'Building covariances ... ' 
+    build_xi_nbar_gmf_cov(Mr=Mr, Nmock=Nmock)
+
+if __name__=='__main__': 
+    build_observations(Nmock=2)
+
