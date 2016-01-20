@@ -86,7 +86,7 @@ def build_nbar(Mr=20):
     
     # save nbar values 
     output_file = ''.join(['../dat/nbar.Mr', str(Mr), '.dat'])
-    np.savetxt(output_file, nbar) 
+    np.savetxt(output_file, [nbar]) 
     return None 
 
 def build_nbar_cov(Mr=20, Nmock=500): 
