@@ -31,7 +31,7 @@ def data_nbar(Mr=20, Nmock=500):
 
 def data_xi(Mr=20, Nmock=500): 
     '''
-    Observed xi (2PCF) from 'data'
+    Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
     '''
     xi_dat_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
     xi = np.loadtxt(xi_dat_file, unpack=True)
@@ -42,6 +42,16 @@ def data_xi(Mr=20, Nmock=500):
     cii = np.diag(covariance)   # diagonal elements
 
     return [xi, cii]
+
+def data_xi_cov(Mr=20, Nmock=500): 
+    '''
+    Observed xi covariance. The entire covariance matrix
+    '''
+    # load covariance of xi 
+    cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov = np.loadtxt(cov_dat_file)
+
+    return cov 
     
 
 # Build observables ---------------

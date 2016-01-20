@@ -55,3 +55,5 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
         '_Mr', str(Mr), '_now_t', str(t), '.png'])
     plt.savefig(fig_file)
     plt.close()
+
+
