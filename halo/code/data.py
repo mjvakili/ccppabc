@@ -3,6 +3,7 @@
 Modules for data and observables in ABC-PMC. 
 
 '''
+import os 
 import numpy as np
 from group_richness import gmf_bins
 from group_richness import richness 
@@ -43,6 +44,12 @@ def data_xi(Mr=20, Nmock=500):
 
     return [xi, cii]
 
+def data_xi_bin(Mr=20):
+    ''' r bins for xi(r)
+    '''
+    rbin_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
+    return np.loadtxt(rbin_file)
+
 def data_xi_cov(Mr=20, Nmock=500): 
     '''
     Observed xi covariance. The entire covariance matrix
@@ -55,7 +62,6 @@ def data_xi_cov(Mr=20, Nmock=500):
     
 
 # Build observables ---------------
-
 def build_xi_nbar_gmf(Mr=20): 
     '''
     Build "data" xi, nbar, GMF values and write to file 
@@ -80,6 +86,17 @@ def build_xi_nbar_gmf(Mr=20):
     np.savetxt(output_file, gmf) 
 
     return None 
+
+def build_xi_bin(Mr=20): 
+    ''' Write out xi r bins
+    '''
+    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
+    model.populate_mock() # population mock realization 
+
+    # write xi 
+    r_bin  = model.mock.compute_galaxy_clustering()[0]
+    output_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
+    np.savetxt(output_file, r_bin)
 
 def build_xi_cov(Mr=20, Nmock=500): 
     '''
@@ -147,6 +164,7 @@ def build_observations(Mr=20, Nmock=500):
     # xi, nbar, gmf
     print 'Building xi(r), nbar, GMF ... ' 
     build_xi_nbar_gmf(Mr=Mr)
+    build_xi_bin(Mr=Mr)
     
     # covariances
     print 'Building xi covariance ... ' 
