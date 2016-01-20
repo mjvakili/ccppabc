@@ -63,6 +63,7 @@ def build_xi_cov(Mr=20, Nmock=500):
     '''
     Build covariance matrix for xi, using Nmock simulations 
     ''' 
+    xir = [] 
     for i in xrange(Nmock): 
         model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
         model.populate_mock() 
