@@ -147,12 +147,15 @@ def build_observations(Mr=20, Nmock=500):
     ''' Build all the fake observations
     '''
     # xi 
+    print 'Building xi(r) ... ' 
     build_xi(Mr=Mr)
     build_xi_cov(Mr=Mr, Nmock=Nmock)
     # nbar
+    print 'Building nbar ... ' 
     build_nbar(Mr=Mr)
     build_nbar_cov(Mr=Mr, Nmock=Nmock)
     # gmf
+    print 'Building gmf ... ' 
     build_gmf(Mr=Mr)
     build_gmf_sigma(Mr=Mr, Nmock=Nmock)
     return None
