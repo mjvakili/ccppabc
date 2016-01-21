@@ -12,6 +12,13 @@ from group_richness import richness
 from group_richness import gmf as GMF
 from halotools.empirical_models import PrebuiltHodModelFactory
 
+def data_hod_param(Mr=20):
+    '''
+    HOD parameters of 'observations'. Returns dictionary with hod parameters. 
+    '''
+    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
+    return model.param_dict
+
 def data_gmf(Mr=20, Nmock=500): 
     ''' Observed GMF from 'data'
     '''

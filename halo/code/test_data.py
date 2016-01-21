@@ -74,6 +74,35 @@ def xi_cov(Mr=20, Nmock=500):
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close()
 
+def gmf(Mr=20, Nmock=500): 
+    '''
+    Plot Group Multiplicty Function of fake observations 
+    '''
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    
+    # import fake obs GMF
+    gmf, sig_gmf = Data.data_gmf(Mr=Mr, Nmock=Nmock)
+    # group richness bins
+    gmf_bin = Data.data_gmf_bins()
+
+    fig = plt.figure(1) 
+    sub = fig.add_subplot(111)
+
+    sub.errorbar(
+            0.5*(gmf_bin[:-1]+gmf_bin[1:]), gmf, yerr=sig_gmf,
+            fmt="ok", capsize=1.0
+            )
+    sub.set_xlim([1, 60])
+    sub.set_yscale('log')
+    sub.set_ylabel(r"Group Multiplicity Function (h$^{3}$ Mpc$^{-3}$)", fontsize=20)
+    sub.set_xlabel(r"$\mathtt{Group\;\;Richness}$", fontsize=20)
+    # save to file 
+    fig_file = ''.join([util.fig_dir(), 
+        'gmf.Mr', str(Mr), '.Nmock', str(Nmock), '.png'])
+    fig.savefig(fig_file, bbox_inches='tight')
+    return None
+
 def gmf_cov(Mr=20, Nmock=500):
     '''Plot the reduced xi covariance
     '''
@@ -108,6 +137,4 @@ def gmf_cov(Mr=20, Nmock=500):
     plt.close()
 
 if __name__=='__main__': 
-    xi(Mr=20, Nmock=500)
-    xi_cov(Mr=20, Nmock=500)
-    gmf_cov(Mr=20, Nmock=500)
+    gmf(Mr=20, Nmock=500)
