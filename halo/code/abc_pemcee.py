@@ -16,11 +16,11 @@ from abcpmc import mpi_util
 import data as Data
 from hod_sim import HODsim
 from group_richness import richness
-
+import util
 # --- Plotting ---
 from plotting import plot_thetas
 
-def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
+def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
     '''
     ABC-PMC implementation. 
 
@@ -34,20 +34,21 @@ def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     - data_dict : dictionary that specifies the observation keywords 
     '''
     # data observables
-    data = []       # list of observables 
+    fake_obs = []       # list of observables 
     for obv in observables: 
         if obv == 'nbar': 
             data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
-            data.append(data_nbar)
+            print data_nbar
+            fake_obs.append(data_nbar)
         if obv == 'gmf': 
             data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
-            data.append(data_gmf)
+            fake_obs.append(data_gmf)
         if obv == 'xi': 
             data_xi, data_cov_ii = Data.data_xi(**data_dict)
-            data.append(data_xi)
-    
+            fake_obs.append(data_xi)
+
     # True HOD parameters
-    if Mr == 20: 
+    if data_dict["Mr"] == 20: 
         data_hod = np.array([11.38 , np.log(0.26) , 12.02 , 1.06 , 13.31])
     else: 
         raise NotImplementedError
@@ -69,6 +70,8 @@ def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     def multivariate_rho(datum, model): 
         dists = [] 
         for i_obv, obv in enumerate(observables): 
+            print "datum=" , datum
+	    print "model=" , model
             if obv == 'nbar': 
                 dist_nz = (datum[i_obv] - model[i_obv])**2. / data_nbar_var 
                 dists.append(dist_nz)
@@ -83,7 +86,7 @@ def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     mpi_pool = mpi_util.MpiPool()
     abcpmc_sampler = abcpmc.Sampler(
             N=N_part,       # N_particles
-            Y=data,         # data
+            Y=fake_obs,         # data
             postfn=simz,    # simulator 
             dist=multivariate_rho,       # distance function  
             pool=mpi_pool)  
@@ -97,13 +100,13 @@ def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
         print eps(pool.t)
         # plot theta
         plot_thetas(pool.thetas, pool.ws , pool.t, 
-                Mr=Mr, truths=data_hod, plot_range=prior_range, observables=observables)
+                Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
         # write theta and w to file 
         theta_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-            '_Mr', str(Mr), '_theta_t', str(pool.t), '.dat'])
+            '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.dat'])
         w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-            '_Mr', str(Mr), '_w_t', str(pool.t), '.dat'])
-        np.savetxt(theta_file, pooltheta)
+            '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.dat'])
+        np.savetxt(theta_file, pool.thetas)
         np.savetxt(w_file, pool.ws)
 
         if pool.t < 3: 
@@ -123,4 +126,4 @@ def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     return pools
 
 if __name__=="__main__": 
-    ABCpmc(10, [1.e10,1.e10], N_part=100)
+    ABCpmc(10, [1.e10,1.e10], N_part=5)
