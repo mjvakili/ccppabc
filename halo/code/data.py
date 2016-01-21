@@ -43,7 +43,7 @@ def data_nbar(Mr=20, Nmock=500):
     Observed nbar from 'data'
     '''
     nbar = np.loadtxt(''.join(['../dat/nbar.Mr', str(Mr), '.dat']))
-    nbar_cov = np.loadtxt(''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nock', str(Nmock), '.dat']))
+    nbar_cov = np.loadtxt(''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat']))
     return [nbar, nbar_cov]
 
 def data_xi(Mr=20, Nmock=500): 
