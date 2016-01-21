@@ -20,4 +20,4 @@ def dat_dir():
     '''
     Dat directory
     '''
-    return '/../dat/'
+    return '../dat/'
