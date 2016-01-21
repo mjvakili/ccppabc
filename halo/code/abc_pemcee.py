@@ -13,7 +13,7 @@ from group_richness import richness
 # --- Plotting ---
 from plotting import plot_thetas
 
-def abcpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
+def ABCpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
     '''
     ABC-PMC implementation. 
 
@@ -117,4 +117,4 @@ def abcpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     return pools
 
 if __name__=="__main__": 
-    abcpmc(10, 60, N_part=100)
+    ABCpmc(10, 60, N_part=100)
