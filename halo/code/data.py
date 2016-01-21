@@ -5,6 +5,8 @@ Modules for data and observables in ABC-PMC.
 '''
 import os 
 import numpy as np
+from numpy.linalg import solve
+
 from group_richness import gmf_bins
 from group_richness import richness 
 from group_richness import gmf as GMF
@@ -175,17 +177,16 @@ def build_xi_inv_cov(Mr=20, Nmock=500, unbias=True):
     Mainly used in MCMC inference
     '''
     xi_cov = data_xi_cov(Mr=Mr, Nmock=Nmock)    # covariance matrix of xi
-
-    N_bins = int(np.sqrt(len(xi_cov)))          # cov matrix is N_bin x N_bin
+    N_bins = int(np.sqrt(xi_cov.size))          # cov matrix is N_bin x N_bin
     
     if unbias: 
-        f_unbias = np.float(Nmocks - 2. - N_bins)/np.float(Nmocks - 1.)
+        f_unbias = np.float(Nmock - 2. - N_bins)/np.float(Nmock - 1.)
         unbias_str = '.unbias'
     else: 
         f_unbias = 1.0 
         unbias_str = ''
-
-    inv_c = solve(np.eye(len(xir_data)) , covariance) * f_unbias 
+    
+    inv_c = solve(np.eye(N_bins) , xi_cov) * f_unbias 
 
     output_file = ''.join(['../dat/', 
         'xi_inv_cov', unbias_str, '.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
