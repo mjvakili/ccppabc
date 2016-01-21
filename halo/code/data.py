@@ -49,7 +49,7 @@ def data_xi(Mr=20, Nmock=500):
     # load covariance of xi 
     cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     cov = np.loadtxt(cov_dat_file)
-    cii = np.diag(covariance)   # diagonal elements
+    cii = np.diag(cov)   # diagonal elements
 
     return [xi, cii]
 

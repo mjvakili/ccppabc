@@ -14,7 +14,7 @@ def fig_dir():
     '''
     figure directory
     '''
-    return ''
+    return '../fig/'
 
 def dat_dir(): 
     '''
