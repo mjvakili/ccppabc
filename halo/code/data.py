@@ -24,6 +24,13 @@ def data_gmf_bins():
     '''
     return gmf_bins()
 
+def data_gmf_cov(Mr=20, Nmock=500): 
+    '''
+    GMF covariance matrix 
+    '''
+    cov_file = ''.join(['../dat/gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    return np.loadtxt(cov_file)
+
 def data_nbar(Mr=20, Nmock=500): 
     '''
     Observed nbar from 'data'
