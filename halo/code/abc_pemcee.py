@@ -79,12 +79,11 @@ def abcpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
             Y=data,         # data
             postfn=simz,    # simulator 
             dist=multivariate_rho,       # distance function  
-            threads=threads,
             pool=mpi_pool)  
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
 
     #eps = abcpmc.ConstEps(T, [1.e13,1.e13])
-    eps = abcpmc.ConstEps(T, eps_val)       # (@mjv: what does this do?)
+    eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
     for pool in abcpmc_sampler.sample(prior, eps):
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
@@ -117,4 +116,4 @@ def abcpmc(T, eps_val, N_part=1000, threads=1, observables=['nbar', 'gmf'], data
     return pools
 
 if __name__=="__main__": 
-    abcpmc(10, 60, N_part=100)
+    abcpmc(10, [1.e10,1.e10], N_part=100)
