@@ -59,6 +59,23 @@ def data_xi_cov(Mr=20, Nmock=500):
     cov = np.loadtxt(cov_dat_file)
 
     return cov 
+
+def data_xi_inv_cov(Mr=20, Nmock=500, unbias_str=True):
+    '''
+    Observed inverse covariance of xi with/without the unbias estimator 
+    factor. Default multiplies by the unbias estimator factor. 
+    '''
+    if unbias_str: 
+        unbias_str = '.unbias'
+    else: 
+        unbias_str = ''
+
+    inv_cov_file = ''.join(['../dat/', 
+        'xi_inv_cov', unbias_str, '.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+
+    inv_cov = np.loadtxt(inv_cov_file) 
+
+    return cov
     
 
 # Build observables ---------------
@@ -148,10 +165,33 @@ def build_xi_nbar_gmf_cov(Mr=20, Nmock=500):
     sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
     output_file = ''.join(['../dat/gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, sigma_tot) 
-
-    
     return None
 
+def build_xi_inv_cov(Mr=20, Nmock=500, unbias=True): 
+    '''
+    Calculate the inverse covariance of xi multiplied by the unbiased
+    estimator factor (Nmocks - 2 - Nbins)/(Nmocks - 1). 
+
+    Mainly used in MCMC inference
+    '''
+    xi_cov = data_xi_cov(Mr=Mr, Nmock=Nmock)    # covariance matrix of xi
+
+    N_bins = int(np.sqrt(len(xi_cov)))          # cov matrix is N_bin x N_bin
+    
+    if unbias: 
+        f_unbias = np.float(Nmocks - 2. - N_bins)/np.float(Nmocks - 1.)
+        unbias_str = '.unbias'
+    else: 
+        f_unbias = 1.0 
+        unbias_str = ''
+
+    inv_c = solve(np.eye(len(xir_data)) , covariance) * f_unbias 
+
+    output_file = ''.join(['../dat/', 
+        'xi_inv_cov', unbias_str, '.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    np.savetxt(output_file, inv_c) 
+
+    return None
 
 def build_observations(Mr=20, Nmock=500): 
     ''' Build all the fake observations
@@ -164,7 +204,8 @@ def build_observations(Mr=20, Nmock=500):
     # covariances
     print 'Building covariances ... ' 
     build_xi_nbar_gmf_cov(Mr=Mr, Nmock=Nmock)
+    print 'Build inverse covariance for xi ...'
+    build_xi_inv_cov(Mr=Mr, Nmock=Nmock, unbias=True)
 
 if __name__=='__main__': 
     build_observations(Nmock=5)
-

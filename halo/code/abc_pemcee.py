@@ -1,3 +1,11 @@
+'''
+
+Module for ABC-PMC inference
+
+Author(s): Chang, MJ
+
+
+'''
 import time
 import numpy as np
 
@@ -6,7 +14,6 @@ from abcpmc import mpi_util
 
 # --- Local --- 
 import data as Data
-#from distance import rho 
 from hod_sim import HODsim
 from group_richness import richness
 

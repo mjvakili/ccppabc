@@ -1,13 +1,23 @@
+'''
+
+
+Module for standard MCMC inference
+
+Author(s): Chang, MJ
+
+
+'''
 import sys
 import numpy as np
 import emcee
-from halotools.empirical_models import Zheng07
+
 from numpy.linalg import solve
 from emcee.utils import MPIPool
 
-#import matplotlib.pyplot as plt
-#import time
-#plt.switch_backend("Agg")
+# --- Local ---
+import data as Data
+from hod_sim import HODsim
+from group_richness import richness
 
 """data, covariance matrix, and the inverse covariance """
 
