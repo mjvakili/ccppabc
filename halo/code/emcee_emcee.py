@@ -11,7 +11,6 @@ import sys
 import numpy as np
 import emcee
 
-from numpy.linalg import solve
 from emcee.utils import MPIPool
 
 # --- Local ---
@@ -19,13 +18,36 @@ import data as Data
 from hod_sim import HODsim
 from group_richness import richness
 
+
+def McMc(data_dict={'Mr':20, 'Nmock':500}): 
+    '''
+    Standard MCMC inference
+    '''
+    # import fake observables
 """data, covariance matrix, and the inverse covariance """
 
 xir_data = np.loadtxt("xir_Mr20.dat")
 covariance = np.loadtxt("clustering_covariance_Mr20.dat")
 N_mocks = 500
-N_bins  = len(xir_data)
-inv_c =  solve(np.eye(len(xir_data)) , covariance)*(N_mocks - 2 - N_bins)/(N_mocks - 1)
+
+
+"""Initializing Walkers"""
+
+ndim, nwalkers = 5, 100
+pos = [np.array([11.5 , np.log(.4) , 12.02 , 1.03 , 13.5]) + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+
+"""Initializing MPIPool"""
+
+pool = MPIPool()
+if not pool.is_master():
+    pool.wait()
+    sys.exit(0)
+
+sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob , pool = pool)
+
+sampler.run_mcmc(pos, 500)
+
+pool.close()
 
 
 
@@ -60,23 +82,6 @@ def lnprob(theta):
         return -np.inf
     return lp + lnlike(theta)
 
-"""Initializing Walkers"""
-
-ndim, nwalkers = 5, 100
-pos = [np.array([11.5 , np.log(.4) , 12.02 , 1.03 , 13.5]) + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-
-"""Initializing MPIPool"""
-
-pool = MPIPool()
-if not pool.is_master():
-    pool.wait()
-    sys.exit(0)
-
-sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob , pool = pool)
-
-sampler.run_mcmc(pos, 500)
-
-pool.close()
 
 """
 samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
