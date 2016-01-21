@@ -13,14 +13,14 @@ from group_richness import richness
 
 class HODsim(object): 
     
-    def __init__(self): 
+    def __init__(self, Mr=20): 
         '''
         Class object that describes our forward model used in AMC-PMC inference.
         Our model forward models the galaxy catalog using HOD parameters using HaloTools. 
         '''
 
         #self.model = zheng07()      # Zheng et al. (2007) model
-        self.model = PrebuiltHodModelFactory('zheng07')
+        self.model = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
     
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         '''
