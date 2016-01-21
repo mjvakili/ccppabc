@@ -67,8 +67,8 @@ def xi_cov(Mr=20, Nmock=500):
     sub.set_xscale('log')
     sub.set_yscale('log')
 
-    sub.set_xlabel(r'$r\;(\mathrm{Mpc}/h)$', fontsize=25)
-    sub.set_ylabel(r'$r\;(\mathrm{Mpc}/h)$', fontsize=25)
+    sub.set_xlabel(r'$\mathtt{r}\;(\mathtt{Mpc}/$h)', fontsize=25)
+    sub.set_ylabel(r'$\mathtt{r}\;(\mathtt{Mpc}/$h)', fontsize=25)
     fig_file = ''.join([util.fig_dir(),
         'xi_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.png'])
     fig.savefig(fig_file, bbox_inches='tight') 
@@ -137,4 +137,4 @@ def gmf_cov(Mr=20, Nmock=500):
     plt.close()
 
 if __name__=='__main__': 
-    gmf(Mr=20, Nmock=500)
+    xi_cov(Mr=20, Nmock=500)
