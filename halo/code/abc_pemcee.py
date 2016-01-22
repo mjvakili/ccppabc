@@ -131,4 +131,5 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     return pools
 
 if __name__=="__main__": 
-    ABCpmc(2, [1.e10,1.e10], N_part=10, observables=['nbar', 'xi'])
+    ABCpmc(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi'])
+    ABCpmc(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi', 'gmf'])
