@@ -56,7 +56,6 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
     # Priors
     prior_min = [10., np.log(0.1), 11.02, 0.8, 13.]
     prior_max = [13., np.log(0.7), 13.02, 1.3, 14.]
-    prior = abcpmc.TophatPrior(prior_min, prior_max)
     prior_range = np.zeros((len(prior_min),2))
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
@@ -81,9 +80,9 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
         """log-likelihood without the term -.5*log(det(cov))"""
 
         nbar_model , xi_model = simz(theta)
-        res_nbar = fake_obs['nbar'] - nbar_model
-        res_xi   = fake_obs['xi'] - xi_model
-	chi_nbar = -0.5*(res_nbar)**2. / 
+        res_nbar = fake_obs[0] - nbar_model
+        res_xi   = fake_obs[1] - xi_model
+	chi_nbar = -0.5*(res_nbar)**2. / data_nbar_var 
         chi_xi   = -0.5*np.sum(np.dot(np.dot(res_xi , data_xi_invcov) , res_xi))
 
         return chi_nbar + chi_xi
@@ -94,10 +93,10 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
         """log-prior"""
 
         a , b , c , d , e = theta
-        if prior_min[0] < a < prior_max[0] and \\
-           prior_min[1] < b < prior_max[1] and \\
-           prior_min[2] < c < prior_max[2] and \\
-           prior_min[3] < d < prior_max[3] and \\
+        if prior_min[0] < a < prior_max[0] and \
+           prior_min[1] < b < prior_max[1] and \
+           prior_min[2] < c < prior_max[2] and \
+           prior_min[3] < d < prior_max[3] and \
            prior_min[4] < e < prior_max[4]:
             return 0.0
         else:
@@ -121,14 +120,14 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
 
     """Initializing MPIPool"""
 
-    pool = MPIPool()
-    if not pool.is_master():
-       pool.wait()
-       sys.exit(0)
+    #pool = MPIPool()
+    #if not pool.is_master():
+    #   pool.wait()
+    #   sys.exit(0)
 
     """Initializing the emcee sampler"""
 
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob , pool = pool)
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob)# , pool = pool)
 
     # Burn in.
     pos, _, _ = sampler.run_mcmc(pos, Nchains_burn)
@@ -138,7 +137,7 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
     pos, _, _ = sampler.run_mcmc(pos, Nchains_pro)
     
     #closing the pool 
-    pool.close()
+    #pool.close()
 
     #saving the mcmc samples
     np.savetxt("mcmc_sample.dat" , sampler.flat_chain)
