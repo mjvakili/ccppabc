@@ -115,8 +115,7 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
 
     """Initializing Walkers"""
 
-    ndim, nwalkers = 5, 100
-    pos = [np.array([11.5 , np.log(.4) , 12.02 , 1.03 , 13.5]) + 1e-6*np.random.randn(Ndim) for i in range(Nwalkers)]
+    pos = [np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5]) + 1e-3*np.random.randn(Ndim) for i in range(Nwalkers)]
 
     """Initializing MPIPool"""
 
@@ -126,23 +125,20 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
     #   sys.exit(0)
 
     """Initializing the emcee sampler"""
-
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob)# , pool = pool)
-
-    # Burn in.
-    pos, _, _ = sampler.run_mcmc(pos, Nchains_burn)
-    sampler.reset()
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob)
+    #sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob, pool = pool)
+    
+    # Burn in + Production
+    sampler.run_mcmc(pos, Nchains_burn + Nchains_pro)
 
     # Production.
-    pos, _, _ = sampler.run_mcmc(pos, Nchains_pro)
-    
+    samples = sampler.chain[:, Nchains_burn:, :].reshape((-1, Ndim))
     #closing the pool 
     #pool.close()
-
     #saving the mcmc samples
-    np.savetxt("mcmc_sample.dat" , sampler.flat_chain)
-
+    np.savetxt("mcmc_sample.dat" , samples)
+    
 if __name__=="__main__": 
     
-    mcmc(10, 10, 10, 5, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500})
+    mcmc(20, 100, 600, 5, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500})
 
