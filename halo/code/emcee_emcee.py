@@ -10,7 +10,7 @@ Author(s): Chang, MJ
 import sys
 import numpy as np
 import emcee
-
+from numpy.linalg import solve
 from emcee.utils import MPIPool
 
 # --- Local ---
@@ -19,77 +19,131 @@ from hod_sim import HODsim
 from group_richness import richness
 
 
-def McMc(data_dict={'Mr':20, 'Nmock':500}): 
+def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500}): 
     '''
-    Standard MCMC inference
-    '''
-    # import fake observables
-"""data, covariance matrix, and the inverse covariance """
-
-xir_data = np.loadtxt("xir_Mr20.dat")
-covariance = np.loadtxt("clustering_covariance_Mr20.dat")
-N_mocks = 500
-
-
-"""Initializing Walkers"""
-
-ndim, nwalkers = 5, 100
-pos = [np.array([11.5 , np.log(.4) , 12.02 , 1.03 , 13.5]) + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-
-"""Initializing MPIPool"""
-
-pool = MPIPool()
-if not pool.is_master():
-    pool.wait()
-    sys.exit(0)
-
-sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob , pool = pool)
-
-sampler.run_mcmc(pos, 500)
-
-pool.close()
-
-
-
-"""likelihood"""
-
-def lnlike(theta):
+    Standard MCMC implementaion
     
-    model = Zheng07(threshold = -20.)
-    model.param_dict['logM0'] = theta[0]
-    model.param_dict['sigma_logM'] = np.exp(theta[1])
-    model.param_dict['logMmin'] = theta[2]     
-    model.param_dict['alpha'] = theta[3]
-    model.param_dict['logM1'] = theta[4]
-    model.populate_mock()
-    r , xir_model = model.mock.compute_galaxy_clustering()
-    res = xir_data - xir_model
-    return -0.5*np.sum(np.dot(np.dot(res , inv_c) , res))
 
-"""prior"""
+    Parameters
+    -----------
+    - Nwalker : Number of walkers
+    - Nchains_burn : Number of burn-in chains
+    - Nchains_pro : Number of production chains   
+    - ndim    : Dimensionality of the parameter space
+    - observables : list of observables. Options are 'nbar', 'gmf', 'xi'
+    -data_dict : dictionary that specifies the observation keywords
+    '''
+    # data observables
+    fake_obs = []       # list of observables 
+    for obv in observables: 
+        if obv == 'nbar': 
+            data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
+            fake_obs.append(data_nbar)
+        if obv == 'gmf': 
+            data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
+            fake_obs.append(data_gmf)
+        if obv == 'xi': 
+            data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)   # import xir and full covariance matrix of xir
+            data_xi_invcov = solve(np.eye(len(data_xi)) , data_xi_cov)  # take the inverse of the covariance matrix
+            fake_obs.append(data_xi)
 
-def lnprior(theta):
-    a , b , c , d , e = theta
-    if 10. < a < 13. and np.log(.1) < b < np.log(.7) and  11.02< c < 13.02 and .8< d < 1.3 and 13.< e < 14.:
-        return 0.0
-    return -np.inf
+    # True HOD parameters
+    if data_dict["Mr"] == 20: 
+        data_hod = np.array([11.38 , np.log(0.26) , 12.02 , 1.06 , 13.31])
+    else: 
+        raise NotImplementedError
+    
+    # Priors
+    prior_min = [10., np.log(0.1), 11.02, 0.8, 13.]
+    prior_max = [13., np.log(0.7), 13.02, 1.3, 14.]
+    prior = abcpmc.TophatPrior(prior_min, prior_max)
+    prior_range = np.zeros((len(prior_min),2))
+    prior_range[:,0] = prior_min
+    prior_range[:,1] = prior_max
 
-"""posterior"""
 
-def lnprob(theta):
-    lp = lnprior(theta)
-    if not np.isfinite(lp):
-        return -np.inf
-    return lp + lnlike(theta)
+    # simulator
+    our_model = HODsim()    # initialize model
+    kwargs = {'prior_range': prior_range, 'observables': observables}
+    def simz(tt): 
+        sim = our_model.sum_stat(tt, **kwargs)
+        if sim is None: 
+            print 'Simulator is giving NoneType.'
+            pickle.dump(tt, open("simz_crash_theta.p", 'wb'))
+            print 'The input parameters are', tt
+            pickle.dump(kwargs, open('simz_crash_kwargs.p', 'wb'))
+            print 'The kwargs are', kwargs
+            raise ValueError
+        return sim
+    
+    def lnlike(theta):
+
+        """log-likelihood without the term -.5*log(det(cov))"""
+
+        nbar_model , xi_model = simz(theta)
+        res_nbar = fake_obs['nbar'] - nbar_model
+        res_xi   = fake_obs['xi'] - xi_model
+	chi_nbar = -0.5*(res_nbar)**2. / 
+        chi_xi   = -0.5*np.sum(np.dot(np.dot(res_xi , data_xi_invcov) , res_xi))
+
+        return chi_nbar + chi_xi
 
 
-"""
-samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
+    def lnprior(theta):
 
-# Burn in.
-pos, _, _ = sampler.run_mcmc(pos, 1000)
-sampler.reset()
+        """log-prior"""
 
-# Production.
-pos, _, _ = sampler.run_mcmc(pos, 4000)
-"""
+        a , b , c , d , e = theta
+        if prior_min[0] < a < prior_max[0] and \\
+           prior_min[1] < b < prior_max[1] and \\
+           prior_min[2] < c < prior_max[2] and \\
+           prior_min[3] < d < prior_max[3] and \\
+           prior_min[4] < e < prior_max[4]:
+            return 0.0
+        else:
+            return -np.inf
+    
+    def lnprob(theta):
+ 
+        """log-posterior"""
+        
+        lp = lnprior(theta)
+        if not np.isfinite(lp):
+           return -np.inf
+        return lp + lnlike(theta)
+
+
+
+    """Initializing Walkers"""
+
+    ndim, nwalkers = 5, 100
+    pos = [np.array([11.5 , np.log(.4) , 12.02 , 1.03 , 13.5]) + 1e-6*np.random.randn(Ndim) for i in range(Nwalkers)]
+
+    """Initializing MPIPool"""
+
+    pool = MPIPool()
+    if not pool.is_master():
+       pool.wait()
+       sys.exit(0)
+
+    """Initializing the emcee sampler"""
+
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob , pool = pool)
+
+    # Burn in.
+    pos, _, _ = sampler.run_mcmc(pos, Nchains_burn)
+    sampler.reset()
+
+    # Production.
+    pos, _, _ = sampler.run_mcmc(pos, Nchains_pro)
+    
+    #closing the pool 
+    pool.close()
+
+    #saving the mcmc samples
+    np.savetxt("mcmc_sample.dat" , sampler.flat_chain)
+
+if __name__=="__main__": 
+    
+    mcmc(10, 10, 10, 5, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500})
+
