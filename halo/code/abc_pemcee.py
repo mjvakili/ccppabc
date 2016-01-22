@@ -7,6 +7,7 @@ Author(s): Chang, MJ
 
 '''
 import time
+import pickle
 import numpy as np
 
 import abcpmc
@@ -27,9 +28,8 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     Parameters
     ----------
     - T : Number of iterations 
-    - eps_val : ???? (@mjv: what does this do?)
+    - eps_val : 
     - N_part : Number of particles
-    - Threads : Number of MPI threads (not sure if this keyword actually works or not 
     - observables : list of observables. Options are 'nbar', 'gmf', 'xi'
     - data_dict : dictionary that specifies the observation keywords 
     '''
@@ -38,7 +38,6 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     for obv in observables: 
         if obv == 'nbar': 
             data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
-            print data_nbar
             fake_obs.append(data_nbar)
         if obv == 'gmf': 
             data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
@@ -65,13 +64,19 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     our_model = HODsim()    # initialize model
     kwargs = {'prior_range': prior_range, 'observables': observables}
     def simz(tt): 
-        return our_model.sum_stat(tt, **kwargs)
+        sim = our_model.sum_stat(tt, **kwargs)
+        if sim is None: 
+            print 'Simulator is giving NoneType.'
+            pickle.dump(tt, open("simz_crash_theta.p", 'wb'))
+            print 'The input parameters are', tt
+            pickle.dump(kwargs, open('simz_crash_kwargs.p', 'wb'))
+            print 'The kwargs are', kwargs
+            raise ValueError
+        return sim
 
     def multivariate_rho(datum, model): 
         dists = [] 
         for i_obv, obv in enumerate(observables): 
-            print "datum=" , datum
-	    print "model=" , model
             if obv == 'nbar': 
                 dist_nz = (datum[i_obv] - model[i_obv])**2. / data_nbar_var 
                 dists.append(dist_nz)
@@ -126,4 +131,4 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     return pools
 
 if __name__=="__main__": 
-    ABCpmc(10, [1.e10,1.e10], N_part=5)
+    ABCpmc(10, [1.e10,1.e10], N_part=100)

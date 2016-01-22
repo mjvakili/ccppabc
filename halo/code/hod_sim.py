@@ -80,8 +80,8 @@ class HODsim(object):
                     return obvs 
 
                 except ValueError:
-                    bins = data_gmf_bins(Mr=20)
+                    bins = data_gmf_bins()
                     return [10. , np.ones_like(bins)[:-1]*1000.]
-                else:
-                    bins = data_gmf_bins(Mr=20)
-                    return [10. , np.ones_like(bins)[:-1]*1000.]
+            else:
+                bins = data_gmf_bins()
+                return [10. , np.ones_like(bins)[:-1]*1000.]
