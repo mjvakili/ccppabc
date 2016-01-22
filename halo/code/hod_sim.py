@@ -6,6 +6,7 @@ HaloTools HOD Simulation
 import numpy as np
 from halotools.empirical_models import PrebuiltHodModelFactory
 
+from data import data_xi_bin
 from data import data_gmf_bins
 from group_richness import gmf 
 from group_richness import richness
@@ -20,6 +21,7 @@ class HODsim(object):
         '''
 
         #self.model = zheng07()      # Zheng et al. (2007) model
+        self.Mr = Mr
         self.model = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
     
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
@@ -80,8 +82,27 @@ class HODsim(object):
                     return obvs 
 
                 except ValueError:
-                    bins = data_gmf_bins()
-                    return [10. , np.ones_like(bins)[:-1]*1000.]
+
+                    obvs = []
+                    for obv in observables: 
+                        if obv == 'nbar': 
+                            obvs.append(10.)
+                        elif obv == 'gmf': 
+                            bins = data_gmf_bins()
+                            obvs.append(np.ones_like(bins)[:-1]*1000.)
+                        elif obv == 'xi': 
+                            bins = data_xi_bin(Mr=self.Mr)
+                            obvs.append(np.zeroes(len(bins)))
+                    return obvs 
             else:
-                bins = data_gmf_bins()
-                return [10. , np.ones_like(bins)[:-1]*1000.]
+                obvs = []
+                for obv in observables: 
+                    if obv == 'nbar': 
+                        obvs.append(10.)
+                    elif obv == 'gmf': 
+                        bins = data_gmf_bins()
+                        obvs.append(np.ones_like(bins)[:-1]*1000.)
+                    elif obv == 'xi': 
+                        bins = data_xi_bin(Mr=self.Mr)
+                        obvs.append(np.zeroes(len(bins)))
+                return obvs
