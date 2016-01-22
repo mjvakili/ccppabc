@@ -23,7 +23,7 @@ def richness(group_id):
 
 def gmf_bins():
     '''
-    Observed GMF bins. Hardcoded. Don't mess with it? 
+    Observed GMF bins. Hardcoded. 
     '''
     bins = np.array([
         3.000000000000000000e+00, 
@@ -51,8 +51,7 @@ def gmf_bins():
         2.900000000000000000e+01, 
         3.100000000000000000e+01, 
         3.500000000000000000e+01, 
-        4.300000000000000000e+01, 
-        6.100000000000000000e+01]) # same hardcoded bins as data 
+        4.300000000000000000e+01]) # same hardcoded bins as data 
     return bins
 
 def gmf(group_richness, counts=False): 
