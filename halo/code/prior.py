@@ -1,10 +1,16 @@
 '''
 
-Module to deal with priors 
+Module to deal with prior range
+
+Author(s): CHH, MJV
+
+Notes
+-----
+ - Prior range implemented Jan 22, 2016 (CHH)
 
 '''
 
-def prior_range(prior_name): 
+def PriorRange(prior_name): 
     ''' Given prior dictionary name, return the prior range. 
     '''
     
@@ -15,7 +21,6 @@ def prior_range(prior_name):
     prior_min = prior_dict['prior_min']
     prior_max = prior_dict['prior_max']
     return [prior_min, prior_max]
-
 
 def prior_dict_table(): 
     ''' dictionary table of priors 

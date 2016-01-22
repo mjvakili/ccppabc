@@ -14,14 +14,16 @@ import abcpmc
 from abcpmc import mpi_util
 
 # --- Local --- 
+import util
 import data as Data
 from hod_sim import HODsim
+from prior import PriorRange
 from group_richness import richness
-import util
+
 # --- Plotting ---
 from plotting import plot_thetas
 
-def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
+def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
     '''
     ABC-PMC implementation. 
 
@@ -47,14 +49,17 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
             fake_obs.append(data_xi)
 
     # True HOD parameters
-    if data_dict["Mr"] == 20: 
-        data_hod = np.array([11.38 , np.log(0.26) , 12.02 , 1.06 , 13.31])
-    else: 
-        raise NotImplementedError
+    data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
+    data_hod = np.array([
+        data_hod_dict['logM0'],                 # log M0 
+        np.log(data_hod_dict['sigma_logM']),    # log(sigma)
+        data_hod_dict['logMmin'],               # log Mmin
+        data_hod_dict['alpha'],                 # alpha
+        data_hod_dict['logM1']                  # log M1
+        ])
     
     # Priors
-    prior_min = [10., np.log(0.1), 11.02, 0.8, 13.]
-    prior_max = [13., np.log(0.7), 13.02, 1.3, 14.]
+    prior_min, prior_max = PriorRange(prior_name)
     prior = abcpmc.TophatPrior(prior_min, prior_max)
     prior_range = np.zeros((len(prior_min),2))
     prior_range[:,0] = prior_min
@@ -131,5 +136,5 @@ def ABCpmc(T, eps_val, N_part=1000, observables=['nbar', 'gmf'], data_dict={'Mr'
     return pools
 
 if __name__=="__main__": 
-    ABCpmc(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi'])
-    ABCpmc(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi', 'gmf'])
+    ABCpmc_HOD(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi'])
+    ABCpmc_HOD(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi', 'gmf'])
