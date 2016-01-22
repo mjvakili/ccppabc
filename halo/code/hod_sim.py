@@ -92,7 +92,7 @@ class HODsim(object):
                             obvs.append(np.ones_like(bins)[:-1]*1000.)
                         elif obv == 'xi': 
                             bins = data_xi_bin(Mr=self.Mr)
-                            obvs.append(np.zeroes(len(bins)))
+                            obvs.append(np.zeros(len(bins)))
                     return obvs 
             else:
                 obvs = []
@@ -104,5 +104,5 @@ class HODsim(object):
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi': 
                         bins = data_xi_bin(Mr=self.Mr)
-                        obvs.append(np.zeroes(len(bins)))
+                        obvs.append(np.zeros(len(bins)))
                 return obvs
