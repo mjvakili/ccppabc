@@ -6,7 +6,7 @@ HaloTools HOD Simulation
 import numpy as np
 from halotools.empirical_models import PrebuiltHodModelFactory
 
-from data import data_xi_bin
+from data import data_xi_bins
 from data import data_gmf_bins
 from group_richness import gmf 
 from group_richness import richness
@@ -91,7 +91,7 @@ class HODsim(object):
                             bins = data_gmf_bins()
                             obvs.append(np.ones_like(bins)[:-1]*1000.)
                         elif obv == 'xi': 
-                            bins = data_xi_bin(Mr=self.Mr)
+                            bins = data_xi_bins(Mr=self.Mr)
                             obvs.append(np.zeros(len(bins)))
                     return obvs 
             else:
@@ -103,7 +103,7 @@ class HODsim(object):
                         bins = data_gmf_bins()
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi': 
-                        bins = data_xi_bin(Mr=self.Mr)
+                        bins = data_xi_bins(Mr=self.Mr)
                         obvs.append(np.zeros(len(bins)))
                 return obvs
 
@@ -176,7 +176,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                         bins = data_gmf_bins()
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi': 
-                        bins = data_xi_bin(Mr=self.Mr)
+                        bins = data_xi_bins(Mr=self.Mr)
                         obvs.append(np.zeros(len(bins)))
                 return obvs 
         else:
@@ -188,6 +188,6 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                     bins = data_gmf_bins()
                     obvs.append(np.ones_like(bins)[:-1]*1000.)
                 elif obv == 'xi': 
-                    bins = data_xi_bin(Mr=self.Mr)
+                    bins = data_xi_bins(Mr=self.Mr)
                     obvs.append(np.zeros(len(bins)))
             return obvs

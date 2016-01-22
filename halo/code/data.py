@@ -19,6 +19,7 @@ def data_hod_param(Mr=20):
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     return model.param_dict
 
+# --- GMF --- 
 def data_gmf(Mr=20, Nmock=500): 
     ''' Observed GMF from 'data'
     '''
@@ -38,6 +39,7 @@ def data_gmf_cov(Mr=20, Nmock=500):
     cov_file = ''.join(['../dat/gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     return np.loadtxt(cov_file)
 
+# --- nbar --- 
 def data_nbar(Mr=20, Nmock=500): 
     '''
     Observed nbar from 'data'
@@ -46,6 +48,7 @@ def data_nbar(Mr=20, Nmock=500):
     nbar_cov = np.loadtxt(''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat']))
     return [nbar, nbar_cov]
 
+# --- 2PCF --- 
 def data_xi(Mr=20, Nmock=500): 
     '''
     Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
@@ -59,7 +62,6 @@ def data_xi(Mr=20, Nmock=500):
     cii = np.diag(cov)   # diagonal elements
 
     return [xi, cii]
-
 
 def data_xi_full_cov(Mr=20, Nmock=500): 
     '''
@@ -75,8 +77,7 @@ def data_xi_full_cov(Mr=20, Nmock=500):
 
     return [xi, cov]
 
-
-def data_xi_bin(Mr=20):
+def data_xi_bins(Mr=20):
     ''' r bins for xi(r)
     '''
     rbin_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
@@ -119,7 +120,7 @@ def build_xi_nbar_gmf(Mr=20):
     model.populate_mock() # population mock realization 
 
     # write xi 
-    data_xir  = model.mock.compute_galaxy_clustering()[1]
+    data_xir = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1]
     output_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, data_xir)
 
@@ -136,16 +137,22 @@ def build_xi_nbar_gmf(Mr=20):
 
     return None 
 
-def build_xi_bin(Mr=20): 
-    ''' Write out xi r bins
+def build_xi_bins(Mr=20): 
+    ''' hardcoded r bins for xi. 
     '''
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     model.populate_mock() # population mock realization 
-
-    # write xi 
-    r_bin  = model.mock.compute_galaxy_clustering()[0]
+    r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
     output_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, r_bin)
+    return None
+
+def hardcoded_xi_bins(): 
+    ''' hardcoded xi bin edges.They are spaced out unevenly due to sparseness
+    at inner r bins. So the first bin ranges from 0.15 to 0.5
+    '''
+    r_bins = np.concatenate([np.array([0.15]), np.logspace(np.log10(0.5), np.log10(20.), 15)])
+    return r_bins
 
 def build_xi_nbar_gmf_cov(Mr=20, Nmock=500): 
     '''
@@ -229,8 +236,8 @@ def build_observations(Mr=20, Nmock=500):
     '''
     # xi, nbar, gmf
     print 'Building xi(r), nbar, GMF ... ' 
+    build_xi_bins(Mr=Mr)
     build_xi_nbar_gmf(Mr=Mr)
-    build_xi_bin(Mr=Mr)
     
     # covariances
     print 'Building covariances ... ' 

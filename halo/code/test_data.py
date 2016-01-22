@@ -23,7 +23,7 @@ def xi(Mr=20, Nmock=500):
     pretty_colors = prettycolors() 
 
     xir, cii = Data.data_xi(Mr=Mr, Nmock=Nmock)
-    rbin = Data.data_xi_bin(Mr=Mr) 
+    rbin = Data.data_xi_bins(Mr=Mr) 
     
     fig = plt.figure(1) 
     sub = fig.add_subplot(111)
@@ -53,7 +53,7 @@ def xi_cov(Mr=20, Nmock=500):
     # covariance  
     xi_cov = Data.data_xi_cov(Mr=Mr, Nmock=Nmock)
     n_bin = int(np.sqrt(xi_cov.size))
-    r_bin = Data.data_xi_bin(Mr=Mr)
+    r_bin = Data.data_xi_bins(Mr=Mr)
     
     # calculate the reduced covariance for plotting
     xi_cov_red = np.zeros([n_bin, n_bin])
@@ -145,14 +145,13 @@ def gmf_cov(Mr=20, Nmock=500):
 def xi_binning_tests(Mr=20):
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
 
-    rbins = np.concatenate([np.array([0.1, 0.5]), np.logspace(0, np.log10(20.), 16)])
+    rbins = np.concatenate([np.array([0.1]), np.logspace(np.log10(0.5), np.log10(20.), 15)])
     print 'R bins = ', rbins
     for ii in xrange(10): 
         model.populate_mock() # population mock realization 
         
         #rbins = np.logspace(-1, np.log10(20.), 16)
         r_bin, xi_r = model.mock.compute_galaxy_clustering(rbins=rbins)
-        print r_bin
         print xi_r
 
 if __name__=='__main__': 
