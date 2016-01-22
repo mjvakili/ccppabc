@@ -10,7 +10,11 @@ import util
 import data as Data
 from plotting import prettyplot
 from plotting import prettycolors
+# --- Halotools ---
+from halotools.empirical_models import PrebuiltHodModelFactory
 
+
+# ---- Plotting ----
 def xi(Mr=20, Nmock=500): 
     '''
     Plot xi(r) of the fake observations
@@ -136,5 +140,21 @@ def gmf_cov(Mr=20, Nmock=500):
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close()
 
+
+# ---- tests -----
+def xi_binning_tests(Mr=20):
+    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
+
+    rbins = np.concatenate([np.array([0.1, 0.5]), np.logspace(0, np.log10(20.), 16)])
+    print 'R bins = ', rbins
+    for ii in xrange(10): 
+        model.populate_mock() # population mock realization 
+        
+        #rbins = np.logspace(-1, np.log10(20.), 16)
+        r_bin, xi_r = model.mock.compute_galaxy_clustering(rbins=rbins)
+        print r_bin
+        print xi_r
+
 if __name__=='__main__': 
-    xi_cov(Mr=20, Nmock=500)
+    #xi_cov(Mr=20, Nmock=500)
+    xi_binning_tests(Mr=20)
