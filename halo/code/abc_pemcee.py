@@ -131,6 +131,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         #    eps.eps = eps_min
             
         pools.append(pool)
+    mpi_pool.close()
     #abcpmc_sampler.close()
     
     return pools
