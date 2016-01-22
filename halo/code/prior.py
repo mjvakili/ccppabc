@@ -9,6 +9,7 @@ Notes
  - Prior range implemented Jan 22, 2016 (CHH)
 
 '''
+import numpy as np
 
 def PriorRange(prior_name): 
     ''' Given prior dictionary name, return the prior range. 
@@ -27,7 +28,7 @@ def prior_dict_table():
     '''
     dict_table = { 
             'first_try': {
-                'prior_min': [10., np.log(0.1), 11.02, 0.8, 13.]
+                'prior_min': [10., np.log(0.1), 11.02, 0.8, 13.],
                 'prior_max': [13., np.log(0.7), 13.02, 1.3, 14.]
                 }
             }
