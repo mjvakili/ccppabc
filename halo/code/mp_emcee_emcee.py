@@ -115,39 +115,29 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro , Ndim, observables=['nbar', 'xi'],
 
     """Initializing Walkers"""
 
-    pos0 = [np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5]) + 1e-3*np.random.randn(Ndim) for i in range(Nwalkers)]
+    pos = [np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5]) + 1e-3*np.random.randn(Ndim) for i in range(Nwalkers)]
 
     """Initializing MPIPool"""
 
-    #pool = MPIPool()
-    #if not pool.is_master():
-    #   pool.wait()
-    #   sys.exit(0)
+    pool = MPIPool(loadbalance=True)
+    if not pool.is_master():
+       pool.wait()
+       sys.exit(0)
 
     """Initializing the emcee sampler"""
-  
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob)
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob, pool=pool)
+    
+    # Burn in + Production
+    sampler.run_mcmc(pos, Nchains_burn + Nchains_pro)
 
-
-    """Running the sampler and saving the chains incrementally"""
-
-    f = open("hod_chain.dat", "w")
-    f.close()
-    for result in sampler.sample(pos0, iterations = Nchains_burn + Nchains_pro, storechain=False):
-        position = result[0]
-        print position.shape
-        f = open("hod_chain.dat", "a")
-        for k in range(position.shape[0]):
-	    output_str = '\t'.join(position[k].astype('str')) + '\n'
-            f.write(output_str)
-        f.close()
-
-
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnprob)
-   
-    #pool.close()
+    # Production.
+    samples = sampler.chain[:, Nchains_burn:, :].reshape((-1, Ndim))
+    #closing the pool 
+    pool.close()
+    
+    np.savetxt("mcmc_sample.dat" , samples)
     
 if __name__=="__main__": 
     
-    mcmc(100, 100, 600, 5, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500})
+    mcmc(20,10, 10, 5, observables=['nbar', 'xi'], data_dict={'Mr':20, 'Nmock':500})
 
