@@ -60,6 +60,22 @@ def data_xi(Mr=20, Nmock=500):
 
     return [xi, cii]
 
+
+def data_xi_full_cov(Mr=20, Nmock=500): 
+    '''
+    Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
+    '''
+    xi_dat_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
+    xi = np.loadtxt(xi_dat_file, unpack=True)
+
+    # load covariance of xi 
+    cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov = np.loadtxt(cov_dat_file)
+    #cii = np.diag(cov)   # diagonal elements
+
+    return [xi, cov]
+
+
 def data_xi_bin(Mr=20):
     ''' r bins for xi(r)
     '''
