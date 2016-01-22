@@ -105,8 +105,14 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     #eps = abcpmc.ConstEps(T, [1.e13,1.e13])
     eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
+    f = open("abc_tolerance.dat" , "w")
+    f.close()
     for pool in abcpmc_sampler.sample(prior, eps):
         while (pool.ratio>.01):
+          for k in range(eps(pool.t).shape[0]):
+              output_str = '\t'.join(eps(pool.t)[k].astype('str')) + '\n'
+              f.write(output_str)
+          f.close()
           print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
           print eps(pool.t)
           # plot theta
