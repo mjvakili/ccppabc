@@ -18,12 +18,17 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
     '''
     Corner plots of input theta values 
     '''
+    pretty_colors = prettycolors()
+
     # weighted theta
     fig = corner.corner(
             theta, 
             weights=w.flatten(), 
             truths=truths,
-            labels=[r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'],
+            truth_color=pretty_colors[0],
+            labels=[
+                r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                ],
             range=plot_range,
             quantiles=[0.16,0.5,0.84], 
             show_titles=True, 
@@ -31,7 +36,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             plot_datapoints=True, 
             fill_contours=True, 
             levels=[0.68, 0.95], 
-            color='b', 
+            color=pretty_colors[2], 
             bins=20,
             smooth=1.0)
     
@@ -45,7 +50,10 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
     fig = corner.corner(
             theta, 
             truths=truths,
-            labels=[r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'],
+            truth_color=pretty_colors[0],
+            labels=[
+                r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                ],
             range=plot_range, 
             quantiles=[0.16,0.5,0.84],
             show_titles=True, 
@@ -53,7 +61,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             plot_datapoints=True, 
             fill_contours=True, 
             levels=[0.68, 0.95], 
-            color='b', 
+            color=pretty_colors[2], 
             bins=16, 
             smooth=1.0)
     fig_file = ''.join([util.fig_dir(), 
