@@ -169,7 +169,7 @@ def build_xi_nbar_gmf_cov(Mr=20, Nmock=500):
         model.populate_mock() 
         
         # xi(r)
-        xir.append(model.mock.compute_galaxy_clustering()[1])
+        xir.append(model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1])
         # nbar
         nbars.append(model.mock.number_density)
         # gmf
