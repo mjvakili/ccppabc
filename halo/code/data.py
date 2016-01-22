@@ -246,4 +246,4 @@ def build_observations(Mr=20, Nmock=500):
     build_xi_inv_cov(Mr=Mr, Nmock=Nmock, unbias=True)
 
 if __name__=='__main__': 
-    build_observations(Nmock=5)
+    build_observations()
