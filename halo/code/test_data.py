@@ -155,4 +155,5 @@ def xi_binning_tests(Mr=20):
         print xi_r
 
 if __name__=='__main__': 
-    xi_cov(Mr=20, Nmock=500)
+    #xi_cov(Mr=20, Nmock=500)
+    xi_binning_tests(Mr=20)
