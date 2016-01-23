@@ -71,12 +71,9 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     def simz(tt): 
         sim = our_model.sum_stat(tt, **kwargs)
         if sim is None: 
-            print 'Simulator is giving NoneType.'
             pickle.dump(tt, open("simz_crash_theta.p", 'wb'))
-            print 'The input parameters are', tt
             pickle.dump(kwargs, open('simz_crash_kwargs.p', 'wb'))
-            print 'The kwargs are', kwargs
-            raise ValueError
+            raise ValueError('Simulator is giving NonetType')
         return sim
 
     def multivariate_rho(datum, model): 
@@ -107,43 +104,41 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     pools = []
     f = open("abc_tolerance.dat" , "w")
     for pool in abcpmc_sampler.sample(prior, eps):
-        while (pool.ratio>.01):
-          for k in range(eps(pool.t).shape[0]):
-              #print str(eps(pool.t)[k])
-              output_str = '\t'.join(str(eps(pool.t)[k])) + '\n'
-              #print output_str
-              f.write(output_str)
-          f.close()
-          print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
-          print eps(pool.t)
-          # plot theta
-          plot_thetas(pool.thetas, pool.ws , pool.t, 
-                  Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
-          # write theta and w to file 
-          theta_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-              '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.dat'])
-          w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-              '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.dat'])
-          np.savetxt(theta_file, pool.thetas)
-          np.savetxt(w_file, pool.ws)
+        while pool.ratio > .01:
+            for k in range(eps(pool.t).shape[0]):
+                output_str = '\t'.join(str(eps(pool.t)[k])) + '\n' 
+                f.write(output_str)
+                f.close()
 
-          if pool.t < 3: 
-              eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
-          elif (pool.t > 2) and (pool.t < 20):
-              eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
-              abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
-          else:
-              eps.eps = np.percentile(np.atleast_2d(pool.dists), 90 , axis = 0)
-              abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
-          #if eps.eps < eps_min:
-          #    eps.eps = eps_min
-            
+            print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
+            print eps(pool.t)
+            # plot theta
+            plot_thetas(pool.thetas, pool.ws , pool.t, 
+                    Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
+            # write theta and w to file 
+            theta_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
+                '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.dat'])
+            w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
+                '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.dat'])
+            np.savetxt(theta_file, pool.thetas)
+            np.savetxt(w_file, pool.ws)
+
+            if pool.t < 3: 
+                eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
+            elif (pool.t > 2) and (pool.t < 20):
+                eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
+                abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
+            else:
+                eps.eps = np.percentile(np.atleast_2d(pool.dists), 90 , axis = 0)
+                abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
+            #if eps.eps < eps_min:
+            #    eps.eps = eps_min
+
         pools.append(pool)
     mpi_pool.close()
     #abcpmc_sampler.close()
-    
     return pools
 
 if __name__=="__main__": 
     ABCpmc_HOD(20, [1.e10,1.e10], N_part=20, observables=['nbar', 'xi'])
-    ABCpmc_HOD(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi', 'gmf'])
+    #ABCpmc_HOD(20, [1.e10,1.e10], N_part=100, observables=['nbar', 'xi', 'gmf'])
