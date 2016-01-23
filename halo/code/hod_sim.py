@@ -53,7 +53,7 @@ class HODsim(object):
                     group_richness = richness(group_id)         # group richness of the galaxies
                     obvs.append(gmf(group_richness))                 # calculate GMF
                 elif obv == 'xi': 
-                    r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())
+                    r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                     obvs.append(xi_r)
                 else: 
                     raise NotImplementedError('Only nbar and GMF implemented so far')
@@ -75,7 +75,7 @@ class HODsim(object):
                             group_richness = richness(group_id)         # group richness of the galaxies
                             obvs.append(gmf(group_richness))                 # calculate GMF
                         elif obv == 'xi': 
-                            r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())
+                            r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                             obvs.append(xi_r)
                         else: 
                             raise NotImplementedError('Only nbar and GMF implemented so far')
@@ -138,7 +138,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                 group_richness = richness(group_id)         # group richness of the galaxies
                 obvs.append(gmf(group_richness))                 # calculate GMF
             elif obv == 'xi': 
-                r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())
+                r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                 obvs.append(xi_r)
             else: 
                 raise NotImplementedError('Only nbar and GMF implemented so far')
@@ -160,7 +160,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                         group_richness = richness(group_id)         # group richness of the galaxies
                         obvs.append(gmf(group_richness))                 # calculate GMF
                     elif obv == 'xi': 
-                        r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())
+                        r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                         obvs.append(xi_r)
                     else: 
                         raise NotImplementedError('Only nbar and GMF implemented so far')
