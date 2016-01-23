@@ -18,11 +18,12 @@ import data as Data
 from hod_sim import HODsim
 from hod_sim import HODsimulator 
 from group_richness import richness
-
+from prior import PriorRange
 
 def mcmc(Nwalkers, Nchains_burn, Nchains_pro, 
         observables=['nbar', 'xi'], 
-        data_dict={'Mr':20, 'Nmock':500}): 
+        data_dict={'Mr':20, 'Nmock':500},
+        prior_name = 'first_try'): 
     '''
     Standard MCMC implementaion
     
@@ -147,7 +148,7 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
 
     f = open("hod_chain.dat", "w")
     f.close()
-    for result in sampler.sample(pos0, iterations = Nchains_burn + Nchains_pro, storechain=False):
+    for result in sampler.sample(random_guess, iterations = Nchains_burn + Nchains_pro, storechain=False):
         position = result[0]
         print position.shape
         f = open("hod_chain.dat", "a")
@@ -161,4 +162,4 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
     pool.close()
     
 if __name__=="__main__": 
-    mcmc(100, 100, 600, observables=['nbar', 'xi'])
+    mcmc(10, 1, 1, observables=['nbar', 'xi'])

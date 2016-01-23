@@ -108,7 +108,7 @@ def data_xi_inv_cov(Mr=20, Nmock=500, unbias_str=True):
 
     inv_cov = np.loadtxt(inv_cov_file) 
 
-    return cov
+    return inv_cov
     
 
 # Build observables ---------------
