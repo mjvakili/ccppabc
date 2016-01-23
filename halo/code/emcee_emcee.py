@@ -68,7 +68,6 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
     
     # Priors
     prior_min, prior_max = PriorRange(prior_name)
-    prior = abcpmc.TophatPrior(prior_min, prior_max)
     prior_range = np.zeros((len(prior_min),2))
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
