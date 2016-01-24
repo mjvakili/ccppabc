@@ -19,6 +19,50 @@ from hod_sim import HODsim
 from hod_sim import HODsimulator 
 from group_richness import richness
 from prior import PriorRange
+    
+def lnPost(theta, **kwargs):
+    '''log-posterior
+    '''
+    prior_range = kwargs['prior_range']
+    prior_min = prior_range[:,0]
+    prior_max = prior_range[:,1]
+
+    # Prior 
+    if prior_min[0] < theta[0] < prior_max[0] and \
+       prior_min[1] < theta[1] < prior_max[1] and \
+       prior_min[2] < theta[2] < prior_max[2] and \
+       prior_min[3] < theta[3] < prior_max[3] and \
+       prior_min[4] < theta[4] < prior_max[4]:
+           lnPrior = 0.0
+    else:
+        lnPrior = -np.inf
+    
+    if not np.isfinite(lnPrior):
+        return -np.inf
+
+    # Likelihood
+    model_obvs = HODsimulator(theta, **kwargs)
+    ind = 0 
+    if 'nbar' in observables: 
+        res_nbar = fake_obs[ind] - model_obvs[ind] 
+        ind += 1 
+    if 'gmf' in observables: 
+        res_gmf = fake_obs[ind] - model_obvs[ind]
+        ind += 1
+    if 'xi' in observables: 
+        res_xi = fake_obs[ind] - model_obvs[ind]
+    
+    chi_tot = 0.
+    if 'nbar' in observables: 
+        chi_tot += -0.5*(res_nbar)**2. / data_nbar_var 
+    if 'gmf' in observables: 
+        raise NotImplementedError('GMF Likelihood has not yet been implemented')
+    if 'xi' in observables: 
+        chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , data_xi_invcov) , res_xi))
+    lnLike = chi_tot
+
+    return lnPrior + lnLike
+
 
 def mcmc(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'], 
         data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', N_threads=1): 
@@ -70,48 +114,6 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
     
-    # simulator
-    #our_model = HODsim()    # initialize model
-
-    def lnPost(theta, **kwargs):
-        '''log-posterior
-        '''
-        # Prior 
-        if prior_min[0] < theta[0] < prior_max[0] and \
-           prior_min[1] < theta[1] < prior_max[1] and \
-           prior_min[2] < theta[2] < prior_max[2] and \
-           prior_min[3] < theta[3] < prior_max[3] and \
-           prior_min[4] < theta[4] < prior_max[4]:
-               lnPrior = 0.0
-        else:
-            lnPrior = -np.inf
-        
-        if not np.isfinite(lnPrior):
-            return -np.inf
-
-        # Likelihood
-        model_obvs = HODsimulator(theta, **kwargs)
-        ind = 0 
-        if 'nbar' in observables: 
-            res_nbar = fake_obs[ind] - model_obvs[ind] 
-            ind += 1 
-        if 'gmf' in observables: 
-            res_gmf = fake_obs[ind] - model_obvs[ind]
-            ind += 1
-        if 'xi' in observables: 
-            res_xi = fake_obs[ind] - model_obvs[ind]
-        
-        chi_tot = 0.
-        if 'nbar' in observables: 
-	    chi_tot += -0.5*(res_nbar)**2. / data_nbar_var 
-        if 'gmf' in observables: 
-            raise NotImplementedError('GMF Likelihood has not yet been implemented')
-        if 'xi' in observables: 
-            chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , data_xi_invcov) , res_xi))
-        lnLike = chi_tot
-
-        return lnPrior + lnLike
-
     # Initializing Walkers (@mjv : f@#k for loops)
     random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
     pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
@@ -126,7 +128,7 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     # Initializing the emcee sampler
     hod_kwargs = {'prior_range': prior_range, 'observables': observables, 'Mr': data_dict['Mr']}
     #sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=[hod_kwargs])
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, kwargs=hod_kwargs)
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, kwargs=hod_kwargs, threads=N_threads)
     sampler.run_mcmc(pos0, Nchains_burn + Nchains_pro) 
     
     #"""Running the sampler and saving the chains incrementally"""
@@ -146,4 +148,4 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     #pool.close()
     
 if __name__=="__main__": 
-    mcmc(10, 1, 1, observables=['nbar', 'xi'], N_threads=2)
+    mcmc(10, 1, 1, observables=['nbar', 'xi'], N_threads=10)
