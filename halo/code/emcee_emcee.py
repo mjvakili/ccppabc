@@ -14,11 +14,13 @@ from numpy.linalg import solve
 from emcee.utils import MPIPool
 
 # --- Local ---
+import util
 import data as Data
 from hod_sim import HODsim
 from hod_sim import HODsimulator 
 from group_richness import richness
 from prior import PriorRange
+import corner
     
 def lnPost(theta, **kwargs):
     '''log Posterior 
@@ -231,8 +233,21 @@ def mcmc_multi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
             'Mr': data_dict['Mr']
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, kwargs=hod_kwargs, threads=threads)
-    sampler.run_mcmc(pos0, Nchains_burn + Nchains_pro) 
 
+    chain_file = ''.join([util.dat_dir(), 
+        util.observable_id_flag(observables), 
+        '_Mr', str(data_dict["Mr"]), '_theta.mcmc_chain.dat'])
+    f = open(chain_file, "w")
+    f.close()
+    for result in sampler.sample(pos0, iterations=Nchains_burn + Nchains_pro, storechain=False):
+        #print result 
+        position = result[0]
+        f = open(chain_file, "a")
+        for k in range(position.shape[0]):
+	    output_str = '\t'.join(position[k].astype('str')) + '\n'
+            f.write(output_str)
+        f.close()
 
 if __name__=="__main__": 
-    mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
+    mcmc_multi(20, 100, 1000, observables=['nbar', 'xi'], threads=1)
+    #mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
