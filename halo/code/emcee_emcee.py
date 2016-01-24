@@ -20,10 +20,8 @@ from hod_sim import HODsimulator
 from group_richness import richness
 from prior import PriorRange
 
-def mcmc(Nwalkers, Nchains_burn, Nchains_pro, 
-        observables=['nbar', 'xi'], 
-        data_dict={'Mr':20, 'Nmock':500},
-        prior_name = 'first_try'): 
+def mcmc(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'], 
+        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', N_threads=1): 
     '''
     Standard MCMC implementaion
     
@@ -74,23 +72,25 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
     
     # simulator
     #our_model = HODsim()    # initialize model
-    kwargs = {'prior_range': prior_range, 'observables': observables, 'Mr': data_dict['Mr']}
-    def simz(tt): 
-        sim = HODsimulator(tt, **kwargs)
-        if sim is None: 
-            print 'Simulator is giving NoneType.'
-            pickle.dump(tt, open("mcmc_simz_crash_theta.p", 'wb'))
-            print 'The input parameters are', tt
-            pickle.dump(kwargs, open('mcmc_simz_crash_kwargs.p', 'wb'))
-            print 'The kwargs are', kwargs
-            raise ValueError
-        return sim
-    
-    def lnLike(theta):
-        #log-likelihood without the term -.5*log(det(cov))
-        # don't mess with the order!
-        model_obvs = simz(theta)
+
+    def lnPost(theta, **kwargs):
+        '''log-posterior
+        '''
+        # Prior 
+        if prior_min[0] < theta[0] < prior_max[0] and \
+           prior_min[1] < theta[1] < prior_max[1] and \
+           prior_min[2] < theta[2] < prior_max[2] and \
+           prior_min[3] < theta[3] < prior_max[3] and \
+           prior_min[4] < theta[4] < prior_max[4]:
+               lnPrior = 0.0
+        else:
+            lnPrior = -np.inf
         
+        if not np.isfinite(lnPrior):
+            return -np.inf
+
+        # Likelihood
+        model_obvs = HODsimulator(theta, **kwargs)
         ind = 0 
         if 'nbar' in observables: 
             res_nbar = fake_obs[ind] - model_obvs[ind] 
@@ -100,7 +100,6 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
             ind += 1
         if 'xi' in observables: 
             res_xi = fake_obs[ind] - model_obvs[ind]
-            ind += 1
         
         chi_tot = 0.
         if 'nbar' in observables: 
@@ -109,56 +108,42 @@ def mcmc(Nwalkers, Nchains_burn, Nchains_pro,
             raise NotImplementedError('GMF Likelihood has not yet been implemented')
         if 'xi' in observables: 
             chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , data_xi_invcov) , res_xi))
-        return chi_tot
+        lnLike = chi_tot
 
-    def lnPrior(theta):
-        #log-prior (tophat)
-        if prior_min[0] < theta[0] < prior_max[0] and \
-           prior_min[1] < theta[1] < prior_max[1] and \
-           prior_min[2] < theta[2] < prior_max[2] and \
-           prior_min[3] < theta[3] < prior_max[3] and \
-           prior_min[4] < theta[4] < prior_max[4]:
-               return 0.0
-        else:
-            return -np.inf
-    
-    def lnPost(theta):
-        #log-posterior
-        lp = lnPrior(theta)
-        if not np.isfinite(lp):
-            return -np.inf
-        return lp + lnLike(theta)
+        return lnPrior + lnLike
 
     # Initializing Walkers (@mjv : f@#k for loops)
     random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
     pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
             1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
-    # Initializing MPIPool
-    pool = MPIPool()
-    if not pool.is_master():
-        pool.wait()
-        sys.exit(0)
+    ## Initializing MPIPool
+    #pool = MPIPool()
+    #if not pool.is_master():
+    #    pool.wait()
+    #    sys.exit(0)
 
-    """Initializing the emcee sampler"""
-    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool)
-
-    """Running the sampler and saving the chains incrementally"""
-
-    f = open("hod_chain.dat", "w")
-    f.close()
-    for result in sampler.sample(random_guess, iterations = Nchains_burn + Nchains_pro, storechain=False):
-        position = result[0]
-        print position.shape
-        f = open("hod_chain.dat", "a")
-        for k in range(position.shape[0]):
-	    output_str = '\t'.join(position[k].astype('str')) + '\n'
-            f.write(output_str)
-        f.close()
+    # Initializing the emcee sampler
+    hod_kwargs = {'prior_range': prior_range, 'observables': observables, 'Mr': data_dict['Mr']}
+    #sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=[hod_kwargs])
+    sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, kwargs=hod_kwargs)
+    sampler.run_mcmc(pos0, Nchains_burn + Nchains_pro) 
+    
+    #"""Running the sampler and saving the chains incrementally"""
+    #f = open("hod_chain.dat", "w")
+    #f.close()
+    #for result in sampler.sample(pos0, iterations = Nchains_burn + Nchains_pro, storechain=False):
+    #    position = result[0]
+    #    print position.shape
+    #    f = open("hod_chain.dat", "a")
+    #    for k in range(position.shape[0]):
+    #        output_str = '\t'.join(position[k].astype('str')) + '\n'
+    #        f.write(output_str)
+    #    f.close()
 
 
     #sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost)
-    pool.close()
+    #pool.close()
     
 if __name__=="__main__": 
-    mcmc(10, 1, 1, observables=['nbar', 'xi'])
+    mcmc(10, 1, 1, observables=['nbar', 'xi'], N_threads=2)

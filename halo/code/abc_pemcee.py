@@ -106,9 +106,9 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     eps_str = ''
     for pool in abcpmc_sampler.sample(prior, eps):
         #while pool.ratio > 0.01:
-        f = open("abc_tolerance.dat" , "a")
         new_eps_str = '\t'.join(eps(pool.t).astype('str'))+'\n'
-        if eps_str != new_eps_str: 
+        if eps_str != new_eps_str:  # if eps is different, open fiel and append 
+            f = open("abc_tolerance.dat" , "a")
             eps_str = new_eps_str
             f.write(eps_str)
             f.close()
