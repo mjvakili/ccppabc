@@ -91,15 +91,13 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
         plot_range[:,1] = prior_max
     
     # chain files 
-    chain_file = ''.join([util.dat_dir(), 
-        util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
-    f = h5py.File(chain_file, 'r')
-    sample = f['positions'][:]
+        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Nchain), '.mcmc_chain.dat'])
+    #f = h5py.File(chain_file, 'r')
+    #sample = f['positions'][:]
+    sample = np.loadtxt(chain_file)
     Ndim = len(sample[0])
     Nchain = len(sample) / Nwalkers 
     
@@ -148,9 +146,11 @@ def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observable
     # chain files 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
-    f = h5py.File(chain_file, 'r')
-    sample = f['positions'][:]
+        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Nchain), '.mcmc_chain.dat'])
+    
+    #f = h5py.File(chain_file, 'r')
+    #sample = f['positions'][:]
+    sample = np.loadtxt(chain_file)
     Nchain = len(sample) / Nwalkers 
         
     fig = corner.corner(

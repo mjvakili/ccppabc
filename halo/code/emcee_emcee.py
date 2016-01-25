@@ -8,7 +8,6 @@ Author(s): Chang, MJ
 
 '''
 import sys
-import h5py
 import numpy as np
 import emcee
 from numpy.linalg import solve
@@ -235,19 +234,21 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Niter), '.mcmc_chain.hdf5'])
+        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Niter), '.mcmc_chain.dat'])
     
-    f = h5py.File(chain_file, "w")
-    f.create_dataset('positions', data=np.zeros((Nwalkers*Niter, Ndim)))
+    #f = h5py.File(chain_file, "w")
+    #f.create_dataset('positions', data=np.zeros((Nwalkers*Niter, Ndim)))
+    #f.close()
+    f.open(chain_file, 'w')
     f.close()
     i_start = 0 
     for result in sampler.sample(pos0, iterations=Niter, storechain=False):
         position = result[0]
-        i_end = i_start + position.shape[0]
-        f = h5py.File(chain_file, "r+")
-        f['positions'][i_start:i_end] = position
+        f.open(chain_file, 'a')
+        for k in range(position.shape[0]): 
+            output_str = '\t'.join(position[k].astype('str')) + '\n'
+            f.write(output_str)
         f.close()
-        i_start = i_end
 
 if __name__=="__main__": 
     mcmc_multi(200, 10000, observables=['nbar', 'xi'], threads=10)
