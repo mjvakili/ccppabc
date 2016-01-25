@@ -14,6 +14,8 @@ import numpy as np
 def PriorRange(prior_name): 
     ''' Given prior dictionary name, return the prior range. 
     '''
+    if prior_name is None: 
+        prior_name = 'first_try'
     
     dict_table = prior_dict_table() 
 
