@@ -106,11 +106,11 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
   
     for i in xrange(5):
         
-        axes[i].plot(chain_ensemble[:, :, i], color="k", alpha=0.1)
+        axes[i].plot(chain_ensemble[:, :, i], color="k", alpha=0.4)
 	axes[i].yaxis.set_major_locator(MaxNLocator(5))
         axes[i].axhline(truths[i], color="#888888", lw=2)
         axes[i].set_ylabel(labels[i])
-
+    axes[5].set_xlabel("step number")    
     fig.tight_layout(h_pad=0.0) 
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
