@@ -3,6 +3,8 @@
 Utility modules 
 
 '''
+import os 
+__file__='util.py'
 
 def observable_id_flag(observables): 
     '''
@@ -14,10 +16,11 @@ def fig_dir():
     '''
     figure directory
     '''
-    return '../fig/'
+    fig_dir = os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'fig/'
+    return fig_dir 
 
 def dat_dir(): 
     '''
     Dat directory
     '''
-    return '../dat/'
+    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
