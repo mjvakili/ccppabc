@@ -68,7 +68,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
     plt.close()
 
 
-def plot_mcmc_chains(Nchains_burn, Mr=20, truths=None, observables=['nbar', 'xi'], 
+def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables=['nbar', 'xi'], 
         plot_range=None): 
     '''
     Plot MCMC chains
@@ -94,9 +94,10 @@ def plot_mcmc_chains(Nchains_burn, Mr=20, truths=None, observables=['nbar', 'xi'
         '_Mr', str(Mr), '_theta.mcmc_chain.dat'])
 
     sample = np.loadtxt(chain_file)
+    Nchain = len(sample) / Nwalkers 
         
     fig = corner.corner(
-            sample[Nchains_burn:], 
+            sample[Nchains_burn*Nwalkers:], 
             truths=truths,
             truth_color='#ee6a50', 
             labels=[
@@ -115,11 +116,11 @@ def plot_mcmc_chains(Nchains_burn, Mr=20, truths=None, observables=['nbar', 'xi'
 
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '.Nsample', str(len(sample)),
+        '_Mr', str(Mr), '.Nchain', str(Nchain),
         '.Nburn', str(Nchains_burn), '.mcmc_chain.png'])
     plt.savefig(fig_file)
     plt.close()
 
 
 if __name__=='__main__':
-    plot_mcmc_chains(100, Mr=20, observables=['nbar', 'xi'])
+    plot_mcmc_chains(20, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
