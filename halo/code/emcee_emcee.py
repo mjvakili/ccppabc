@@ -249,5 +249,5 @@ def mcmc_multi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
         f.close()
 
 if __name__=="__main__": 
-    mcmc_multi(20, 100, 1000, observables=['nbar', 'xi'], threads=1)
+    mcmc_multi(200, 100, 10000, observables=['nbar', 'xi'], threads=22)
     #mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
