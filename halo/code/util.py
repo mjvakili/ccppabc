@@ -4,7 +4,6 @@ Utility modules
 
 '''
 import os 
-__file__='util.py'
 
 def observable_id_flag(observables): 
     '''
