@@ -3,6 +3,7 @@
 Plotting modules 
 
 '''
+import h5py
 import corner
 import numpy as np
 import matplotlib.pyplot as plt
@@ -92,12 +93,17 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
     # chain files 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '_theta.mcmc_chain.dat'])
+        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
 
-    sample = np.loadtxt(chain_file)
+    chain_file = ''.join([util.dat_dir(), 
+        util.observable_id_flag(observables), 
+        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
+    f = h5py.File(chain_file, 'r')
+    sample = f['positions'][:]
+    Ndim = len(sample[0])
     Nchain = len(sample) / Nwalkers 
     
-    chain_ensemble = sample.reshape(Nchain , Nwalkers, 5)
+    chain_ensemble = sample.reshape(Nchain , Nwalkers, Ndim)
     fig , axes = plt.subplots(5, 1 , sharex=True, figsize=(10, 12))
 
     labels=[
@@ -115,7 +121,7 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
         '_Mr', str(Mr), '.Nchain', str(Nchain),
-        '.Nburn', str(Nchains_burn), '.mcmc_time.png'])
+        '.Nburn', str(Nchains_burn), '.mcmc_time.test.png'])
     plt.savefig(fig_file)
     plt.close()
 
@@ -142,9 +148,9 @@ def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observable
     # chain files 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '_theta.mcmc_chain.dat'])
-
-    sample = np.loadtxt(chain_file)
+        '_Mr', str(Mr), '_theta.mcmc_chain.hdf5'])
+    f = h5py.File(chain_file, 'r')
+    sample = f['positions'][:]
     Nchain = len(sample) / Nwalkers 
         
     fig = corner.corner(
@@ -168,11 +174,11 @@ def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observable
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
         '_Mr', str(Mr), '.Nchain', str(Nchain),
-        '.Nburn', str(Nchains_burn), '.mcmc_samples.png'])
+        '.Nburn', str(Nchains_burn), '.mcmc_samples.test.png'])
     plt.savefig(fig_file)
     plt.close()
 
 
 if __name__=='__main__':
-    plot_mcmc_chains(20, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
-    plot_mcmc_samples(20, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
+    plot_mcmc_chains(10, Nchains_burn=1, Mr=20, observables=['nbar', 'xi'])
+    #plot_mcmc_samples(10, Nchains_burn=1, Mr=20, observables=['nbar', 'xi'])
