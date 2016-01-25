@@ -8,6 +8,7 @@ Author(s): Chang, MJ
 
 '''
 import sys
+import h5py
 import numpy as np
 import emcee
 from numpy.linalg import solve
@@ -165,7 +166,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     #sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost)
     pool.close()
     
-def mcmc_multi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'], 
+def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'], 
         data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', threads=1): 
     '''
     Standard MCMC implementaion
@@ -175,10 +176,8 @@ def mcmc_multi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     -----------
     - Nwalker : 
         Number of walkers
-    - Nchains_burn : 
-        Number of burn-in chains
-    - Nchains_pro : 
-        Number of production chains   
+    - Niter : 
+        Number of chain iterations 
     - observables : 
         list of observables. Options are 'nbar', 'gmf', 'xi'
     - data_dict : dictionary that specifies the observation keywords
@@ -236,18 +235,21 @@ def mcmc_multi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(data_dict["Mr"]), '_theta.mcmc_chain.dat'])
-    f = open(chain_file, "w")
+        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Niter), '.mcmc_chain.hdf5'])
+    
+    f = h5py.File(chain_file, "w")
+    f.create_dataset('positions', data=np.zeros((Nwalkers*Niter, Ndim)))
     f.close()
-    for result in sampler.sample(pos0, iterations=Nchains_burn + Nchains_pro, storechain=False):
-        #print result 
+    i_start = 0 
+    for result in sampler.sample(pos0, iterations=Niter, storechain=False):
         position = result[0]
-        f = open(chain_file, "a")
-        for k in range(position.shape[0]):
-	    output_str = '\t'.join(position[k].astype('str')) + '\n'
-            f.write(output_str)
+        i_end = i_start + position.shape[0]
+        f = h5py.File(chain_file, "r+")
+        f['positions'][i_start:i_end] = position
         f.close()
+        i_start = i_end
 
 if __name__=="__main__": 
-    mcmc_multi(200, 100, 10000, observables=['nbar', 'xi'], threads=22)
+    mcmc_multi(200, 10000, observables=['nbar', 'xi'], threads=10)
+    #mcmc_multi(10, 1, 5, observables=['nbar', 'xi'], threads=10)
     #mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
