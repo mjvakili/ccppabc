@@ -6,6 +6,7 @@ Plotting modules
 import corner
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator 
 
 # --- local ---
 import util
@@ -97,7 +98,7 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
     Nchain = len(sample) / Nwalkers 
     
     chain_ensemble = sample.reshape(Nchain , Nwalkers, 5)
-    fig , axes = plt.subplot(5, 1 , sharex=True, figsize=(10, 12))
+    fig , axes = plt.subplots(5, 1 , sharex=True, figsize=(10, 12))
 
     labels=[
         r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
@@ -107,7 +108,7 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
         
         axes[i].plot(chain_ensemble[:, :, i], color="k", alpha=0.1)
 	axes[i].yaxis.set_major_locator(MaxNLocator(5))
-        axes[i].axhline(thruths[i], color="#888888", lw=2)
+        axes[i].axhline(truths[i], color="#888888", lw=2)
         axes[i].set_ylabel(labels[i])
 
     fig.tight_layout(h_pad=0.0) 
