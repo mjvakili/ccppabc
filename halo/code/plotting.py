@@ -25,7 +25,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             truths=truths,
             truth_color='#ee6a50', 
             labels=[
-                r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
                 ],
             range=plot_range,
             quantiles=[0.16,0.5,0.84], 
@@ -50,7 +50,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             truths=truths,
             truth_color='#ee6a50', 
             labels=[
-                r'$\logM_{0}$',r'$\sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
                 ],
             range=plot_range, 
             quantiles=[0.16,0.5,0.84],
