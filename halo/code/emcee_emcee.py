@@ -239,12 +239,12 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
     #f = h5py.File(chain_file, "w")
     #f.create_dataset('positions', data=np.zeros((Nwalkers*Niter, Ndim)))
     #f.close()
-    f.open(chain_file, 'w')
+    f = open(chain_file, 'w')
     f.close()
     i_start = 0 
     for result in sampler.sample(pos0, iterations=Niter, storechain=False):
         position = result[0]
-        f.open(chain_file, 'a')
+        f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
             output_str = '\t'.join(position[k].astype('str')) + '\n'
             f.write(output_str)
