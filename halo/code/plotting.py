@@ -70,7 +70,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
     plt.close()
 
 
-def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables=['nbar', 'xi'], 
+def plot_mcmc_chains(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=None, observables=['nbar', 'xi'], 
         plot_range=None): 
     '''
     Plot MCMC chains
@@ -94,14 +94,14 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Nchain), '.mcmc_chain.dat'])
+        '_Mr', str(Mr), '_theta.Niter', str(Niter), '.mcmc_chain.dat'])
     #f = h5py.File(chain_file, 'r')
     #sample = f['positions'][:]
     sample = np.loadtxt(chain_file)
     Ndim = len(sample[0])
-    Nchain = len(sample) / Nwalkers 
+    Nchain = len(sample)/Nwalkers
     
-    chain_ensemble = sample.reshape(Nchain , Nwalkers, Ndim)
+    chain_ensemble = sample.reshape(Nchain, Nwalkers, Ndim)
     fig , axes = plt.subplots(5, 1 , sharex=True, figsize=(10, 12))
 
     labels=[
@@ -109,7 +109,6 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
            ]
   
     for i in xrange(5):
-        
         axes[i].plot(chain_ensemble[:, :, i], color="k", alpha=0.4)
 	axes[i].yaxis.set_major_locator(MaxNLocator(5))
         axes[i].axhline(truths[i], color="#888888", lw=2)
@@ -118,13 +117,13 @@ def plot_mcmc_chains(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables
     fig.tight_layout(h_pad=0.0) 
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '.Nchain', str(Nchain),
+        '_Mr', str(Mr), '.Niter', str(Niter),
         '.Nburn', str(Nchains_burn), '.mcmc_time.test.png'])
     plt.savefig(fig_file)
     plt.close()
 
-def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observables=['nbar', 'xi'], 
-        plot_range=None): 
+def plot_mcmc_samples(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=None, 
+        observables=['nbar', 'xi'], plot_range=None): 
     '''
     Plot MCMC chains
     '''
@@ -146,12 +145,11 @@ def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observable
     # chain files 
     chain_file = ''.join([util.dat_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Nchain), '.mcmc_chain.dat'])
+        '_Mr', str(Mr), '_theta.Niter', str(Niter), '.mcmc_chain.dat'])
     
     #f = h5py.File(chain_file, 'r')
     #sample = f['positions'][:]
     sample = np.loadtxt(chain_file)
-    Nchain = len(sample) / Nwalkers 
         
     fig = corner.corner(
             sample[Nchains_burn*Nwalkers:], 
@@ -173,12 +171,12 @@ def plot_mcmc_samples(Nwalkers, Nchains_burn=100, Mr=20, truths=None, observable
 
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
-        '_Mr', str(Mr), '.Nchain', str(Nchain),
+        '_Mr', str(Mr), '.Niter', str(Niter),
         '.Nburn', str(Nchains_burn), '.mcmc_samples.test.png'])
     plt.savefig(fig_file)
     plt.close()
 
 
 if __name__=='__main__':
-    plot_mcmc_chains(10, Nchains_burn=1, Mr=20, observables=['nbar', 'xi'])
-    #plot_mcmc_samples(10, Nchains_burn=1, Mr=20, observables=['nbar', 'xi'])
+    plot_mcmc_chains(100, Niter=10000, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
+    plot_mcmc_samples(100, Niter=10000, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
