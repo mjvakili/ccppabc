@@ -7,6 +7,7 @@ Author(s): Chang, MJ
 
 
 '''
+import os 
 import sys
 import numpy as np
 import emcee
@@ -166,7 +167,8 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     pool.close()
     
 def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'], 
-        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', threads=1): 
+        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', 
+        threads=1, continue_chain=False): 
     '''
     Standard MCMC implementaion
     
@@ -217,10 +219,37 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
     
-    # Initializing Walkers (@mjv : f@#k for loops)
-    random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
-    pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-            1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+    # mcmc chain output file 
+    chain_file = ''.join([
+        util.dat_dir(), 
+        util.observable_id_flag(observables), 
+        '_Mr', str(data_dict["Mr"]), 
+        '_theta.Niter', str(Niter), 
+        '.mcmc_chain.dat'
+        ])
+
+    if os.path.isfile(chain_file) and continue_chain:   
+        print 'Continuing previous MCMC chain!'
+        sample = np.loadtxt(chain_file) 
+        Nchain = Niter - (len(sample) / Nwalkers) # Number of chains left to finish 
+        if Nchain > 0: 
+            pass
+        else: 
+            raise ValueError
+        print Nchain, ' iterations left to finish'
+
+        # Initializing Walkers from the end of the chain 
+        pos0 = sample[-Nwalkers:]
+    else: 
+        # new chain 
+        f = open(chain_file, 'w')
+        f.close()
+        Nchain = Niter
+         
+        # Initializing Walkers 
+        random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+        pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
+                1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing the emcee sampler
     hod_kwargs = {
@@ -231,17 +260,8 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
             'Mr': data_dict['Mr']
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, kwargs=hod_kwargs, threads=threads)
-
-    chain_file = ''.join([util.dat_dir(), 
-        util.observable_id_flag(observables), 
-        '_Mr', str(data_dict["Mr"]), '_theta.Niter', str(Niter), '.mcmc_chain.dat'])
     
-    #f = h5py.File(chain_file, "w")
-    #f.create_dataset('positions', data=np.zeros((Nwalkers*Niter, Ndim)))
-    #f.close()
-    f = open(chain_file, 'w')
-    f.close()
-    for result in sampler.sample(pos0, iterations=Niter, storechain=False):
+    for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
         f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
@@ -250,6 +270,6 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
         f.close()
 
 if __name__=="__main__": 
-    mcmc_multi(100, 10000, observables=['nbar', 'xi'], threads=10)
+    mcmc_multi(100, 10000, observables=['nbar', 'xi'], threads=5, continue_chain=True)
     #mcmc_multi(10, 1, 5, observables=['nbar', 'xi'], threads=10)
     #mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
