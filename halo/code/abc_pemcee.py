@@ -143,4 +143,4 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     return pools
 
 if __name__=="__main__": 
-    ABCpmc_HOD(20, [1.e10,1.e10], N_part=1000, observables=['nbar', 'xi'])
+    ABCpmc_HOD(20, [1.e10,1.e10], N_part=1000, observables=['nbar', 'xi', 'gmf'])
