@@ -241,7 +241,6 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
     #f.close()
     f = open(chain_file, 'w')
     f.close()
-    i_start = 0 
     for result in sampler.sample(pos0, iterations=Niter, storechain=False):
         position = result[0]
         f = open(chain_file, 'a')
@@ -251,6 +250,6 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
         f.close()
 
 if __name__=="__main__": 
-    mcmc_multi(200, 10000, observables=['nbar', 'xi'], threads=10)
+    mcmc_multi(100, 10000, observables=['nbar', 'xi'], threads=10)
     #mcmc_multi(10, 1, 5, observables=['nbar', 'xi'], threads=10)
     #mcmc_mpi(10, 1, 1, observables=['nbar', 'xi'])
