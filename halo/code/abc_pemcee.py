@@ -4,8 +4,24 @@ Module for ABC-PMC inference
 
 Author(s): Chang, MJ
 
+Commandline call sequence : 
+
+python abc_pemcee.py Niter Npart ObsStr OutputDir
+
+- Niter : int
+    Number of iterations 
+- Npart : int
+    Number of particles 
+- ObsStr : string
+    String that specifies the observables. 
+    'nbarxi' is ['nbar', 'xi']
+    'nbargmf' is ['nbar', 'gmf']
+    'nbarxigmf' is ['nbar', 'xi', 'gmf']
+- OutputDir : string
+    String that specifies the output directory
 
 '''
+import sys 
 import time
 import pickle
 import numpy as np
@@ -23,7 +39,8 @@ from group_richness import richness
 # --- Plotting ---
 from plotting import plot_thetas
 
-def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
+def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], 
+        data_dict={'Mr':20, 'Nmock': 500}, output_dir=None):
     '''
     ABC-PMC implementation. 
 
@@ -35,6 +52,10 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     - observables : list of observables. Options are 'nbar', 'gmf', 'xi'
     - data_dict : dictionary that specifies the observation keywords 
     '''
+    if output_dir is None: 
+        output_dir = util.dat_dir()
+    else: 
+        pass
     # data observables
     fake_obs = []       # list of observables 
     for obv in observables: 
@@ -103,6 +124,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
     f = open("abc_tolerance.dat" , "w")
+    f.close()
     eps_str = ''
     for pool in abcpmc_sampler.sample(prior, eps):
         #while pool.ratio > 0.01:
@@ -119,10 +141,10 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         plot_thetas(pool.thetas, pool.ws , pool.t, 
                 Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
         # write theta and w to file 
-        theta_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-            '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.dat'])
-        w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
-            '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.dat'])
+        theta_file = ''.join([output_dir, util.observable_id_flag(observables), 
+            '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.mercer.dat'])
+        w_file = ''.join([output_dir, util.observable_id_flag(observables), 
+            '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.mercer.dat'])
         np.savetxt(theta_file, pool.thetas)
         np.savetxt(w_file, pool.ws)
 
@@ -143,4 +165,28 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     return pools
 
 if __name__=="__main__": 
-    ABCpmc_HOD(20, [1.e10,1.e10], N_part=1000, observables=['nbar', 'xi'])
+
+    Niter = int(sys.argv[1])
+    print 'N iterations = ', Niter
+    Npart = int(sys.argv[2])
+    print 'N particles = ', Npart
+    obv_flag = sys.argv[3]
+    if obv_flag == 'nbarxi': 
+        obv_list = ['nbar', 'xi']
+    elif obv_flag == 'nbargmf':  
+        obv_list = ['nbar', 'gmf']
+    elif obv_flag == 'nbarxigmf':
+        obv_list = ['nbar', 'xi', 'gmf']
+    else: 
+        raise ValueError
+    print 'Observables: ', ', '.join(obv_list)
+    eps_list = [1.e10 for i in range(len(obv_list))]
+
+    if len(sys.argv) > 4: 
+        out_dir = sys.argv[4]
+        if out_dir[-1] != '/': 
+            out_dir += '/'
+        print 'Output to ', out_dir
+        ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list, output_dir=out_dir)
+    else: 
+        ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list, output_dir=None)

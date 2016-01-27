@@ -7,6 +7,7 @@ import os
 import numpy as np
 from numpy.linalg import solve
 
+import util
 from group_richness import gmf_bins
 from group_richness import richness 
 from group_richness import gmf as GMF
@@ -23,8 +24,8 @@ def data_hod_param(Mr=20):
 def data_gmf(Mr=20, Nmock=500): 
     ''' Observed GMF from 'data'
     '''
-    gmf_dat_file = ''.join(['../dat/gmf.Mr', str(Mr), '.dat'])
-    gmf_sig_file = ''.join(['../dat/gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    gmf_dat_file = ''.join([util.dat_dir(), 'gmf.Mr', str(Mr), '.dat'])
+    gmf_sig_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     return [np.loadtxt(gmf_dat_file), np.loadtxt(gmf_sig_file)]
 
 def data_gmf_bins(): 
@@ -36,7 +37,7 @@ def data_gmf_cov(Mr=20, Nmock=500):
     '''
     GMF covariance matrix 
     '''
-    cov_file = ''.join(['../dat/gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     return np.loadtxt(cov_file)
 
 # --- nbar --- 
@@ -44,8 +45,8 @@ def data_nbar(Mr=20, Nmock=500):
     '''
     Observed nbar from 'data'
     '''
-    nbar = np.loadtxt(''.join(['../dat/nbar.Mr', str(Mr), '.dat']))
-    nbar_cov = np.loadtxt(''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat']))
+    nbar = np.loadtxt(''.join([util.dat_dir(), 'nbar.Mr', str(Mr), '.dat']))
+    nbar_cov = np.loadtxt(''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat']))
     return [nbar, nbar_cov]
 
 # --- 2PCF --- 
@@ -53,11 +54,11 @@ def data_xi(Mr=20, Nmock=500):
     '''
     Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
     '''
-    xi_dat_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
+    xi_dat_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     xi = np.loadtxt(xi_dat_file, unpack=True)
 
     # load covariance of xi 
-    cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov_dat_file = ''.join([util.dat_dir(), 'xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     cov = np.loadtxt(cov_dat_file)
     cii = np.diag(cov)   # diagonal elements
 
@@ -67,11 +68,11 @@ def data_xi_full_cov(Mr=20, Nmock=500):
     '''
     Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
     '''
-    xi_dat_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
+    xi_dat_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     xi = np.loadtxt(xi_dat_file, unpack=True)
 
     # load covariance of xi 
-    cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov_dat_file = ''.join([util.dat_dir(), 'xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     cov = np.loadtxt(cov_dat_file)
     #cii = np.diag(cov)   # diagonal elements
 
@@ -80,7 +81,7 @@ def data_xi_full_cov(Mr=20, Nmock=500):
 def data_xi_bins(Mr=20):
     ''' r bins for xi(r)
     '''
-    rbin_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
+    rbin_file = ''.join([util.dat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     return np.loadtxt(rbin_file)
 
 def data_xi_cov(Mr=20, Nmock=500): 
@@ -88,7 +89,7 @@ def data_xi_cov(Mr=20, Nmock=500):
     Observed xi covariance. The entire covariance matrix
     '''
     # load covariance of xi 
-    cov_dat_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    cov_dat_file = ''.join([util.dat_dir(), 'xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     cov = np.loadtxt(cov_dat_file)
 
     return cov 
@@ -103,7 +104,7 @@ def data_xi_inv_cov(Mr=20, Nmock=500, unbias_str=True):
     else: 
         unbias_str = ''
 
-    inv_cov_file = ''.join(['../dat/', 
+    inv_cov_file = ''.join([util.dat_dir(), 
         'xi_inv_cov', unbias_str, '.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
 
     inv_cov = np.loadtxt(inv_cov_file) 
@@ -121,18 +122,18 @@ def build_xi_nbar_gmf(Mr=20):
 
     # write xi 
     data_xir = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1]
-    output_file = ''.join(['../dat/xir.Mr', str(Mr), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, data_xir)
 
     # write nbar values 
     nbar = model.mock.number_density
-    output_file = ''.join(['../dat/nbar.Mr', str(Mr), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'nbar.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, [nbar]) 
     
     # write GMF 
     rich = richness(model.mock.compute_fof_group_ids())
     gmf = GMF(rich)  # GMF
-    output_file = ''.join(['../dat/gmf.Mr', str(Mr), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'gmf.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, gmf) 
 
     return None 
@@ -143,7 +144,7 @@ def build_xi_bins(Mr=20):
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     model.populate_mock() # population mock realization 
     r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
-    output_file = ''.join(['../dat/xir_rbin.Mr', str(Mr), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, r_bin)
     return None
 
@@ -180,30 +181,30 @@ def build_xi_nbar_gmf_cov(Mr=20, Nmock=500):
 
     # save xi covariance 
     xi_covar = np.cov(np.array(xir).T)
-    output_file = ''.join(['../dat/xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, xi_covar)
 
     # save nbar values 
     nbar_cov = np.var(nbars, axis=0) 
-    output_file = ''.join(['../dat/nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, [nbar_cov]) 
     
     # write GMF covariance 
     gmf_cov = np.cov(np.array(gmfs).T)
-    output_file = ''.join(['../dat/gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, gmf_cov) 
     # write GMF Poisson
     gmf_counts_mean = np.mean(gmf_counts, axis=0)
     poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
-    output_file = ''.join(['../dat/gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, poisson_gmf) 
     # write GMF standard dev 
     sigma_gmf = np.std(gmfs, axis=0)                    # sample variance 
-    output_file = ''.join(['../dat/gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, sigma_gmf) 
     # write GMF total noise 
     sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
-    output_file = ''.join(['../dat/gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    output_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, sigma_tot) 
     return None
 
@@ -226,7 +227,7 @@ def build_xi_inv_cov(Mr=20, Nmock=500, unbias=True):
     
     inv_c = solve(np.eye(N_bins) , xi_cov) * f_unbias 
 
-    output_file = ''.join(['../dat/', 
+    output_file = ''.join([util.dat_dir(), 
         'xi_inv_cov', unbias_str, '.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     np.savetxt(output_file, inv_c) 
 

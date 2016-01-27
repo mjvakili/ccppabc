@@ -53,7 +53,7 @@ pos = [result["x"] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 #    pool.wait()
 #    sys.exit(0)
 
-sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(x, y, yerr))# , threads=15)
+sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(x, y, yerr)) , threads=15)
 f = open("chain.dat", "w")
 f.close()
 for result in sampler.sample(pos, iterations=600, storechain=False):
@@ -72,17 +72,17 @@ samples = sampler.chain[:, 100:, :].reshape((-1, ndim))
 
 #pool.close()
 
-import corner
-fig = corner.corner(samples, labels=["$m$", "$b$", "$\ln\,f$"],
-                      truths=[m_true, b_true, np.log(f_true)])
-fig.savefig("/home/mj/public_html/triangle_final.png")
-
-samples2 = np.loadtxt("chain.dat")
-
-fig = corner.corner(samples2[100:], labels=["$m$", "$b$", "$\ln\,f$"],
-                      truths=[m_true, b_true, np.log(f_true)])
-
-fig.savefig("/home/mj/public_html/triangle_incremental.png")
+#import corner
+#fig = corner.corner(samples, labels=["$m$", "$b$", "$\ln\,f$"],
+#                      truths=[m_true, b_true, np.log(f_true)])
+#fig.savefig("/home/mj/public_html/triangle_final.png")
+#
+#samples2 = np.loadtxt("chain.dat")
+#
+#fig = corner.corner(samples2[100:], labels=["$m$", "$b$", "$\ln\,f$"],
+#                      truths=[m_true, b_true, np.log(f_true)])
+#
+#fig.savefig("/home/mj/public_html/triangle_incremental.png")
 
 
 
