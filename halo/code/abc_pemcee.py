@@ -179,8 +179,10 @@ if __name__=="__main__":
         raise ValueError
     print 'Observables: ', ', '.join(obv_list)
     eps_list = [1.e10 for i in range(len(obv_list))]
+
     if len(sys.argv) > 4: 
         out_dir = sys.argv[4]
         print 'Output to ', out_dir
-
-    #ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list)
+        ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list, output_dir=out_dir)
+    else: 
+        ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list, output_dir=None)
