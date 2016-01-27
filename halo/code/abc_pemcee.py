@@ -182,6 +182,8 @@ if __name__=="__main__":
 
     if len(sys.argv) > 4: 
         out_dir = sys.argv[4]
+        if out_dir[-1] != '/': 
+            out_dir += '/'
         print 'Output to ', out_dir
         ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list, output_dir=out_dir)
     else: 
