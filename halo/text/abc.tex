@@ -1,522 +1,3 @@
-ss[12pt, preprint]{aastex}
-\usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
-\usepackage{graphicx}	% For figures
-\usepackage{natbib}	% For citep and citep
-\usepackage{amsmath}	% for \iint
-\usepackage{bm}
-\usepackage[breaklinks]{hyperref}	% for blackboard bold numbers
-\usepackage{hyperref}
-\usepackage{algorithmic,algorithm}
-\hypersetup{colorlinks}
-\usepackage{color}
-\usepackage{morefloats}
-\definecolor{darkred}{rgb}{0.5,0,0}
-\definecolor{darkgreen}{rgb}{0,0.5,0}
-\definecolor{darkblue}{rgb}{0,0,0.5}
-\hypersetup{ colorlinks,
-linkcolor=darkblue,
-filecolor=darkgreen,
-urlcolor=darkred,
-citecolor=darkblue}
-
-\DeclareMathOperator*{\argmax}{arg\,max}
-
-\newcommand{\todo}[1]{{\bf \textcolor{red}{ #1}}}
-\newcommand{\beq}{\begin{equation}}
-\newcommand{\eeq}{\end{equation}}
-\newcommand{\lang}{\langle}
-\newcommand{\ra}{\rangle}
-\newcommand{\vep}{\bm{\epsilon}}
-\newcommand{\ep}{\epsilon}
-\newcommand{\pars}{\vec{\theta}}
-\newcommand{\dev}{\mathrm{d}}
-
-\begin{document}
-% We need a better definitely shorter title...
-\title{Approximate bayesian computation in large scale structure modeling : constraining the galaxy-halo connection}
-\begin{abstract}
-\todo{This is not a paper about hod, let's not start with describing hod. I suggest that we talk about parameter estimation in large scale structure in general and then move on to hod. Constraining hod is a just the first step in testing our methodology.} The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies
-populate dark matter halos that has had much success in reproducing large scale galaxy
-clustering and understanding galaxy evolution within the context of the halo model.
-Constraints on the parameters that describe the HOD model have so far been inferred using 
-the standard practice of Bayesian inference with likelihood estimation that assumes a
-functional Gaussian form of the likelihood.\todo{(Do we want to include analytic models for clustering statistics here? Yes, also we should say we use summary statistics that are not independent: clustering + group. Also there is no analytic model for the abundance of galaxy group richnesses)}  % I think we should keep it simple. There's no need to go into detail about everything in the abstract. This is already a pretty sizable abstract. 
-Likelihood free inference methods such as the
-Approximate Bayesian Computation (ABC) makes Bayesian inference possible without ever 
-having to calculate the likelihood. 
-
-In this work, we present ABC in the context of constraining the parameters of the HOD model
-using {\it Halotools}, a publicly available ... First, we set a mock galaxy catalog created
-with HOD parameters from \cite{Zheng:2007aa} \todo{why do we site here?} as our data catalog. Then we use ABC on a set 
-% To give it a false sense of legitimacy... 
-of observables measured from forward modeled mock catalogs generated with {\it Halotools} 
-in order to accurately infer constraints on the HOD parameters that 
-reproduce the original parameters. \todo{Remark about the comparison between our ABC 
-method constraints and the standard MCMC constraints.} Furthermore, since ABC does 
-not require computing the likelihood, we include observables beyond galaxy clustering 
-such as the galaxy number density and the galaxy group multiplicity function, for which
-accurately constructing a likelihood is intractable. 
-We demonstrate that adding these measurements to our set of observables leads to stronger
-constraints on the HOD parameters, specifically the ones that govern the satellite galaxy
-population. Moreover, the constraints we infer illustrate the feasibility of ABC in 
-cosmological contexts.
-
-\todo{Hogg writes here too}
-
-\end{abstract}
-
-\section{Introduction}
-
-Cosmology was revolutionized in the 1990s with the introduction of likelihoods---%
-pro\-ba\-bil\-iites for the data given the theoretical model and parameter settings---%
-for combining data from different surveys and performing principled inferences of
-the cosmological parameters (CITE CITE).
-Nowhere has this been more true than in cosmic microwave background studies,
-where it is nearly possible to analytically evaluate a likelihood function that
-involves no (or minimal) approximations (CITE Wandelt and others).
-
-Fundamentally, the tractability of likelihood functions in cosmology flows from
-the fact that the initial conditions are exceedingly close to Gaussian in form,
-and many sources of measurement noise are also Gaussian.
-Likelihood functions are easier to write down and evaluate when things are closer to Gaussian,
-so they get easier as the length scales get larger and the structure formation gets
-younger.
-Hence the suitability of CMB data for likelihood analyses.
-
-In large-scale structure studies, which have galaxies, quasars, or quasar absorption
-systems as tracers, the likelihood cannot be Gaussian:
-Even if the initial conditions are perfectly Gaussian, the growth of structure
-creates non-linearities which are non-Gaussian, and the galaxies form
-within the density field in some complex manner that is unknown (or modeled only effectively).
-Even if the galaxies were a Poisson sampling of the density field (which they are demonstrably
-not; CITE PEOPLE), it would be tremendously hard to write down even an approximate
-likelihood function.
-
-The standard approach is to make two strong assumptions, both demonstrably wrong:
-The first is that the (density and) two-point function measurements constitute
-sufficient statistics for the cosmological parameters.
-That is, the assumption is that all of the information about the cosmological model is
-encoded in the mean and variance statistics of the tracer population.
-This first assumption is equivalent to assuming that the density field is a Gaussian process,
-and is therefore closer to true on larger scales.
-
-The second strong and wrong assumption is that the likelihood functon for the data can
-be approximated by a pseudo-likelihood function that is a Gaussian probability density
-in the space of the two-point correlation function estimate.
-That is, the assumption is that a pseudo-likelihood of the data given by a squared distance
-(scaled by an inverse covariance matrix) between an estimate of the correlation function
-(the data) and a theoretical prediction of that same function will return sensible posterior
-inferences.
-This assumption cannot be correct (in detail) at any scale, since a correlation function,
-being related to the variance of a continuous field,
-must satisfy non-trivial positive-definiteness
-requirements (it must take the form of a valid kernel function; CITE SOMETHING).
-These requirements truncate function space such that the likelihood in that functon space
-could never be Gaussian.
-This second assumption becomes truer as the correlation function gets better measured, so
-it is most true on intermediate scales (where neither shot noise nor cosmic variance blow up).
-We expect it to be very strongly violated at the baryon acoustic scale in particular!
-
-Neither of these two assumptions are required for cosmological inferences, however:
-We have very sophisticated simulations and emulations of structure and galaxy formation.
-Indeed, the theory of large-scale structure \emph{is} the output of these simulations;
-we can simulate the data in great detail.
-Therefore, we can simulate not just the one- and two-point statistics of the galaxies,
-but also any higher order statistics that might be relevant.
-Furthermore, we can see the distributions of these statistics, and where the data lie within
-those distributions.
-That is---in principle---we don't need to make these strong and wrong assumptions;
-we can create---in principle---a likelihood function directly from (an enormous number of)
-simulation outputs.
-
-Of course, any naive approach to sufficiently simulating the data would be ruinously
-expensive.
-Fortunately, there are principled, (relatively) efficient methods for minimizing computation
-and delivering correct posterior inferences,
-using only a data simulator and some choices about statistics.
-Here we use \todo{Introduce the names ABC and LFI with references}.
-
-As we will see, the LFI approach---despite cleverness---will be very computationally expensive.
-For context, it is worth remembering that even the traditional approach to large-scale structure,
-outlined above, requires enormous numbers of structure- and galaxy-formation simulations as well,
-to construct the covariance matrices that go into the pseudo-likelihood.
-So although our costs will be high, there are no inexpensive methods to compare to.
-
-\todo{MJ: What Hogg wrote above doesn't mesh with (that is, repeats differently) what you have written below, so can you go through and fix that?  Lots of what is below should remain, but some should get woven into what's above.}
-
-% style note: Here and in what follows: --- separates parenthetical phrases, -- connects words that appear together in a relationship (like galaxy--galaxy) and (galaxy--halo), and - connects pairs of words into an adjective (like two-point).
-
-Inference of the cosmological parameters and understanding the formation of galaxies within the context of large scale 
-structure, requires understanding of the galaxy--halo connection. Halos are biased tracers of the large scale structure 
-and galaxies reside in dark matter Halos. Halo occupation distribution---HOD---is a probabilistic framework that describes how galaxies populate dark matter halos. The central tenet of halo occupation model is that the probability that a certain number of galaxies populate a dark matter halo is determined by the mass of the host halo. This statistical prescription for connection of galaxies and halos has been successful in reproducing the galaxy two-point clustering as well as the galaxy--matter cross correlation---galaxy--galaxy 
-lensing---within the context of the halo model, and has been used in understanding the co-evolution of galaxies and halos and putting constraints on the relation between the stellar mass and halo mass of galaxies.
-
-In the context of large scale clustering of galaxies, inference of the cosmological and halo model parameters are performed by treating some estimate of the galaxy--galaxy two-point correlation function as the data,
-assuming an analytic model for the theoretical two-point correlation function prediction,
-and a Gaussian likelihood connecting the two.
-The accuracy of the analytic model of the galaxy clustering statistics hinges upon the accuracy of the fitting functions such as halo bias, halo mass function that are accurate to ten percent level. There are other simplifying assumptions encoded in these analytic models such as the scale independence of the halo bias. 
-
-Furthermore, the likelihood of observing the data---observed positions of the galaxies in the configuration space---given the cosmological and halo model parameters is approximated by a Gaussian function whose argument is the squared difference of the two-point correlation function measured from the observations and the analytic model for the galaxy clustering, weighted by a covariance matrix.
-\todo{Why MUST this be wrong?}
-The weighted difference of the number density of the observed galaxies and the analytic number density is also added to this. In this work, we investigate the how accurately we can infer the model parameters by relaxing the underlying assumptions of the parameter inference methods. 
-
-Approximate bayesian computation (ABC) provides a \emph{rejected sampling} framework framework that alleviates the issues arising from approximating the likelihood of observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting the proposals for which the distance between the data and the simulation (measured by a metric) is less than a certain small threshold.
-
-In practice, the rejected sampling method is replaced by a more efficient adaptive importance sampling operation called Population Monte Carlo (PMC). Initially, PMC rejects the draws from prior pdf with a relatively large threshold. In the consequent steps, importance sampling from the previous samples that passed the distance criteria is performed, and the threshold is updated adaptively. That is, after each iteration, the threshold is lowered according to the distribution of the distances.  
- 
-Furthermore, This sampling formalism permits us to sample the posterior of the model by simulating the data via a forward generative model that accounts for all the complications and uncertainties associated with the survey data that are difficult to take into account in approximating the likelihood function. In the context of the large galaxy surveys, these complications may include masks, nontrivial survey geometry, and missing data as a result of fiber collision.
-
-Rejected sampling in ABC requires a distance function that quantifies the closeness of the simulation (e.g. fiber collided galaxies) to the data (observed positions of the galaxies in the survey). In principle, this distance metric is a positive definite function  that compares various summary statistics of the data and those of the simulations. In this investigation, we focus on the two-point correlation, number density, and the group statistics (more specifically the abundance of the galaxy group richnesses). 
-
-Performing a full cosmological inference using this sampling method requires a simulator that, (I) takes a set of cosmological parameters as input and generates a snapshot of dark matter particles at a given redshift using an N-body simulation, (II) builds a catalog of dark matter halos for that snapshot of the N-body simulation using a halo finder algorithm, and (III) paints galaxies into host halos given a set of halo occupation model parameters. 
-
-Computationally, this process is extremely demanding. One way to make this problem more tractable is to split this into to separate this problem into two parts: \emph{emulation}, and \emph{simulation}. That is, one can use a set of N-body simulations with known cosmologies, and perform halo occupation simulations using the pre-built halo catalogs of those simulations. In order to compute the summary statistics corresponding to the samples from the parameter space for which there is no N-body simulation, one can interpolate between the summary statistics of the parameters for which we have available N-body simulations. This procedure is called emulation. Emulation has been introduced in the literature in coyote universe [CITE COYOTE].
-
-In this work however, we narrow our focus on inferring the posterior probability over the parameters of the halo model using an already existing halo catalog of a dark matter particle N-body simulation with a fixed cosmology. That is we simplify the problem by leaving the problem of emulation for future investigations.
-
-The calculations regarding populating the dark matter halos, computing the clustering statistics and finding groups in the galaxy mock catalogs are performed using ({\fontfamily{cmss}\selectfont Halotools}) which is an open-source package tailored for modeling galaxy-halo connection in large scale structure modeling ({\fontfamily{cmss}\selectfont http://halotools.readthedocs.org}).
-
-This paper is structured as follows. In Section \ref{sec:method},
-we discuss the components of the Halo occupation modeling, and the ABC sampling method. We also give a brief overview of the summary statistics used in this investigation. In Section \ref{sec:halo} we give a brief overview of the forward modeling of the galaxy mock catalogs using Halotools as well as generating a mock galaxy catalog as data. In Section \ref{sec:results} we explore the results of our parameter inference using different summary statistics. Finally, we discuss and conclude in Section \ref{sec:discussion}.
-
-\section{Method}\label{sec:method}
-
-\subsection{Approximate Bayesian Computation}
-
-ABC is a generative simulation-based inference based on rejection sampling. That is, the parameters of the forward model of the data are drawn from the prior probability, and are rejected if the simulated data is not sufficiently close to the observations according to some distance metric $\rho$. The method requires a prior probability over the parameters of interest $\pi(\theta)$, a generative forward model of the data given a set of parameters $f(\theta)$, and a distance metric $\rho(.,.)$ which measures the distance between the simulation $X=f(\theta)$ and the observed data $D$. 
-
-In a large scale structure study however, the observed data---which encompasses the angular positions of galaxies on the sky and their redshifts---is a high dimensional object. Therefore the distance metric measures the closeness of statistical summaries of the data and those of the simulation. When the observed data-set under study is the positions of all galaxies observed in the survey, possible statistical summaries of the data are the number density of galaxies, two-point correlation function, three-point correlation function, galaxy group statistics (counts in cells), and so on.
-
-Here, we provide a brief overview of rejection sampling algorithm and how it is used in a simulation-based inference. We want to draw samples from a probability distribution $p(\alpha)$. Now, let us assume that: (i) there exists an auxiliary density $q(\alpha)$ from which we can directly sample from, and (ii) there exist $M>1$ which is an appropriate bound on $p(\alpha)/q(\alpha)$. Given these assumptions, rejection sampling works in the following way. We draw a sample $\alpha$ from the auxiliary density $q(\alpha)$. Afterwards, we draw a random number $u$ from a uniform distribution between zero and one. Then we accept the draw $\alpha$ if the $u$ is less than the ratio $p(\alpha)/Mq(\alpha)$. This procedure is repeated until sufficient number of draws are accepted.
-
-In the context of a simulation-based inference, we aim to sample from the joint probability of a simulation $X$, and parameters $\pars$ given the observed data $D$
-
-\beq
-p(\pars,X | D)
-\eeq
-
-which according to the Bayes rule can be written as 
-
-\begin{eqnarray}
-p(\pars,X | D)  &=& \frac{p(D|X)p(X|\pars)\pi(\pars)}{Z},  \\
-Z &=& \int \dev \pars \; \dev X \; p(D|X)p(X|\pars)\pi(\pars),
-\end{eqnarray}
-where $Z$ is the evidence. There exists a constant $M>1$ 
-\beq 
-M = \frac{\mathrm{max}_{X} \; p(D|X)}{Z},
-\eeq 
-and auxiliary density $q(\pars ,X)$
-\beq 
-q(\pars ,X)=p(X|\pars )\pi(\pars ),
-\eeq 
-such that:
-\beq 
-p(\pars ,X|D)<Mq(\pars ,X).
-\eeq 
-Now in a simulation-based inference, we first draw a pair $\{\pars , X \}$ from the density $q(\pars , X)$. This requires drawing a sample $\pars$ from the prior $\pi(\pars)$, and generating a simulation $X=f(\pars)$ via the forward model. Then, we accept the pair $\{\pars , X \}$, if the following condition is met
-
-\beq 
-u \sim \mathrm{Uniform}[0,1] < \frac{p(\pars,X|D)}{Mq(\pars,X)}=\frac{p(D|X)}{\mathrm{max}_{X}p(D|X)}.
-\eeq 
-
-ABC postulates that the probability of observing data $D$ given simulation $X$, $p(D|X)$ is controlled by a threshold $\epsilon$, and that this probability is one if the distance between the data and the simulation, $\rho(D,X)$ is less than $\epsilon$. That is
-
-\beq 
-p(D|X) = p_{\epsilon}(D|X) \equiv \begin{cases}
-                                    1 \ \ \  \mathrm{if} \ \rho(D,X)<\epsilon \; , \\
-                                    0 \ \ \ \mathrm{otherwise} \; .
-                                    \end{cases}
-\eeq 
-
-Thus the set of parameters $\pars$ is accepted if $\rho(D,f(\pars))<\epsilon$. In principle, the distance function measures the distance 
-between the statistical summaries of the data and those of the simulation. 
-The distance, in general, can be a vector, with each component representing the distance between one summary statistics of the data (e.g. variance) and the same summary statistics of the simulation. That is
-\beq 
-\rho(D,X) = \Big[\rho_{1}(S_{1}(D) , S_{1}(X)), ... , \rho_{M}(S_{M}(D) , S_{M}(X)) \Big],
-\eeq 
-where $M$ is the number of statistical summaries used in the inference, $S_{i}$ is the i-th summary statistics, and $\rho_{i}$ is a scalar function that measures the distance between the i-th summary statistics of the data and that of the simulation. In this case, the threshold $\epsilon$ is an $M$ dimensional vector.
-
-We draw a large number of proposals from the prior distribution over the parameter space, 
-and reject the samples for which the distance between the data and the simulation corresponding to that 
-sample is more than a certain threshold $\bm{\epsilon}$. This requirement is satisfied \emph{if and only if}
-every component of the distance vector is less than its corresponding threshold. Note that, each summary statistics 
-has a separate threshold. This procedure is done iteratively until, we are left with a certain number
-of samples that satisfy the distance criteria. The final ensemble approximates the posterior probability distribution over the parameters of the generative model of the data.
-
-For a sufficiently small threshold, this algorithm samples from the posterior probability, $p(\pars | D)$, and for an arbitrarily large threshold, the algorithm samples from the prior $\pi(\pars)$. This rejection sampling technique requires repeated sampling from the prior, and a very small threshold to succeed.
-
-In this investigation instead, we use Population Monte Carlo Algorithm (PMC) as our sampling technique. PMC is an iterative method that performs rejected sampling from a sequence of distributions $\{p_{1}(\pars),...,p_{T}(\pars)\}$.These distributions are paired with a sequence of decreasing distance thresholds $\{\epsilon_{1} , ... , \epsilon_{T}\}$.
-
-At each iteration, $N$ proposals are drawn from a distribution over parameters, and a weight is assigned to each one. In the first step, the threshold is set to an arbitrarily large value. Therefore the algorithm makes $N$ draws from the prior and assigns equal weights to all the proposals.
-
-In the consequent iterations, the distance threshold is set to a smaller value. A proposal is weighted-sampled from the previous sample. It is perturbed by a kernel which is set to the covariance of the parameters in the previous sample. A simulation is then generated by feeding the perturbed parameter into the forward model. The perturbed parameter is then accepted if the distance between the data and the generated simulation is less than the value of the threshold in that iteration. This procedure is repeated until $N$ particles are sampled. Then the weights are updated according to the kernel, the prior, and the previous set of weights.
-
-\begin{algorithm}
-\caption{The procedure for ABC-PMC}
-\begin{algorithmic}[1]
-%\STATE \DATA: D
-%\STATE \RESULT: ABC posterior sample of $\pars$
-\IF{$t=1:$}
-%\STATE $\epsilon_t \gets \infty$
-\FOR{$i=1,...,N$}
-   \STATE // \emph{This loop can now be done in parallel for all i}
-   \WHILE{$\rho(X,D)>\epsilon_t$}
-   \STATE $\pars^{*}_{t} \gets \pi(\pars)$
-   \STATE $X = f(\pars^{*}_{t})$
-   \ENDWHILE
-   \STATE $\pars^{(i)}_{t} \gets \pars^{*}_{t}$
-   \STATE $w^{(i)}_{t} \gets 1/N$
-\ENDFOR
-\ENDIF
-\IF{$t=2,...,T:$}
-\FOR{$i=1,...,N$}
-   \STATE // \emph{This loop can now be done in parallel for all i}
-   \WHILE{$\rho(X,D)>\epsilon_t$}
-   \STATE Draw $\pars^{*}_{t}$ from $\{\pars^{j}_{t-1}\}$ with probabilities $\{w^{j}_{t-1}\}$
-   \STATE $\pars^{*}_{t} \gets K(\pars^{*}_{t},.)$
-   \STATE $X = f(\pars^{*}_{t})$
-   \ENDWHILE
-   \STATE $\pars^{(i)}_{t} \gets \pars^{*}_{t}$
-   \STATE $w^{(i)}_{t} \gets \frac{\pi(\pars^{(i)}_{t})}{\sum_{j=1}^{N}w_{t-1}^{(i)}K(\pars^{(j)}_{t-1},\pars^{(i)}_{t})}$
-\ENDFOR
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
-
-%\begin{algorithm}[H]
-% \Data{this text}
-% \Result{how to write algorithm with \LaTeX2e }
-% initialization\;
-% \While{not at end of this document}{
-%  read current\;
-%  \eIf{understand}{
-%   go to next section\;
-%   current section becomes this one\;
-%   }{
-%   go back to the beginning of current section\;
-%  }
-% }
-% \caption{How to write algorithms}
-%\end{algorithm}
-
-
-\subsection{Forward model of the large scale galaxy populations}\label{sec:halo}
-\subsubsection{halo occupation modeling}
-
-\newcommand{\lcdm}{\Lambda {\rm CDM}}
-\newcommand{\dd}{\mathrm{d}}
-\newcommand{\mean}[2]{\left\langle#1 \vert {#2}\right\rangle}
-
-%%% HALO OCCUPATION DISTRIBUTION %%%
-\newcommand{\ngal}{N_{\mathrm{g}}}
-\newcommand{\nsat}{N_\mathrm{s}}
-\newcommand{\ncen}{N_\mathrm{c}}
-\newcommand{\pnm}[2]{P(#1|#2)}
-
-\newcommand{\mhalo}{M_{\rm h}}
-\newcommand{\mvir}{M_\mathrm{vir}} 
-
-\newcommand{\dndmvir}{\frac{\dd n}{\dd\mvir}}
-\newcommand{\dndmhalo}{\frac{\dd n}{\dd\mhalo}}
-\newcommand{\dndmvirprime}{\frac{\dd n}{\dd\mvir'}}
-
-%%% CLUSTERING STATISTICS %%%
-\newcommand{\xigg}{\xi_{\mathrm{gg}}}
-\newcommand{\xihh}{\xi_{\mathrm{hh}}}
-\newcommand{\xiggr}{\xi_{\mathrm{gg}}(r)}
-\newcommand{\xiggroneh}{\xi^{1h}_{\mathrm{gg}}(r)}
-\newcommand{\xiggrtwoh}{\xi^{2h}_{\mathrm{gg}}(r)}
-\newcommand{\ngalaxy}{\bar{n}_{\mathrm{g}}}
-
-One of the most well-studied statistics of the galaxy distribution 
-is $\xigg,$ the galaxy-galaxy correlation function. Mathematically, $\xigg$ encodes the
-excess probability that a pair of galaxies in a sample are 
-separated by three-dimensional distance $r.$ 
-Galaxy clustering is straightforward to measure observationally, 
-and it is a highly sensitive probe of both the physics of galaxy evolution 
-as well as the fundamental parameters of $\lcdm$ cosmology. 
-
-The assumption that galaxies reside in dark matter halos is the bedrock underlying 
-all contemporary theoretical predictions for galaxy clustering. Since the 
-clustering of dark matter halos can be predicted to high precision with N-body simulations, 
-then knowledge of how galaxies populate and are distributed within halos 
-is sufficient to predict $\xigg.$ Under this assumption, $\xigg$ can be formally decomposed
-into a ``one-halo term" and a ``two-halo term'', 
-referring to galaxy pairs that reside in the same halo vs. distinct halos, respectively. 
-The two-halo term of $\xigg$ is a pair-number weighted average of $\xihh,$ 
-the halo-halo correlation function, whereas the one-halo term is the pair-number 
-weighted average of the intra-halo distribution of galaxies. 
-Models for the galaxy-halo connection aiming to predict $\xigg$ must therefore 
-provide theoretical means by which to calculate these weights and spatial distributions. 
-
-The Halo Occupation Distribution (HOD) is one of the most widely used 
- approaches to characterizing the galaxy-halo connection. 
-The central quantity In the HOD is $\pnm{\ngal}{\mhalo},$ the probability that a halo of mass
-$\mhalo$ hosts $\ngal$ galaxies. The first two moments of $\pnm$ contain the 
-necessary information to calculate the one- and two-halo terms of the galaxy correlation function:
-
-\begin{eqnarray}
-\label{eq:onehaloterm}
-1+\xiggroneh \simeq \frac{1}{4\pi{}r^{2}\ngalaxy^{2}}\int\dd\mhalo\dndmhalo\Xi_{\rm gg}(r|\mhalo) \times \mean{\ngal(\ngal-1)}{\mhalo},
-\end{eqnarray} and
-
-\begin{eqnarray}
-\label{eq:twohaloterm}
-\xiggrtwoh \simeq \xi_{\mathrm{mm}}(r)\left[\frac{1}{\ngalaxy}\int\dd\mhalo\dndmhalo \mean{\ngal}{\mhalo}b_{\mathrm{h}}(\mhalo)\right]^{2}
-\end{eqnarray}
-
-In Eqs.~(\ref{eq:onehaloterm}) and (\ref{eq:twohaloterm}), $\ngalaxy$
-is the galaxy number density,
-$\dd\mathrm{n}/\dd\mhalo$ is the halo mass function, 
-the spatial bias of dark matter halos is $b_{\mathrm{h}}(\mhalo),$ and
-$\xi_{\rm mm}$ is the correlation function of dark matter.  
-If we represent the spherically symmetric intra-halo distribution of galaxies 
-by a unit-normalized $n_{\rm g}(r),$
-then the quantity $\Xi_{\rm gg}(r)$ appearing in the above two equations 
-is the convolution of $n_{\rm g}(r)$ with itself. 
-
-Employing Eqs.~(\ref{eq:onehaloterm}) and (\ref{eq:twohaloterm}) to 
-calculate $\xigg(r)$ is the most common technical method used in HOD 
-studies of galaxy clustering. 
-However, this technique requires appeal to many simplifying assumptions 
-in addition to the supposition that galaxies reside in halos. For example, 
-Eqs.~(\ref{eq:onehaloterm}) and (\ref{eq:twohaloterm}) presume that 
-the intra-halo galaxy distribution is spherically symmetric, and 
-that the halo bias $b_{\mathrm{h}}(\mhalo)$ has no radial dependence. 
-Moreover, these equations does not take halo exclusion into account. 
-We refer the interested reader to \citet{cooray02,mo_vdb_white10,vdBosch13}, 
-and references therein, for further information. 
-
-In addition to the above, in the vast majority of HOD studies the actual calculation of 
-Eqs.~(\ref{eq:onehaloterm}) and (\ref{eq:twohaloterm}) relies on further assumption still. 
-The quantities $b_{\mathrm{h}}(\mhalo),$ $\xi_{\mathrm{mm}}(r)$ and $\dndmhalo$ 
-are commonly replaced by analytical fitting functions that have been calibrated 
-against a suite of N-body simulations \citep[e.g.,][]{sheth_tormen01,smith03,tinker05,tinker10}.   
-And yet, it is well established that the precision of these fitting functions is 
-limited to the $\sim10\%$ level \citep[e.g.][]{tinker08}. 
-
-\todo{APH: Ok, so the above level of detail may be overkill for this paper. I figured that part of the argument we'd make is this: it is now time to start taking the precision of our predictions seriously, the ten-percent game is over. ABC is a big contribution to going beyond ten percent, and now that Halotools makes it possible to circumvent the need for these fitting functions, this opens up new limiting factors such as the hard Gaussianity assumption. So I see the above argument as part of the argument for using ABC. However, I'm not married to any of the above text, so just let me know if you want me to scrap some of it. Otherwise, I will next pick up from here and start talking about how Halotools relaxes the reliance on these approximations, and I will make explicit the point about how this new level of precision motivates the exploration of ABC.}
-
-\todo{MJ: I think all of the text written above is necessary for making a case for simulation-based inference in large-scale structure modeling. So I'm in favor of keeping it for now.}
-
-
-Dark matter halos are biased tracers of the underlying matter distribution of the universe. The halo model postulates that galaxies reside in dark matter halos. Halo Occupation distribution---HOD---is a powerful tool for description of galaxy--halo connection. HOD provides a probabilistic prescription for how galaxies populate halos. According to HOD modeling, the number of galaxies that populate a dark matter halo is dictated by the host halo mass $M_h$. The probability of a dark matter halo of mass $M_h$ being populated by $N_g$ galaxies---$P(N_g|M_h)$--- is a Poisson distribution, and is separable to two parts 
-\beq
-P(N_g|M_h) = P(N_\mathrm{cen}|M_h) + P(N_\mathrm{sat}|M_h),
-\eeq
-where $N_\mathrm{cen}$ is the number of central galaxies, and $N_\mathrm{sat}$ is the number of satellites. 
-
-\subsubsection{Generating mock galaxy populations with halotools}
-
-%\todo{Halotools allows us to forward model galaxy positions from HOD parameters. From the galaxy positions, we can calculate observable summary statistics such as the 2PCF, Group Multiplicity Function (GMF) and the number density $\bar{n}$.}
-
-%Talk about why it is better to simulate the mock and compute %the summary statistics of the mock instead of using analytic formulas...
-
-%Talk about all the assumptions that go into analytic %formulas...
-
-%Talk about why we do not want to write down likelihood %function for gmf, 2pcf, ...
-\subsubsection{summary statistics of galaxy populations}
-
-
-\subsubsection{distance metrics}
-
-
-%\todo{Talk about the observable: 2pcf, group multiplicity %function, and number density ...}
-
-
-\section{Mock Observations}\label{sec:data}
-\todo{The fake observations we use as "data" in our inference.}
-%Plots showing 2pcf, gmf, ... of the mock data.
-%How we compute the covariance matrix from mocks...
-%Talk about error bars. Talk about poisson errors in group %populations ... 
-
-\section{Results}\label{sec:results}
-Show the posteriors...
-Show evolution of the posterior errorbars with iteration. Show epsilon. Convice that we are converging ...
-Draw samples from the posterior, populate the mock catalogs with those samples, and compute the summary statistcs with them 
-and demonstrate that they match the data...
-
-\subsection{Comparison to MCMC}
-\todo{Apples to apples comparison between ABC and MCMC.}
-ABC-PMC using nbar and xi vs MCMC
-
-\subsection{ABC Including GMF}
-ABC-PMC results using observables beyond galaxy clustering and nbar(z) GMF
-
-\section{Discussion}\label{sec:discussion}
-\todo{talk about cosmological inference and why this is good first step for likelihood free inference in large scale ...}
-
-
-talk about halo model ...
-
-talk about HOD and why it is too simple to be the right model ...
-
-talk about assembly bias perhaps ... and how we can use the same machinery for detection of assemblt bias ... 
-
-talk about writing down a likelihood for gmf, tpcf, ... , and the Gaussianity assumption ....
-
-talk about are results ...
-talk about future directions ...
-
-%%%%%%%%%% FIGURES %%%%%%%%%%
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{xi_covariance_Mr20_Nmock500.png}
-\caption{eft panel:
-Correlation coefficients of the error covariance matrix for the Mock galaxy two-point correlation function signal in Fig. 1, where the covariance matrix is computed from the 500 mock catalogs}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{gmf_covariance_Mr20_Nmock500.png}
-\caption{eft panel:
-Correlation coefficients of the error covariance matrix for the Mock galaxy group multiplicity function signal in Fig. 2, where the covariance matrix
-is computed from the 500 mock catalogs}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{tpcf_sigma.pdf}
-\caption{1-$\sigma$(dark-shaded) and two-$\sigma$ ABC posterior predictions
-for the two-point correlation function of galaxies. The black lines show the data-points.}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{tpcf_res_sigma3.pdf}
-\caption{1-$\sigma$(dark-shaded) and two-$\sigma$ ABC posterior model prediction residuals
-for the two-point correlation function of galaxies.}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{gmf3.png}
-\caption{{\bf Top Panel:}1-$\sigma$(dark-shaded) and 2-$\sigma$ ABC posterior model prediction 
-for the group multiplicity function of galaxies in the mock catalog.{\bf Bottom Panel:}Same as the top panel, but showing the residuals.}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-\section*{acknowledgments}
-
-We would like to thank Mike Blanton, Boris Leidstadt, Micheal Schneider, Uros Seljak, Ross Fadely, Jeremy Tinker, Alex Malz, Patrick McDonald, Dan Foreman-Mackey, for productive and insightful discussions. 
-MJV was supported by NSF grant AST-1517237. CHH was supported by James Arthur Graduate Award Grant.
-DWH was supported by NSF (grants IIS-1124794 and AST-1517237), NASA (grant NNX12AI50G), and the Moore-Sloan Data Science Environment at NYU.
-
-\bibliographystyle{yahapj}
-\bibliography{ccppabc}
-\end{document}
 \documentclass[12pt, preprint]{aastex}
 \usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{graphicx}	% For figures
@@ -552,7 +33,7 @@ citecolor=darkblue}
 
 \begin{document}
 % We need a better definitely shorter title...
-\title{Approximate bayesian computation in large scale structure modeling : constraining the galaxy-halo connection}
+\title{Approximate Bayesian Computation in Large Scale Structure: Constraining the Galaxy-Halo Connection}
 \begin{abstract}
 \todo{This is not a paper about hod, let's not start with describing hod. I suggest that we talk about parameter estimation in large scale structure in general and then move on to hod. Constraining hod is a just the first step in testing our methodology.} The Halo Occupation Distribution (HOD) model is a powerful prescription of how galaxies
 populate dark matter halos that has had much success in reproducing large scale galaxy
@@ -587,7 +68,7 @@ cosmological contexts.
 \section{Introduction}
 
 Cosmology was revolutionized in the 1990s with the introduction of likelihoods---%
-pro\-ba\-bil\-iites for the data given the theoretical model and parameter settings---%
+pro\-ba\-bil\-ities for the data given the theoretical model and parameter settings---%
 for combining data from different surveys and performing principled inferences of
 the cosmological parameters (CITE CITE).
 Nowhere has this been more true than in cosmic microwave background studies,
@@ -596,7 +77,7 @@ involves no (or minimal) approximations (CITE Wandelt and others).
 
 Fundamentally, the tractability of likelihood functions in cosmology flows from
 the fact that the initial conditions are exceedingly close to Gaussian in form,
-and many sources of measurement noise are also Gaussian.
+and many sources of measurement noise are also Gaussian. (may as well cite evidence for this too)
 Likelihood functions are easier to write down and evaluate when things are closer to Gaussian,
 so they get easier as the length scales get larger and the structure formation gets
 younger.
@@ -940,15 +421,39 @@ where $N_\mathrm{cen}$ is the number of central galaxies, and $N_\mathrm{sat}$ i
 \subsubsection{distance metrics}
 
 
-%\todo{Talk about the observable: 2pcf, group multiplicity %function, and number density ...}
 
-
-\section{Mock Observations}\label{sec:data}
-\todo{The fake observations we use as "data" in our inference.}
+\section{Experiments}\label{sec:data}
+\subsection{Mock observations}
+\subsection{}
+In order to test the va
 %Plots showing 2pcf, gmf, ... of the mock data.
 %How we compute the covariance matrix from mocks...
-%Talk about error bars. Talk about poisson errors in group %populations ... 
+%Talk about error bars. Talk about poisson errors in group %populations .
+%--------------------------------------------------------
+% Covariance matrix of xi  
+%--------------------------------------------------------
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{xi_covariance_Mr20_Nmock500.png}
+\caption{The reduce covariance matrix $C_{i,j}/\sqrt{C_{i,i} C_{j,j}}$ of 
+the two-point correlation function, $\xi(r)$, estimated from 500 Halotools 
+realizations. We describe the calculation of $\xi(r)$ in Section \todo{reference section}. \todo{binning and range of $r$}.}
+\label{fig:2pcf_cov}
+\end{figure}
+%--------------------------------------------------------
+% Covariance matrix of GMF 
+%--------------------------------------------------------
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{gmf_covariance_Mr20_Nmock500.png}
+\caption{The reduce covariance matrix $C_{i,j}/\sqrt{C_{i,i} C_{j,j}}$ of 
+the Galaxy Multiplicity Function (GMF) estimated from 500 Halotools 
+realizations. \todo{reference to GMF calculation in text}. 
+\todo{binning and range of $r$}.}
+\label{fig:gmf_cov}
+\end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%% SECTION: %%%%%%%%%%%%%%%%%%%%%%%
+% SECTION: RESULTS 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}\label{sec:results}
 Show the posteriors...
 Show evolution of the posterior errorbars with iteration. Show epsilon. Convice that we are converging ...
@@ -958,9 +463,44 @@ and demonstrate that they match the data...
 \subsection{Comparison to MCMC}
 \todo{Apples to apples comparison between ABC and MCMC.}
 ABC-PMC using nbar and xi vs MCMC
+%--------------------------------------------------------
+% ABC-PMC Posterior likelihoods using nbar and xi
+%--------------------------------------------------------
+\begin{figure*}
+\begin{center}
+\includegraphics[width=\textwidth]{nbar_xi_Mr20_Niter10000_Nburn100_mcmc_samples_test.png}
+\caption{Posterior likelihood of HOD parameters $\log M_0$, 
+$\sigma_{\log M}$, $\log M_{min}$, $\alpha$, and $\log M_1$ using the
+standard Markov Chain Monte Carlo method as described in Section \todo{CITECITE}. 
+\todo{THIS IS A SPACE MARKER NOT THE FINAL FIGURE.}}
+\label{fig:post_abc_nbarxi}
+\end{center}
+\end{figure*}
+%--------------------------------------------------------
+% MC-MC Posterior likelihoods using nbar and xi
+%--------------------------------------------------------
+\begin{figure*}
+\begin{center}
+\includegraphics[width=\textwidth]{nbar_xi_Mr20_now_t11.png}
+\caption{Posterior likelihood of HOD parameters $\log M_0$, 
+$\sigma_{\log M}$, $\log M_{min}$, $\alpha$, and $\log M_1$ using ABC-PMC 
+with distance criteria defined by the observables $\bar{n}$ and $\xi(r)$.
+\todo{This is the 12th iteration. NOT THE FINAL.}}
+\label{fig:post_abc_nbarxi}
+\end{center}
+\end{figure*}
 
+%%%%%%%%%%%%%%%%%%%%%%% SECTION: %%%%%%%%%%%%%%%%%%%%%%%
+% ABC INCLUDING GMF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ABC Including GMF}
 ABC-PMC results using observables beyond galaxy clustering and nbar(z) GMF
+%--------------------------------------------------------
+% ABC-PMC Posterior likelihoods using nbar, xi and GMF 
+%--------------------------------------------------------
+\todo{Insert ABC-PMC Posterior Likelihoods using $\bar{n}$, $\xi(r)$ and GMF 
+once it finishes running}
+
 
 \section{Discussion}\label{sec:discussion}
 \todo{talk about cosmological inference and why this is good first step for likelihood free inference in large scale ...}
@@ -977,34 +517,24 @@ talk about writing down a likelihood for gmf, tpcf, ... , and the Gaussianity as
 talk about are results ...
 talk about future directions ...
 
-%%%%%%%%%% FIGURES %%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABC-PMC Posterior likelihoods using nbar and GMF 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 \begin{center}
-  \includegraphics[width=1.\textwidth]{xi_covariance_Mr20_Nmock500.png}
-\caption{eft panel:
-Correlation coefficients of the error covariance matrix for the Mock galaxy two-point correlation function signal in Fig. 1, where the covariance matrix is computed from the 500 mock catalogs}
-\label{fig:2pcf-model}
+\includegraphics[width=\textwidth]{nbar_gmf5_Mr20_now_t18.png}
+\caption{Posterior likelihood of HOD parameters $\log M_0$, 
+$\sigma_{\log M}$, $\log M_{min}$, $\alpha$, and $\log M_1$ using ABC-PMC 
+with distance criteria defined by the observables $\bar{n}$ and GMF.}
+\label{fig:post_abc_nbargmf}
 \end{center}
 \end{figure*}
-
-\begin{figure*}
-\begin{center}
-  \includegraphics[width=1.\textwidth]{gmf_covariance_Mr20_Nmock500.png}
-\caption{eft panel:
-Correlation coefficients of the error covariance matrix for the Mock galaxy group multiplicity function signal in Fig. 2, where the covariance matrix
-is computed from the 500 mock catalogs}
-\label{fig:2pcf-model}
-\end{center}
-\end{figure*}
-
-
 \begin{figure*}
 \begin{center}
   \includegraphics[width=1.\textwidth]{tpcf_sigma.pdf}
 \caption{1-$\sigma$(dark-shaded) and two-$\sigma$ ABC posterior predictions
 for the two-point correlation function of galaxies. The black lines show the data-points.}
-\label{fig:2pcf-model}
+\label{fig:gmf_cov}
 \end{center}
 \end{figure*}
 
@@ -1027,13 +557,19 @@ for the group multiplicity function of galaxies in the mock catalog.{\bf Bottom 
 \end{center}
 \end{figure*}
 
-\section*{acknowledgments}
+\section*{Acknowledgments}
 
-We would like to thank Mike Blanton, Boris Leidstadt, Micheal Schneider, Uros Seljak, Ross Fadely, Jeremy Tinker, Alex Malz, Patrick McDonald, Dan Foreman-Mackey, for productive and insightful discussions. 
-MJV was supported by NSF grant AST-1517237. CHH was supported by James Arthur Graduate Award Grant.
-DWH was supported by NSF (grants IIS-1124794 and AST-1517237), NASA (grant NNX12AI50G), and the Moore-Sloan Data Science Environment at NYU.
+We would like to thank Mike Blanton, Boris Leidstadt, Micheal Schneider, 
+Uros Seljak, Ross Fadely, Jeremy Tinker, Alex Malz, Patrick McDonald, Dan 
+Foreman-Mackey, for productive and insightful discussions. 
+
+MJV was supported by NSF grant AST-1517237. CHH was supported by James 
+Arthur Graduate Award Grant. DWH was supported by NSF (grants IIS-1124794 
+and AST-1517237), NASA (grant NNX12AI50G), and the Moore-Sloan Data Science 
+Environment at NYU.
+
+\todo{We need to acknowledge AstroHackWeek.}
 
 \bibliographystyle{yahapj}
 \bibliography{ccppabc}
 \end{document}
-
