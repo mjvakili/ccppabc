@@ -22,7 +22,7 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'],
                   Mr=20 , data_dict={'Mr':20, 'Nmock':500}):
     
     #load the data   
-    theta = np.loadtxt(file_name+".dat") 
+    theta = np.loadtxt(file_name+".dat")[:3] 
     for obv in observables: 
         if obv == 'xi': 
             # import xir and full covariance matrix of xir
@@ -48,7 +48,6 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'],
  
     xi_gg = np.array(xi_gg)
     a, b, c, d, e = np.percentile(xi_gg, [2.5, 16, 50, 84, 97.5], axis=0)
-
     
     fig1 = plt.figure()
     ax = fig1.add_subplot(111)
@@ -167,7 +166,7 @@ def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'],
                    Mr=20, data_dict={'Mr':20, 'Nmock':500}):
     
     #load the data   
-    theta = np.loadtxt(file_name+".dat") 
+    theta = np.loadtxt(file_name+".dat")[:3] 
     
     for obv in observables: 
         if obv == 'gmf': 
