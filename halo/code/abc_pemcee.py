@@ -4,8 +4,24 @@ Module for ABC-PMC inference
 
 Author(s): Chang, MJ
 
+Commandline call sequence : 
+
+python abc_pemcee.py Niter Npart ObsStr OutputDir
+
+- Niter : int
+    Number of iterations 
+- Npart : int
+    Number of particles 
+- ObsStr : string
+    String that specifies the observables. 
+    'nbarxi' is ['nbar', 'xi']
+    'nbargmf' is ['nbar', 'gmf']
+    'nbarxigmf' is ['nbar', 'xi', 'gmf']
+- OutputDir : string
+    String that specifies the output directory
 
 '''
+import sys 
 import time
 import pickle
 import numpy as np
@@ -147,4 +163,24 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     return pools
 
 if __name__=="__main__": 
-    ABCpmc_HOD(20, [1.e10,1.e10,1.e10], N_part=10, observables=['nbar', 'xi', 'gmf'])
+
+    Niter = sys.argv[1]
+    print 'N iterations = ', Niter
+    Npart = sys.argv[2]
+    print 'N particles = ', Npart
+    obv_flag = sys.argv[3]
+    if obv_flag == 'nbarxi': 
+        obv_list = ['nbar', 'xi']
+    elif obv_flag == 'nbargmf':  
+        obv_list = ['nbar', 'gmf']
+    elif obv_flag == 'nbarxigmf':
+        obv_list = ['nbar', 'xi', 'gmf']
+    else: 
+        raise ValueError
+    print 'Observables: ', ', '.join(obv_list)
+    eps_list = [1.e10 for i in range(len(obv_list))]
+    if len(sys.argv) > 4: 
+        out_dir = sys.argv[4]
+        print 'Output to ', out_dir
+
+    #ABCpmc_HOD(Niter, eps_list, N_part=Npart, observables=obv_list)
