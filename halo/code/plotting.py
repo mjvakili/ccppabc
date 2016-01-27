@@ -26,8 +26,13 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             truths=truths,
             truth_color='#ee6a50', 
             labels=[
-                r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                r'$\mathtt{\log\;M_{0}}$',
+                r'$\mathtt{\log\;\sigma_{\logM}}$',
+                r'$\mathtt{\log\;M_{min}}$',
+                r'$\mathtt{\alpha}$',
+                r'$\mathtt{\log\;M_{1}}$'
                 ],
+            label_kwargs={'fontsize': 25},
             range=plot_range,
             quantiles=[0.16,0.5,0.84], 
             show_titles=True, 
@@ -69,7 +74,6 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
     plt.savefig(fig_file)
     plt.close()
 
-
 def plot_mcmc_chains(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=None, observables=['nbar', 'xi'], 
         plot_range=None): 
     '''
@@ -105,15 +109,22 @@ def plot_mcmc_chains(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=None
     fig , axes = plt.subplots(5, 1 , sharex=True, figsize=(10, 12))
 
     labels=[
-        r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
-           ]
+        r'$\mathtt{\log\;M_{0}}$',
+        r'$\mathtt{\log\;\sigma_{\logM}}$',
+        r'$\mathtt{\log\;M_{min}}$',
+        r'$\mathtt{\alpha}$',
+        r'$\mathtt{\log\;M_{1}}$'
+        ]
   
     for i in xrange(5):
         axes[i].plot(chain_ensemble[:, :, i], color="k", alpha=0.4)
 	axes[i].yaxis.set_major_locator(MaxNLocator(5))
         axes[i].axhline(truths[i], color="#888888", lw=2)
-        axes[i].set_ylabel(labels[i])
-    axes[4].set_xlabel("step number")    
+        axes[i].vlines(Nchains_burn, plot_range[i,0], plot_range[i,1], colors='#ee6a50', linewidth=4, alpha=1)
+        axes[i].set_ylim([plot_range[i,0], plot_range[i,1]])
+        axes[i].set_ylabel(labels[i], fontsize=25)
+
+    axes[4].set_xlabel("Step Number", fontsize=25)    
     fig.tight_layout(h_pad=0.0) 
     fig_file = ''.join([util.fig_dir(), 
         util.observable_id_flag(observables), 
@@ -156,8 +167,13 @@ def plot_mcmc_samples(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=Non
             truths=truths,
             truth_color='#ee6a50', 
             labels=[
-                r'$\logM_{0}$',r'$\log \sigma_{\logM}$',r'$\logM_{min}$',r'$\alpha$',r'$\logM_{1}$'
+                r'$\mathtt{\log\;M_{0}}$',
+                r'$\mathtt{\log\;\sigma_{\logM}}$',
+                r'$\mathtt{\log\;M_{min}}$',
+                r'$\mathtt{\alpha}$',
+                r'$\mathtt{\log\;M_{1}}$'
                 ],
+            label_kwargs={'fontsize': 25},
             range=plot_range, 
             quantiles=[0.16,0.5,0.84],
             show_titles=True, 
@@ -179,4 +195,4 @@ def plot_mcmc_samples(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=Non
 
 if __name__=='__main__':
     plot_mcmc_chains(100, Niter=10000, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
-    plot_mcmc_samples(100, Niter=10000, Nchains_burn=100, Mr=20, observables=['nbar', 'xi'])
+    #plot_mcmc_samples(100, Niter=10000, Nchains_burn=500, Mr=20, observables=['nbar', 'xi'])
