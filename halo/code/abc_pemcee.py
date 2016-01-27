@@ -164,9 +164,9 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
 
 if __name__=="__main__": 
 
-    Niter = sys.argv[1]
+    Niter = int(sys.argv[1])
     print 'N iterations = ', Niter
-    Npart = sys.argv[2]
+    Npart = int(sys.argv[2])
     print 'N particles = ', Npart
     obv_flag = sys.argv[3]
     if obv_flag == 'nbarxi': 
