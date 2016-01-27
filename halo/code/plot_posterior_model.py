@@ -15,12 +15,21 @@ from halotools.empirical_models import PrebuiltHodModelFactory
 # --- Local ---
 import util
 import data as Data
-from group_richness import gmf , richness , gmf_bins
 from prior import PriorRange
-    
+from hod_sim import HODsimulator    
+from group_richness import gmf_bins
+
+# ---Need this for some smoothing stuff, will most-likely get rid of them
+from data import data_xi_bins
+from data import data_gmf_bins
+from data import hardcoded_xi_bins
+
+
 def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], 
-                  Mr=20 , data_dict={'Mr':20, 'Nmock':500}):
-    
+                  Mr=20 , data_dict={'Mr':20, 'Nmock':500} , smooth = "False"):
+    """
+    2PCF model 1\sigma & 2\sigma model predictions 
+    """    
     #load the data   
     theta = np.loadtxt(file_name+".dat")[:3] 
     for obv in observables: 
@@ -32,18 +41,18 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'],
 
     for i in xrange(len(theta)):
         
-        mod = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
-        mod.param_dict["logM0"] = theta[i][0]
-        mod.param_dict["sigma_logM"] = np.exp(theta[i][1])
-    	mod.param_dict["logMmin"] = theta[i][2]
-    	mod.param_dict["alpha"] = theta[i][3]
-    	mod.param_dict["logM1"] = theta[i][4]  
+        #mod = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
+        #mod.param_dict["logM0"] = theta[i][0]
+        #mod.param_dict["sigma_logM"] = np.exp(theta[i][1])
+    	#mod.param_dict["logMmin"] = theta[i][2]
+    	#mod.param_dict["alpha"] = theta[i][3]
+    	#mod.param_dict["logM1"] = theta[i][4]  
         
-        mod.populate_mock()
+        #mod.populate_mock()
         """ if we want to make a smooth plot, we do this:"""
-        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(num_iterations = 6 )
+        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = hardcoded_xi_bins , num_iterations = 6 )
         """else"""
-        rr , xi = mod.mock.compute_galaxy_clustering()
+        HODsimulator(theta[i], prior_range=None, observables=['xi'], Mr=20)
         xi_gg.append(xi)
  
     xi_gg = np.array(xi_gg)
@@ -165,6 +174,9 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'],
 def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'], 
                    Mr=20, data_dict={'Mr':20, 'Nmock':500}):
     
+    """
+    GMF model 1\sigma & 2\sigma model predictions 
+    """    
     #load the data   
     theta = np.loadtxt(file_name+".dat")[:3] 
     
@@ -176,20 +188,7 @@ def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'],
 
     for i in xrange(len(theta)):
         
-        mod = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
-        mod.param_dict["logM0"] = theta[i][0]
-        mod.param_dict["sigma_logM"] = np.exp(theta[i][1])
-    	mod.param_dict["logMmin"] = theta[i][2]
-    	mod.param_dict["alpha"] = theta[i][3]
-    	mod.param_dict["logM1"] = theta[i][4]  
-        
-        mod.populate_mock()
-        """ if we want to make a smooth plot, we do this:"""
-        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(num_iterations = 6 )
-        """else"""
-        group_id = mod.mock.compute_fof_group_ids() 
-        group_richness = richness(grou_id)
-        mod_gmf.append(gmf(group_richness)) 
+        mod_gmf.append(HODsimulator(theta[i], prior_range=None, observables=['xi'], Mr=20))
  
     mod_gmf = np.array(mod_gmf)
     bins = gmf_bins
@@ -258,5 +257,5 @@ def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'],
 
 if __name__ == '__main__':
 
-     plot_xi_model("../dat/nbar_gmf_Mr20_theta_t18", observables=['xi'], Mr=20)      
-     plot_gmf_model("../dat/nbar_gmf_Mr20_theta_t18", observables=['xi'], Mr=20)      
+     #plot_xi_model("../dat/nbar_gmf_Mr20_theta_t18", observables=['xi'], Mr=20, smooth = "False")      
+     plot_gmf_model("../dat/nbar_gmf_Mr20_theta_t18", observables=['gmf'], Mr=20)      
