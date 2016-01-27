@@ -54,6 +54,8 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     '''
     if output_dir is None: 
         output_dir = util.dat_dir()
+    else: 
+        pass
     # data observables
     fake_obs = []       # list of observables 
     for obv in observables: 
