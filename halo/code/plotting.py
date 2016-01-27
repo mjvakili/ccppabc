@@ -197,8 +197,10 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
             model_obv = [obv_i]
     model_obv = np.array(model_obv)
 
-    if observable == 'xi': 
+    if 'xi' in observable: 
         r_bin = Data.data_xi_bins(Mr=data_dict['Mr'])
+    elif observable == 'gmf': 
+        r_bin = Data.data_gmf_bins()
 
     a, b, c, d, e = np.percentile(model_obv, [2.5, 16, 50, 84, 97.5], axis=0)
     a = a[0] 
@@ -235,6 +237,18 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
         ax.set_ylabel(r'$r \xi_{\rm gg}$', fontsize=25)
         ax.set_xscale('log')
         ax.set_xlim([0.1, 20.])
+
+    elif observable == 'gmf':   # GMF
+        data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
+        ax.fill_between(r_bin, a, e, color="k", alpha=0.1, edgecolor="none")
+        ax.fill_between(r_bin, b, d, color="k", alpha=0.3, edgecolor="none")
+        ax.errorbar(r_bin, data_gmf, yerr = data_gmf_sigma, fmt=".k",
+                    capsize=0)    
+        ax.set_xlabel(r'Group Richness', fontsize=25)
+        ax.set_ylabel(r'GMF $[\mathrm{h}^3\mathrm{Mpc}^{-3}]$', fontsize=25)
+        
+        ax.set_yscale('log')
+        ax.set_xlim([1., 50.[)
 
     fig.savefig(
             ''.join([util.fig_dir(), 
