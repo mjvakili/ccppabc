@@ -71,9 +71,9 @@ def plot_xi_model(theta, observables=['xi'], Mr=20):
     ax.fill_between(rr, a, e, color="k", alpha=0.1, edgecolor="none")
     ax.fill_between(rr, b, d, color="k", alpha=0.3, edgecolor="none")
     ax.plot(rr, c, "k", lw=1)
-    ax.errorbar(rr, data_xi, yerr=np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+    ax.errorbar(rr, data_xi, yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
                 capsize=0)    
-    xlabel = ax.set_xlabel('R [Mpc]', fontsize=20)
+    xlabel = ax.set_xlabel(r'$r[\mathrm{Mpc}h^{-1}]$', fontsize=20)
     ylabel = ax.set_ylabel(r'$\xi_{\rm gg}$', fontsize=25)
     
     plt.xscale('log')
@@ -88,8 +88,8 @@ def plot_xi_model(theta, observables=['xi'], Mr=20):
 
     ax.fill_between(rr, rr*a, rr*e, color="k", alpha=0.1, edgecolor="none")
     ax.fill_between(rr, rr*b, rr*d, color="k", alpha=0.3, edgecolor="none")
-    ax.plot(rr, c, "k", lw=1)
-    ax.errorbar(rr, rr*data_xi, yerr=rr*np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+    #ax.plot(rr, c, "k", lw=1) we don't care about the best fit here
+    ax.errorbar(rr, rr*data_xi, yerr = rr*np.sqrt(np.diag(data_xi_cov)), fmt=".k",
                 capsize=0)
     xlabel = ax.set_xlabel(r'$r[\mathrm{Mpc}h^{-1}]$', fontsize=20)
     ylabel = ax.set_ylabel(r'$\xi_{\rm gg}$', fontsize=25)
@@ -97,4 +97,21 @@ def plot_xi_model(theta, observables=['xi'], Mr=20):
     plt.xscale('log')
     plt.xlim(xmin = .1 , xmax = 15)
     fig2.savefig('../figs/xi_scaled_posterior_prediction'+str(Mr)+'.pdf',
+                bbox_extra_artists=[xlabel, ylabel], bbox_inches='tight')
+
+    
+    fig3 = plt.figure()
+    ax = fig3.add_subplot(111)
+
+    ax.fill_between(rr, a - data_xi, e-data_xi, color="k", alpha=0.1, edgecolor="none")
+    ax.fill_between(rr, b - data_xi, d-data_xi, color="k", alpha=0.3, edgecolor="none")
+    #ax.plot(rr, c, "k", lw=1) we don't care about the best fit here
+    ax.errorbar(rr, data_xi - data_xi, yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+                capsize=0)
+    xlabel = ax.set_xlabel(r'$r[\mathrm{Mpc}h^{-1}]$', fontsize=20)
+    ylabel = ax.set_ylabel(r'$\Delta \xi_{\rm gg}$', fontsize=25)
+
+    plt.xscale('log')
+    plt.xlim(xmin = .1 , xmax = 15)
+    fig2.savefig('../figs/xi_residual_posterior_prediction'+str(Mr)+'.pdf',
                 bbox_extra_artists=[xlabel, ylabel], bbox_inches='tight')
