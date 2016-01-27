@@ -123,9 +123,9 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         plot_thetas(pool.thetas, pool.ws , pool.t, 
                 Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
         # write theta and w to file 
-        theta_file = ''.join([, util.observable_id_flag(observables), 
+        theta_file = ''.join([output_dir, util.observable_id_flag(observables), 
             '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.mercer.dat'])
-        w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
+        w_file = ''.join([output_dir, util.observable_id_flag(observables), 
             '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.mercer.dat'])
         np.savetxt(theta_file, pool.thetas)
         np.savetxt(w_file, pool.ws)
