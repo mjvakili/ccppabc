@@ -66,7 +66,7 @@ def lnPost(theta, **kwargs):
         chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
         ind += 1
     if 'gmf' in observables: 
-        raise NotImplementedError('GMF Likelihood has not yet been implemented')
+        chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
     if 'xi' in observables: 
         chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
     lnLike = chi_tot
@@ -102,7 +102,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
         if obv == 'gmf': 
             data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
             fake_obs.append(data_gmf)
-            fake_obs_cov.append(data_gmf)
+            fake_obs_cov.append(data_gmf_sigma**2.)
         if obv == 'xi': 
             # import xir and full covariance matrix of xir
             data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)   
@@ -130,7 +130,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'xi'],
     # Initializing Walkers (@mjv : f@#k for loops)
     random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
     pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-            1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+            1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()
@@ -194,7 +194,7 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
         if obv == 'gmf': 
             data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
             fake_obs.append(data_gmf)
-            fake_obs_cov.append(data_gmf)
+            fake_obs_cov.append(data_gmf_sigma**2.)
         if obv == 'xi': 
             # import xir and full covariance matrix of xir
             data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)   
