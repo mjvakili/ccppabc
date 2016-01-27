@@ -92,7 +92,7 @@ def plot_xi_model(theta, observables=['xi'], Mr=20):
     ax.errorbar(rr, rr*data_xi, yerr = rr*np.sqrt(np.diag(data_xi_cov)), fmt=".k",
                 capsize=0)
     xlabel = ax.set_xlabel(r'$r[\mathrm{Mpc}h^{-1}]$', fontsize=20)
-    ylabel = ax.set_ylabel(r'$\xi_{\rm gg}$', fontsize=25)
+    ylabel = ax.set_ylabel(r'$r\xi_{\rm gg}$', fontsize=25)
 
     plt.xscale('log')
     plt.xlim(xmin = .1 , xmax = 15)
@@ -113,5 +113,64 @@ def plot_xi_model(theta, observables=['xi'], Mr=20):
 
     plt.xscale('log')
     plt.xlim(xmin = .1 , xmax = 15)
-    fig2.savefig('../figs/xi_residual_posterior_prediction'+str(Mr)+'.pdf',
+    fig3.savefig('../figs/xi_residual_posterior_prediction'+str(Mr)+'.pdf',
+                bbox_extra_artists=[xlabel, ylabel], bbox_inches='tight')
+
+
+    fig4, axes = pl.subplots(2, 1, figsize=(10, 8) , sharex = True)
+    fig4.subplots_adjust(wspace=0.0 hspace=0.4)
+
+    ax1 = axes[0,0]
+    
+    ax1.fill_between(rr, a, e, color="k", alpha=0.1, edgecolor="none")
+    ax1.fill_between(rr, b, d, color="k", alpha=0.3, edgecolor="none")
+    #ax1.plot(rr, c, "k", lw=1)
+    ax1.errorbar(rr, data_xi, yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+                capsize=0)    
+    ylabel = ax1.set_ylabel(r'$\xi_{\rm gg}$', fontsize=25)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1_set.xlim(xmin = .1 , xmax = 15)
+    
+    ax2 = axes[0,0]
+    ax2.fill_between(rr, a - data_xi, e- data_xi, color="k", alpha=0.1, edgecolor="none")
+    ax2.fill_between(rr, b- data_xi, d- data_xi, color="k", alpha=0.3, edgecolor="none")
+    #ax2.plot(rr, c, "k", lw=1)
+    ax2.errorbar(rr, data_xi- data_xi , yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+                capsize=0)    
+    ylabel = ax2.set_ylabel(r'$\Delta \xi_{\rm gg}$', fontsize=25)
+    ax2.set_xscale("log")
+    ax2_set.xlim(xmin = .1 , xmax = 15)
+
+    fig4.savefig('../figs/xi&residual_posterior_prediction'+str(Mr)+'.pdf',
+                bbox_extra_artists=[xlabel, ylabel], bbox_inches='tight')
+
+
+
+    fig5, axes = pl.subplots(2, 1, figsize=(10, 8) , sharex = True)
+    fig5.subplots_adjust(wspace=0.0 hspace=0.4)
+
+    ax1 = axes[0,0]
+    
+    ax1.fill_between(rr,rr* a, rr* e, color="k", alpha=0.1, edgecolor="none")
+    ax1.fill_between(rr, rr* b, rr* d, color="k", alpha=0.3, edgecolor="none")
+    #ax1.plot(rr, c, "k", lw=1)
+    ax1.errorbar(rr, rr* data_xi, rr* yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+                capsize=0)    
+    ylabel = ax1.set_ylabel(r'$r\xi_{\rm gg}$', fontsize=25)
+    ax1.set_xscale("log")
+    ax1.set_yscale("log")
+    ax1_set.xlim(xmin = .1 , xmax = 15)
+    
+    ax2 = axes[0,0]
+    ax2.fill_between(rr, rr* a - rr* data_xi, rr* e- rr* data_xi, color="k", alpha=0.1, edgecolor="none")
+    ax2.fill_between(rr, rr* b- rr* data_xi, rr* d- rr* data_xi, color="k", alpha=0.3, edgecolor="none")
+    #ax2.plot(rr, c, "k", lw=1)
+    ax2.errorbar(rr, rr*data_xi- rr* data_xi , yerr = rr* np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+                capsize=0)    
+    ylabel = ax2.set_ylabel(r'$\Delta(r\xi_{\rm gg})$', fontsize=25)
+    ax2.set_xscale("log")
+    ax2_set.xlim(xmin = .1 , xmax = 15)
+
+    fig5.savefig('../figs/xi&residual_scaled_posterior_prediction'+str(Mr)+'.pdf',
                 bbox_extra_artists=[xlabel, ylabel], bbox_inches='tight')
