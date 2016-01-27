@@ -18,18 +18,15 @@ import data as Data
 from group_richness import gmf , richness , gmf_bins
 from prior import PriorRange
     
-def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], Mr=20):
+def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], 
+                  Mr=20 , data_dict={'Mr':20, 'Nmock':500}):
     
     #load the data   
     theta = np.loadtxt(file_name+".dat") 
-    fake_obs = []
-    fake_obs_cov = [] 
     for obv in observables: 
         if obv == 'xi': 
             # import xir and full covariance matrix of xir
             data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)   
-            fake_obs.append(data_xi)
-            fake_obs_cov.append(data_xi_invcov)
     
     xi_gg = []
 
@@ -107,7 +104,7 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], Mr=20):
 
 
     fig4, axes = pl.subplots(2, 1, figsize=(10, 8) , sharex = True)
-    fig4.subplots_adjust(wspace=0.0 hspace=0.4)
+    fig4.subplots_adjust(wspace=0.0 , hspace=0.4)
 
     ax1 = axes[0,0]
     
@@ -137,14 +134,14 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], Mr=20):
 
 
     fig5, axes = pl.subplots(2, 1, figsize=(10, 8) , sharex = True)
-    fig5.subplots_adjust(wspace=0.0 hspace=0.4)
+    fig5.subplots_adjust(wspace=0.0 , hspace=0.4)
 
     ax1 = axes[0,0]
     
     ax1.fill_between(rr,rr* a, rr* e, color="k", alpha=0.1, edgecolor="none")
     ax1.fill_between(rr, rr* b, rr* d, color="k", alpha=0.3, edgecolor="none")
     #ax1.plot(rr, c, "k", lw=1)
-    ax1.errorbar(rr, rr* data_xi, rr* yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
+    ax1.errorbar(rr, rr* data_xi, yerr = rr*np.sqrt(np.diag(data_xi_cov)), fmt=".k",
                 capsize=0)    
     ylabel = ax1.set_ylabel(r'$r\xi_{\rm gg}$', fontsize=25)
     ax1.set_xscale("log")
@@ -166,18 +163,15 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], Mr=20):
 
 
     
-def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'], Mr=20):
+def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'], 
+                   Mr=20, data_dict={'Mr':20, 'Nmock':500}):
     
     #load the data   
     theta = np.loadtxt(file_name+".dat") 
     
-    fake_obs = []
-    fake_obs_cov = [] 
     for obv in observables: 
         if obv == 'gmf': 
             data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
-            fake_obs.append(data_gmf)
-            fake_obs_cov.append(data_gmf)
     
     mod_gmf = []
 
@@ -238,7 +232,7 @@ def plot_gmf_model(file_name="infered_hod_file_name", observables=['gmf'], Mr=20
 
 
     fig3, axes = pl.subplots(2, 1, figsize=(10, 8) , sharex = True)
-    fig3.subplots_adjust(wspace=0.0 hspace=0.4)
+    fig3.subplots_adjust(wspace=0.0  , hspace=0.4)
 
     ax1 = axes[0,0]
     
