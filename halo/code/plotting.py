@@ -3,6 +3,7 @@
 Plotting modules 
 
 '''
+import os 
 import h5py
 import corner
 import numpy as np
@@ -167,7 +168,8 @@ def plot_mcmc(Nwalkers, Niter=10000, Nchains_burn=100, Mr=20, truths=None,
     plt.savefig(fig_file)
     plt.close()
 
-def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'Nmock':500}):
+def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'Nmock':500}, 
+        clobber=False):
     '''
     Plot 1\sigma and 2\sigma model predictions from ABC-PMC posterior likelihood 
 
@@ -186,16 +188,23 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
         obvs_str = 'xi'
     else: 
         obvs_str = observable 
-    for i in xrange(len(theta)):
-        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = hardcoded_xi_bins , num_iterations = 6 )
-        obv_i  = HODsimulator(
-                theta[i], prior_range=None, 
-                observables=[obvs_str], Mr=data_dict['Mr'])
-        try: 
-            model_obv.append(obv_i)
-        except UnboundLocalError: 
-            model_obv = [obv_i]
-    model_obv = np.array(model_obv)
+
+    obvs_file = ''.join(abc_theta_file.rsplit('.dat')[:-1] + ['.', observable, '.dat'])
+    print obvs_file 
+    if not os.path.isfile(obvs_file) or clobber:
+        for i in xrange(len(theta)):
+            #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = hardcoded_xi_bins , num_iterations = 6 )
+            obv_i  = HODsimulator(
+                    theta[i], prior_range=None, 
+                    observables=[obvs_str], Mr=data_dict['Mr'])
+            try: 
+                model_obv.append(obv_i[0])
+            except UnboundLocalError: 
+                model_obv = [obv_i[0]]
+        model_obv = np.array(model_obv)
+        np.savetxt(obvs_file, model_obv)
+    else: 
+        model_obv = np.loadtxt(obvs_file)
 
     if 'xi' in observable: 
         r_bin = Data.data_xi_bins(Mr=data_dict['Mr'])
@@ -203,11 +212,6 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
         r_bin = Data.data_gmf_bins()
 
     a, b, c, d, e = np.percentile(model_obv, [2.5, 16, 50, 84, 97.5], axis=0)
-    a = a[0] 
-    b = b[0] 
-    c = c[0]
-    d = d[0] 
-    e = e[0]
 
     # plotting 
     fig = plt.figure(1)
@@ -218,7 +222,7 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
 
         ax.fill_between(r_bin, a, e, color="k", alpha=0.1, edgecolor="none")
         ax.fill_between(r_bin, b, d, color="k", alpha=0.3, edgecolor="none")
-        ax.plot(r_bin, c, "k", lw=1)
+        #ax.plot(r_bin, c, "k", lw=1)
         ax.errorbar(r_bin, data_xi, yerr = np.sqrt(np.diag(data_xi_cov)), fmt=".k",
                     capsize=0)    
         ax.set_xlabel(r'$r\;[\mathrm{Mpc}/h]$', fontsize=20)
@@ -248,7 +252,7 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
         ax.set_ylabel(r'GMF $[\mathrm{h}^3\mathrm{Mpc}^{-3}]$', fontsize=25)
         
         ax.set_yscale('log')
-        ax.set_xlim([1., 50.[)
+        ax.set_xlim([1., 50.])
 
     fig.savefig(
             ''.join([util.fig_dir(), 
@@ -262,6 +266,6 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'N
 if __name__=='__main__':
     plot_posterior_model('xi',  
             abc_theta_file="../dat/nbar_gmf_Mr20_theta_t18.dat", 
-            data_dict={'Mr':20, 'Nmock':500})
+            data_dict={'Mr':20, 'Nmock':500}, clobber=True)
     #plot_mcmc(100, Niter=10000, Nchains_burn=500, Mr=20, observables=['nbar', 'xi'])
-    #plot_mcmc_samples(100, Niter=10000, Nchains_burn=500, Mr=20, observables=['nbar', 'xi'])
+    #plot_mcmc_samples(100, Niter=10000, Nchains_burn=500, Mr=20, observables=['nbar', 'xi'])
