@@ -23,7 +23,8 @@ from group_richness import richness
 # --- Plotting ---
 from plotting import plot_thetas
 
-def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], data_dict={'Mr':20, 'Nmock': 500}):
+def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], 
+        data_dict={'Mr':20, 'Nmock': 500}, output_dir=None):
     '''
     ABC-PMC implementation. 
 
@@ -35,6 +36,8 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     - observables : list of observables. Options are 'nbar', 'gmf', 'xi'
     - data_dict : dictionary that specifies the observation keywords 
     '''
+    if output_dir is None: 
+        output_dir = util.dat_dir()
     # data observables
     fake_obs = []       # list of observables 
     for obv in observables: 
@@ -103,6 +106,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
     f = open("abc_tolerance.dat" , "w")
+    f.close()
     eps_str = ''
     for pool in abcpmc_sampler.sample(prior, eps):
         #while pool.ratio > 0.01:
@@ -119,7 +123,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         plot_thetas(pool.thetas, pool.ws , pool.t, 
                 Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, observables=observables)
         # write theta and w to file 
-        theta_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
+        theta_file = ''.join([, util.observable_id_flag(observables), 
             '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.mercer.dat'])
         w_file = ''.join([util.dat_dir(), util.observable_id_flag(observables), 
             '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.mercer.dat'])
@@ -143,4 +147,4 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     return pools
 
 if __name__=="__main__": 
-    ABCpmc_HOD(20, [1.e10,1.e10,1.e10], N_part=1000, observables=['nbar', 'xi', 'gmf'])
+    ABCpmc_HOD(20, [1.e10,1.e10,1.e10], N_part=10, observables=['nbar', 'xi', 'gmf'])
