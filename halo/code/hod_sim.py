@@ -49,7 +49,7 @@ class HODsim(object):
                 if obv == 'nbar': 
                     obvs.append(self.model.mock.number_density)       # nbar of the galaxy catalog
                 elif obv == 'gmf': 
-                    group_id = self.model.mock.compute_fof_group_ids() 
+                    group_id = self.model.mock.compute_fof_group_ids(num_threads=1) 
                     group_richness = richness(group_id)         # group richness of the galaxies
                     obvs.append(gmf(group_richness))                 # calculate GMF
                 elif obv == 'xi': 
@@ -71,7 +71,7 @@ class HODsim(object):
                         if obv == 'nbar':
                             obvs.append(self.model.mock.number_density)     # nbar
                         elif obv == 'gmf': 
-                            group_id = self. model.mock.compute_fof_group_ids()
+                            group_id = self. model.mock.compute_fof_group_ids(num_threads=1)
                             group_richness = richness(group_id)         # group richness of the galaxies
                             obvs.append(gmf(group_richness))                 # calculate GMF
                         elif obv == 'xi': 
@@ -134,7 +134,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
             if obv == 'nbar': 
                 obvs.append(model.mock.number_density)       # nbar of the galaxy catalog
             elif obv == 'gmf': 
-                group_id = model.mock.compute_fof_group_ids() 
+                group_id = model.mock.compute_fof_group_ids(num_threads=1) 
                 group_richness = richness(group_id)         # group richness of the galaxies
                 obvs.append(gmf(group_richness))                 # calculate GMF
             elif obv == 'xi': 
@@ -156,7 +156,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                     if obv == 'nbar':
                         obvs.append(model.mock.number_density)     # nbar
                     elif obv == 'gmf': 
-                        group_id = model.mock.compute_fof_group_ids()
+                        group_id = model.mock.compute_fof_group_ids(num_threads=1)
                         group_richness = richness(group_id)         # group richness of the galaxies
                         obvs.append(gmf(group_richness))                 # calculate GMF
                     elif obv == 'xi': 
