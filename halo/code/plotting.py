@@ -17,10 +17,16 @@ from prior import PriorRange
 from hod_sim import HODsimulator    
 plt.switch_backend("Agg")
 
-def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=None, filename=None): 
+def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=None, 
+        filename=None, output_dir=None): 
     '''
     Corner plots of input theta values 
     '''
+    if output_dir is None: 
+        fig_dir = util.fig_dir()
+    else: 
+        fig_dir = output_dir
+
     # weighted theta
     fig = corner.corner(
             theta, 
@@ -45,8 +51,8 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             color='b', 
             bins=20,
             smooth=1.0)
-    
-    fig_file = ''.join([util.fig_dir(), 
+     
+    fig_file = ''.join([fig_dir, 
         util.observable_id_flag(observables), 
         '_Mr', str(Mr), '_t', str(t), '.png'])
     plt.savefig(fig_file)
@@ -70,8 +76,7 @@ def plot_thetas(theta, w , t, Mr=20, truths=None, plot_range=None, observables=N
             color='b', 
             bins=16, 
             smooth=1.0)
-    fig_file = ''.join([util.fig_dir(), 
-        util.observable_id_flag(observables), 
+    fig_file = ''.join([fig_dir, util.observable_id_flag(observables), 
         '_Mr', str(Mr), '_now_t', str(t), '.png'])
     plt.savefig(fig_file)
     plt.close()
