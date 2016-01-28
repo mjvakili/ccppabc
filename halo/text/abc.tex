@@ -147,20 +147,16 @@ So although our costs will be high, there are no inexpensive methods to compare 
 % style note: Here and in what follows: --- separates parenthetical phrases, -- connects words that appear together in a relationship (like galaxy--galaxy) and (galaxy--halo), and - connects pairs of words into an adjective (like two-point).
 
 Inference of the cosmological parameters and understanding the formation of galaxies within the context of large scale 
-structure, requires understanding of the galaxy--halo connection. Halos are biased tracers of the large scale structure 
-and galaxies reside in dark matter Halos. Halo occupation distribution---HOD---is a probabilistic framework that describes how galaxies populate dark matter halos. The central tenet of halo occupation model is that the probability that a certain number of galaxies populate a dark matter halo is determined by the mass of the host halo. This statistical prescription for connection of galaxies and halos has been successful in reproducing the galaxy two-point clustering as well as the galaxy--matter cross correlation---galaxy--galaxy 
-lensing---within the context of the halo model, and has been used in understanding the co-evolution of galaxies and halos and putting constraints on the relation between the stellar mass and halo mass of galaxies.
+structure typically assumes the existence of dark matter halos (CITE) and therefore requires an understanding of the galaxy--halo connection (CITE). Halos are biased tracers of the large scale structure (CITE), the statistical properties of which are well understood from the study of dark matter simulations (12 CHANNELS PEOPLE, 12!), 
+and the general assumption is that galaxies reside in dark matter Halos \todo{evidence for this claim or rather, evidence that supports this assumption}. Halo occupation distribution---HOD---is a probabilistic framework that describes how galaxies populate dark matter halos. The central tenet of halo occupation model is that the probability that a certain number of galaxies populate a dark matter halo is determined by the mass of the host halo. This statistical prescription for connection of galaxies and halos has been successful in reproducing the galaxy two-point clustering as well as the galaxy--matter cross correlation---galaxy--galaxy 
+lensing---within the context of the halo model, and has been used in understanding the co-evolution of galaxies and halos (how? CITE) and putting constraints on the relation between the stellar mass and halo mass of galaxies and clusters (M-N ratio?) as well as cosmological parameters.
 
 In the context of large scale clustering of galaxies, inference of the cosmological and halo model parameters are performed by treating some estimate of the galaxy--galaxy two-point correlation function as the data,
 assuming an analytic model for the theoretical two-point correlation function prediction,
 and a Gaussian likelihood connecting the two.
-The accuracy of the analytic model of the galaxy clustering statistics hinges upon the accuracy of the fitting functions such as halo bias, halo mass function that are accurate to ten percent level. There are other simplifying assumptions encoded in these analytic models such as the scale independence of the halo bias. 
+The accuracy of the analytic model of the galaxy clustering statistics hinges upon the accuracy of the fitting functions such as halo bias, halo mass function that are accurate to ten percent level. There are other simplifying assumptions encoded in these analytic models such as the scale independence of the halo bias. The weighted difference of the number density of the observed galaxies and the analytic number density is also added to this. In this work, we investigate the how accurately we can infer the model parameters by relaxing the underlying assumptions of the parameter inference methods.
 
-Furthermore, the likelihood of observing the data---observed positions of the galaxies in the configuration space---given the cosmological and halo model parameters is approximated by a Gaussian function whose argument is the squared difference of the two-point correlation function measured from the observations and the analytic model for the galaxy clustering, weighted by a covariance matrix.
-\todo{Why MUST this be wrong?}
-The weighted difference of the number density of the observed galaxies and the analytic number density is also added to this. In this work, we investigate the how accurately we can infer the model parameters by relaxing the underlying assumptions of the parameter inference methods. 
-
-Approximate bayesian computation (ABC) provides a \emph{rejected sampling} framework framework that alleviates the issues arising from approximating the likelihood of observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting the proposals for which the distance between the data and the simulation (measured by a metric) is less than a certain small threshold.
+Approximate bayesian computation (ABC) provides a \emph{rejected sampling} framework that alleviates the issues arising from approximating the likelihood of observing the large scale population of galaxies given the cosmological and halo model parameters. ABC approximates the posterior probability distribution function over the model parameters given the data---the angular positions of the galaxies on the sky and their redshifts---by drawing proposals from the prior over the model parameters, simulating the data with the proposals, and rejecting the proposals for which the distance between the data and the simulation (measured by a metric) is greater than a certain small threshold.
 
 In practice, the rejected sampling method is replaced by a more efficient adaptive importance sampling operation called Population Monte Carlo (PMC). Initially, PMC rejects the draws from prior pdf with a relatively large threshold. In the consequent steps, importance sampling from the previous samples that passed the distance criteria is performed, and the threshold is updated adaptively. That is, after each iteration, the threshold is lowered according to the distribution of the distances.  
  
@@ -170,38 +166,108 @@ Rejected sampling in ABC requires a distance function that quantifies the closen
 
 Performing a full cosmological inference using this sampling method requires a simulator that, (I) takes a set of cosmological parameters as input and generates a snapshot of dark matter particles at a given redshift using an N-body simulation, (II) builds a catalog of dark matter halos for that snapshot of the N-body simulation using a halo finder algorithm, and (III) paints galaxies into host halos given a set of halo occupation model parameters. 
 
-Computationally, this process is extremely demanding. One way to make this problem more tractable is to split this into to separate this problem into two parts: \emph{emulation}, and \emph{simulation}. That is, one can use a set of N-body simulations with known cosmologies, and perform halo occupation simulations using the pre-built halo catalogs of those simulations. In order to compute the summary statistics corresponding to the samples from the parameter space for which there is no N-body simulation, one can interpolate between the summary statistics of the parameters for which we have available N-body simulations. This procedure is called emulation. Emulation has been introduced in the literature in coyote universe [CITE COYOTE].
+Computationally, this process is extremely demanding. One way to make this problem more tractable is to separate it into two parts: \emph{emulation}, and \emph{simulation}. That is, one can use a set of N-body simulations with known cosmologies, and perform halo occupation simulations using the pre-built halo catalogs of those simulations. In order to compute the summary statistics corresponding to the samples from the parameter space for which there is no N-body simulation, one can interpolate between the summary statistics of the parameters for which we have available N-body simulations. This procedure is called emulation. Emulation has been introduced in the literature in coyote universe [CITE COYOTE].
 
 In this work however, we narrow our focus on inferring the posterior probability over the parameters of the halo model using an already existing halo catalog of a dark matter particle N-body simulation with a fixed cosmology. That is we simplify the problem by leaving the problem of emulation for future investigations.
 
 The calculations regarding populating the dark matter halos, computing the clustering statistics and finding groups in the galaxy mock catalogs are performed using ({\fontfamily{cmss}\selectfont Halotools}) which is an open-source package tailored for modeling galaxy-halo connection in large scale structure modeling ({\fontfamily{cmss}\selectfont http://halotools.readthedocs.org}).
 
 This paper is structured as follows. In Section \ref{sec:method},
-we discuss the components of the Halo occupation modeling, and the ABC sampling method. We also give a brief overview of the summary statistics used in this investigation. In Section \ref{sec:halo} we give a brief overview of the forward modeling of the galaxy mock catalogs using Halotools as well as generating a mock galaxy catalog as data. In Section \ref{sec:results} we explore the results of our parameter inference using different summary statistics. Finally, we discuss and conclude in Section \ref{sec:discussion}.
+we discuss the ABC sampling method and the components of the Halo occupation modeling. We also give a brief overview of the summary statistics used in this investigation. In Section \ref{sec:halo} we give a brief overview of the forward modeling of the galaxy mock catalogs using halotools as well as generating a mock galaxy catalog as data. In Section \ref{sec:results} we explore the results of our parameter inference using different summary statistics. Finally, we discuss and conclude in Section \ref{sec:discussion}.
 
 \section{Method}\label{sec:method}
 
+%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%
+% Approximate Bayesian Computation  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Approximate Bayesian Computation}
 
-ABC is a generative simulation-based inference based on rejection sampling. That is, the parameters of the forward model of the data are drawn from the prior probability, and are rejected if the simulated data is not sufficiently close to the observations according to some distance metric $\rho$. The method requires a prior probability over the parameters of interest $\pi(\theta)$, a generative forward model of the data given a set of parameters $f(\theta)$, and a distance metric $\rho(.,.)$ which measures the distance between the simulation $X=f(\theta)$ and the observed data $D$. 
+ABC is based on rejection sampling, which is a Monte Carlo method 
+used to draw samples from a probability distribution that is difficult 
+to directly sample. For inference, the probability distribution that 
+we want to sample is the posterior probability distribution function.  
+Before we present the theory and algorithm of ABC, we provide a brief
+overview of rejection sampling.  
 
-In a large scale structure study however, the observed data---which encompasses the angular positions of galaxies on the sky and their redshifts---is a high dimensional object. Therefore the distance metric measures the closeness of statistical summaries of the data and those of the simulation. When the observed data-set under study is the positions of all galaxies observed in the survey, possible statistical summaries of the data are the number density of galaxies, two-point correlation function, three-point correlation function, galaxy group statistics (counts in cells), and so on.
+Briefly, rejection sampling is a method that draws samples from a 
+probability distribution $f(\alpha)$, which is difficult to 
+directly sample, by sampling from the distribution $M g(\alpha)$ that 
+satisfies $f(\alpha) < M g(\alpha)$. $g(\alpha)$ is an instrumental 
+distribution where sampling is easier and $M > 1$.
+
+More specifically, in the context of simulation-based inference, 
+the main goal is to sample from the joint probability of a
+simulation $X$ and parameters $\pars$ given observed data $D$, which 
+from Bayes rule can be written as 
+\beq
+p(\pars, X | D) = \frac{P(D|X)p(X|\pars)\pi(\pars)}{\mathcal{Z}}
+\eeq
+where $\pi(\pars)$ is the prior probabilities over the parameters of 
+interest and $\mathcal{Z}$ is the evidence, 
+\beq
+\mathcal{Z} = \int d\pars \; dX\; p(D|X) p(X|\pars) \pi(\pars). 
+\eeq
+Since $p(\pars, X | D)$ cannot be directly sampled, we use rejection 
+sampling with instrumental distribution 
+\beq
+q(\pars, X) = p(X|\pars) \pi(\pars)
+\eeq
+and 
+\beq
+M = \frac{\mathrm{max}\; p(D|X)}{\mathcal{Z}} > 1.
+\eeq
+The choices of $q(\pars, X)$ and $M$ satisfy the condition 
+\beq
+p(\pars, X | D) < M q(\pars, X)
+\eeq
+so we can sample $p(\pars, X | D)$ by drawing ${\pars, X}$ from 
+the $q(\pars, X)$ distribution. In practice, this is done 
+by first drawing $\pars$ from the prior $\pi(\pars)$ then generating a 
+simulation $X = f(\pars)$ via the forward model. Afterwards, ${\pars, X}$ 
+is accepted if
+\beq
+u < \frac{p(\pars, X | D)}{M q(\pars, X)} = \frac{p(D|X)}{\mathrm{max}\;p(D|X)}
+\eeq
+where $u$ is drawn from $\mathtt{Uniform}[0,1]$. 
+
+At this point, ABC postulates that $p(D|X)$ 
+
+The method requires a prior probability over the parameters of interest 
+($\pi(\theta)$), a generative forward model of the data given a set of 
+parameters ($f(\theta)$) and a distance metric $\rho(x,D)$ which measures 
+the distance between the simulation $X = f(\theta)$ and the observed data $D$. 
+
+Technically in large scale structure studies, the observed data is the 
+total angular and redshift positions of galaxies on the sky. However, 
+in practice, this data is an intractably high dimensional object. As a result, we 
+utilize statistical summaries of galaxy positions as our observed 'data' 
+and the distance metric we use measures the closeness of the statistical 
+summaries of observed galaxy positions versus the simulated galaxy 
+positions. Common summary statistics used to encapsulate the galaxy position 
+information include the number density of the galaxy sample, the two-point 
+correlation function (2PCF), three-point correlation function, and galaxy 
+group statistics. 
+
+Therefore the distance metric measures the closeness of statistical summaries of the data and those of the simulation. When the observed data-set under study is the positions of all galaxies observed in the survey, possible statistical summaries of the data are the number density of galaxies, two-point correlation function, three-point correlation function, galaxy group statistics (counts in cells), and so on.
 
 Here, we provide a brief overview of rejection sampling algorithm and how it is used in a simulation-based inference. We want to draw samples from a probability distribution $p(\alpha)$. Now, let us assume that: (i) there exists an auxiliary density $q(\alpha)$ from which we can directly sample from, and (ii) there exist $M>1$ which is an appropriate bound on $p(\alpha)/q(\alpha)$. Given these assumptions, rejection sampling works in the following way. We draw a sample $\alpha$ from the auxiliary density $q(\alpha)$. Afterwards, we draw a random number $u$ from a uniform distribution between zero and one. Then we accept the draw $\alpha$ if the $u$ is less than the ratio $p(\alpha)/Mq(\alpha)$. This procedure is repeated until sufficient number of draws are accepted.
 
-In the context of a simulation-based inference, we aim to sample from the joint probability of a simulation $X$, and parameters $\pars$ given the observed data $D$
-
+In the context of a simulation-based inference, we main goal is to 
+sample from the joint probability of a simulation $X$ and parameters 
+$\pars$ given the observed data $D$: 
 \beq
 p(\pars,X | D)
 \eeq
+According to Bayes rule $p(\pars, X | D)$ can be written as 
+\beq
+p(\pars,X | D)  = \frac{p(D|X)p(X|\pars)\pi(\pars)}{\mathcal{Z}}
+\eeq
+where $\mathcal{Z}$  is the evidence, 
+\beq
+\mathcal{Z} = \int \dev \pars \; \dev X \; p(D|X)p(X|\pars)\pi(\pars),
+\eeq
 
-which according to the Bayes rule can be written as 
-
-\begin{eqnarray}
-p(\pars,X | D)  &=& \frac{p(D|X)p(X|\pars)\pi(\pars)}{Z},  \\
-Z &=& \int \dev \pars \; \dev X \; p(D|X)p(X|\pars)\pi(\pars),
-\end{eqnarray}
-where $Z$ is the evidence. There exists a constant $M>1$ 
+There exists a constant $M>1$ 
 \beq 
 M = \frac{\mathrm{max}_{X} \; p(D|X)}{Z},
 \eeq 
@@ -332,7 +398,7 @@ One of the most well-studied statistics of the galaxy distribution
 is $\xigg,$ the galaxy-galaxy correlation function. Mathematically, $\xigg$ encodes the
 excess probability that a pair of galaxies in a sample are 
 separated by three-dimensional distance $r.$ 
-Galaxy clustering is straightforward to measure observationally, 
+Galaxy clustering is straightforward to measure observationally \todo{(redshift space distortions?)}, 
 and it is a highly sensitive probe of both the physics of galaxy evolution 
 as well as the fundamental parameters of $\lcdm$ cosmology. 
 
@@ -400,32 +466,57 @@ limited to the $\sim10\%$ level \citep[e.g.][]{tinker08}.
 \todo{MJ: I think all of the text written above is necessary for making a case for simulation-based inference in large-scale structure modeling. So I'm in favor of keeping it for now.}
 
 
-Dark matter halos are biased tracers of the underlying matter distribution of the universe. The halo model postulates that galaxies reside in dark matter halos. Halo Occupation distribution---HOD---is a powerful tool for description of galaxy--halo connection. HOD provides a probabilistic prescription for how galaxies populate halos. According to HOD modeling, the number of galaxies that populate a dark matter halo is dictated by the host halo mass $M_h$. The probability of a dark matter halo of mass $M_h$ being populated by $N_g$ galaxies---$P(N_g|M_h)$--- is a Poisson distribution, and is separable to two parts 
+Dark matter halos are biased tracers of the underlying matter distribution of the universe. The halo model postulates that galaxies reside in dark matter halos. Halo Occupation distribution---HOD---is a powerful tool for description of the galaxy--halo connection. HOD provides a probabilistic prescription for how galaxies populate halos. According to (conventional) HOD modeling, the number of galaxies that populate a dark matter halo is dictated by the host halo mass $M_h$. The probability of a dark matter halo of mass $M_h$ being populated by $N_g$ galaxies---$P(N_g|M_h)$--- is a Poisson distribution, and is separable to two parts 
 \beq
 P(N_g|M_h) = P(N_\mathrm{cen}|M_h) + P(N_\mathrm{sat}|M_h),
 \eeq
-where $N_\mathrm{cen}$ is the number of central galaxies, and $N_\mathrm{sat}$ is the number of satellites. 
+where $N_\mathrm{cen}$ is the number of central galaxies, and $N_\mathrm{sat}$ is the number of satellites. Given a halo catalog generated from the output of a cosmological N-body simulation, these probability density functions can be used to make draws for each halo to find its occupation number of central and satellite galaxies.
 
 \subsubsection{Generating mock galaxy populations with halotools}
 
-%\todo{Halotools allows us to forward model galaxy positions from HOD parameters. From the galaxy positions, we can calculate observable summary statistics such as the 2PCF, Group Multiplicity Function (GMF) and the number density $\bar{n}$.}
-
-%Talk about why it is better to simulate the mock and compute %the summary statistics of the mock instead of using analytic formulas...
-
-%Talk about all the assumptions that go into analytic %formulas...
-
-%Talk about why we do not want to write down likelihood %function for gmf, 2pcf, ...
 \subsubsection{summary statistics of galaxy populations}
-
 
 \subsubsection{distance metrics}
 
 
-
 \section{Experiments}\label{sec:data}
+
 \subsection{Mock observations}
-\subsection{}
-In order to test the va
+
+\newcommand{\gmf}{\mathcal{\zeta}_{\rm g}}
+
+As a testbed of our method, we create a mock population of galaxies in the following way. We set the upper limit of the luminosity of the mock galaxies to -20. Then mock observations---positions of galaxies--- are generated by populating the pre-built halo catalogs in the bolshoi simulation according to \cite{Zheng:2007aa} HOD model, and the best-fit HOD parameters found by \citet{Zheng:2007aa} for SDSS galaxy samples with the same luminosity threshold.
+
+Afterwards, summary statistics of the mock observations are computed. These summary statistics include the man number density $\ngalaxy$ the galaxy-galaxy correlation function $\xigg$, the group multiplicity function $\gmf$. These quantities are measured in the following way. 
+
+Co-moving number density of the mock galaxy catalog $\ngalaxy$ is calculated. Th radial bins at which $\xigg$ is computed are selected to match the radial bins used in [CITE ZEHAVI ETAL] clustering analysis of the SDSS DR7 galaxy sample. The measured $\xigg$ of the mock galaxy catalog is shown in Figure ~\ref{1}. The error-bars are measured from the diagonal elements of the error covariance matrix built from 500 mocks. That is, with the same set of true HOD parameters, 500 mock galaxy catalogs are generated and after computing the $\xigg$ for every mock catalog, the covariance matrix shown in Figure \ref{2pcf_cov} is calculated in the following way.
+
+\begin{eqnarray} 
+\mathrm{C}_{\xi}[i,j] &=& \frac{1}{N_{\mathrm{mocks}}-1}\sum_{k=1}^{N_{\mathrm{mocks}}} \Big[\xigg^{(k)}(r_{i})-\bar{\xi}_{\rm gg}(r_{i})\Big]\Big[\xigg^{(k)}(r_{j})-\bar{\xi}_{\rm gg}(r_{j}) \Big], \\
+\bar{\xi}_{\rm gg}(r_{i}) &=& \frac{1}{N_{\mathrm{mocks}}}\sum_{k=1}^{N_{\mathrm{mocks}}} \xigg^{(k)}(r_{i}).
+\end{eqnarray}
+
+FoF group IDs of galaxies are derived by setting the projected linking length $b_{\perp}$ to 0.2 and the line-of-sight linking length $b_{\parallel}$ to 0.1. Then the galaxies with identical group IDs are grouped together. The group IDs are then binned into galaxy group richness bins. The group richness bins are selected in away that they match the ones used in [CITE Berlind etal] analysis of SDSS galaxy group identification. The resulting product is the histogram of the galaxy group richnesses. Group multiplicity function $\gmf$ of the mock observations is computed by divinding the number of galaxies in each richness bin by the volume of the simulation box 250 $\mathrm{Mpc}^3\mathrm{h}^{-3}$.
+
+The measured $\gmf$ of the mock galaxy catalog is shown in figure ~\ref{2}. The covariance between the group multiplicity functions between two richness bins has two components. The first one is the sample covariance between the richness bins. This is computed from the group multiplicity function evaluations of a set of 500 galaxy mock catalogs. This covariance is computed in the following way:
+
+\begin{eqnarray} 
+\mathrm{C}_{\zeta}^{\mathrm{sample}}[i,j] &=& \frac{1}{N_{\mathrm{mocks}}-1}\sum_{k=1}^{N_{\mathrm{mocks}}} \Big[\gmf^{(k)}(N_{i})-\bar{\zeta}_{\rm g}(N_{i})\Big]\Big[\gmf^{(k)}(N_{j})-\bar{\zeta}_{\rm g}(N_{j}) \Big], \\
+\bar{\zeta}_{\rm g}(N_{i}) &=& \frac{1}{N_{\mathrm{mocks}}}\sum_{k=1}^{N_{\mathrm{mocks}}} \gmf^{(k)}(N_{i}).
+\end{eqnarray}
+
+The second contribution to the error covariance matrix of $\gmf$ measurements stems from Poisson noise which can be approximated by the number of galaxies within each richness bin devided by the volume of the box. That is,
+
+\begin{eqnarray} 
+\mathrm{C}_{\zeta}[i,j] &=& \mathrm{C}_{\zeta}^{\mathrm{sample}}[i,j] + \mathrm{C}_{\zeta}^{\mathrm{poisson}}[i,j], \\
+\mathrm{C}_{\zeta}^{\mathrm{poisson}}[i,j] &=& \delta_{i,j}\frac{\langle N_{i}\rangle^{2}}{V_{\mathrm{box}}},
+\end{eqnarray}
+where $V_{\mathrm{box}} = 250 \mathrm{Mpc}^3\mathrm{h}^{-3}$, and $\langle N_{i}\rangle$ is the estimated number of galaxies in the richness bin $i$.
+
+\subsection{Tests}
+
+
+
 %Plots showing 2pcf, gmf, ... of the mock data.
 %How we compute the covariance matrix from mocks...
 %Talk about error bars. Talk about poisson errors in group %populations .
@@ -573,3 +664,4 @@ Environment at NYU.
 \bibliographystyle{yahapj}
 \bibliography{ccppabc}
 \end{document}
+
