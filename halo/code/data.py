@@ -362,7 +362,8 @@ def build_full_inv_covars(Mr=20, Nmock=500):
 
     full_cov = data_full_cov(Mr=Mr, Nmock=Nmock)
     N_bins = int(np.sqrt(full_cov.size))
-    inv_c = solve(np.eye(N_bins) , full_cov)
+    f_unbias = np.float(Nmock - 2. - N_bins)/np.float(Nmock - 1.)
+    inv_c = solve(np.eye(N_bins) , full_cov) * f_unbias
 
     outfn = ''.join([util.dat_dir(),
                      'nbar_gmf_xir_inv_cov.Mr', str(Mr),
@@ -371,7 +372,8 @@ def build_full_inv_covars(Mr=20, Nmock=500):
 
     nbgmf_cov = data_nbar_gmf_cov(Mr=Mr, Nmock=Nmock)
     N_bins = int(np.sqrt(nbgmf_cov.size))
-    inv_c = solve(np.eye(N_bins) , nbgmf_cov)
+    f_unbias = np.float(Nmock - 2. - N_bins)/np.float(Nmock - 1.)
+    inv_c = solve(np.eye(N_bins) , nbgmf_cov) * f_unbias
 
     outfn = ''.join([util.dat_dir(),
                      'nbar_gmf_inv_cov.Mr', str(Mr),
@@ -380,7 +382,8 @@ def build_full_inv_covars(Mr=20, Nmock=500):
 
     nbxi_cov = data_nbar_xi_cov(Mr=Mr, Nmock=Nmock)
     N_bins = int(np.sqrt(nbxi_cov.size))
-    inv_c = solve(np.eye(N_bins) , nbxi_cov)
+    f_unbias = np.float(Nmock - 2. - N_bins)/np.float(Nmock - 1.)
+    inv_c = solve(np.eye(N_bins) , nbxi_cov) * f_unbias
 
     outfn = ''.join([util.dat_dir(),
                      'nbar_xi_inv_cov.Mr', str(Mr),
@@ -389,7 +392,8 @@ def build_full_inv_covars(Mr=20, Nmock=500):
 
     gmfxi_cov = data_gmf_xi_cov(Mr=Mr, Nmock=Nmock)
     N_bins = int(np.sqrt(gmfxi_cov.size))
-    inv_c = solve(np.eye(N_bins) , gmfxi_cov)
+    f_unbias = np.float(Nmock - 2. - N_bins)/np.float(Nmock - 1.)
+    inv_c = solve(np.eye(N_bins) , gmfxi_cov) * f_unbias
 
     outfn = ''.join([util.dat_dir(),
                      'gmf_xi_inv_cov.Mr', str(Mr),

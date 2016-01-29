@@ -103,14 +103,14 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
             if xit:
                 inv_cov = Data.data_nb_gmf_xi_fullicov(**data_dict)
             else:
-                inv_cov = Data.data_nbar_gmf_inv_cov()
+                inv_cov = Data.data_nbar_gmf_inv_cov(**data_dict)
         elif xit:
-            inv_cov = Data.data_nbar_xi_inv_cov()
+            inv_cov = Data.data_nbar_xi_inv_cov(**data_dict)
         else:
             inv_cov = 1. / data_nbar_var
     elif gmt:
         if xit:
-            inv_cov = Data.data_gmf_xi_inv_cov()
+            inv_cov = Data.data_gmf_xi_inv_cov(**data_dict)
         else:
             inv_cov = 1. / data_gmf_sigma ** 2
     elif xit:
