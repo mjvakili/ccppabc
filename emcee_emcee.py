@@ -73,8 +73,8 @@ def lnPost(theta, **kwargs):
 
     return lnPrior + lnLike
 
-def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'], 
-        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', output_dir=None): 
+def mcmc_mpi(Nwalkers, Niter, observables, continue_chain, output_dir=None, 
+        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try'): 
     '''
     Standard MCMC implementaion
     
@@ -154,7 +154,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
         Nchain = Niter
          
         # Initializing Walkers
-        random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+        random_guess = np.array([11.1 , np.log(.27) , 11.5 , 1.03 , 13.1])
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                          1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
@@ -174,12 +174,13 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=hod_kwargs)
     # Initializing Walkers 
-    random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
-    pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+    #random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+    #pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
+    #            1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
 
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
+        print "12"
         position = result[0]
         f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
@@ -271,9 +272,9 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
         Nchain = Niter
          
         # Initializing Walkers 
-        random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+        random_guess = np.array([11. , np.log(.3) , 11.5 , 1.02 , 13.5])
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                1e-5 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing the emcee sampler
     hod_kwargs = {
@@ -296,9 +297,9 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 if __name__=="__main__": 
 
     Niter = int(sys.argv[1])
-    print 'N iterations = ', Niter
+    print 'N_iterations = ', Niter
     Nwalkers = int(sys.argv[2])
-    print 'N walkers = ', Nwalkers
+    print 'N_walkers = ', Nwalkers
     obv_flag = sys.argv[3]
     if obv_flag == 'nbarxi':
         obv_list = ['nbar', 'xi']
@@ -313,6 +314,6 @@ if __name__=="__main__":
         if out_dir[-1] != '/':
             out_dir += '/'
         print 'Output to ', out_dir
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, continue_chain=True , output_dir=out_dir)
+        mcmc_mpi(Nwalkers, Niter, obv_list, continue_chain=False, output_dir=out_dir)
     else:
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=None)
+        mcmc_mpi(Nwalkers, Niter, obv_list, continue_chain=True, output_dir=None)
