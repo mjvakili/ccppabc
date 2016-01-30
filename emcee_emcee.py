@@ -180,7 +180,7 @@ def mcmc_mpi(Nwalkers, Niter, observables, continue_chain, output_dir=None,
 
 
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
-        print "12"
+
         position = result[0]
         f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
