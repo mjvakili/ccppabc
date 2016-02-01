@@ -175,34 +175,30 @@ The calculations regarding populating the dark matter halos, computing the clust
 This paper is structured as follows. In Section \ref{sec:method},
 we discuss the ABC sampling method and the components of the Halo occupation modeling. We also give a brief overview of the summary statistics used in this investigation. In Section \ref{sec:halo} we give a brief overview of the forward modeling of the galaxy mock catalogs using halotools as well as generating a mock galaxy catalog as data. In Section \ref{sec:results} we explore the results of our parameter inference using different summary statistics. Finally, we discuss and conclude in Section \ref{sec:discussion}.
 
-\section{Method}\label{sec:method}
-
+\section{Methods}\label{sec:method}
 %%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%
 % Approximate Bayesian Computation  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Approximate Bayesian Computation}
+\subsection{Approximate Bayesian Computation} \label{sec:abc}
 
-ABC is based on rejection sampling, which is a Monte Carlo method 
+ABC is based on rejection sampling, so we begin this section with a brief overview of 
+rejection sampling. Broadly speaking, rejection sampling is a Monte Carlo method 
 used to draw samples from a probability distribution that is difficult 
-to directly sample. For inference, the probability distribution that 
-we want to sample is the posterior probability distribution function.  
-Before we present the theory and algorithm of ABC, we provide a brief
-overview of rejection sampling.  
+to directly sample. More explicitly, it samples a probability distribution 
+$f(\alpha)$, which is difficult to directly sample, by drawing samples 
+from the distribution $M g(\alpha)$ that satisfies the condition 
+$f(\alpha) < M g(\alpha)$ where $M > 1$ and $g(\alpha)$ is an 
+instrumental distribution where sampling is easier.
 
-Briefly, rejection sampling is a method that draws samples from a 
-probability distribution $f(\alpha)$, which is difficult to 
-directly sample, by sampling from the distribution $M g(\alpha)$ that 
-satisfies $f(\alpha) < M g(\alpha)$. $g(\alpha)$ is an instrumental 
-distribution where sampling is easier and $M > 1$.
-
-More specifically, in the context of simulation-based inference, 
-the main goal is to sample from the joint probability of a
-simulation $X$ and parameters $\pars$ given observed data $D$, which 
-from Bayes rule can be written as 
+In the context of simulation-based inference, 
+the ultimate goal is to sample from the joint probability of a
+simulation $X$ and parameters $\pars$ given observed data $D$, the
+posterior probability distribution. From Bayes rule this posterior 
+distribution can be written as 
 \beq
 p(\pars, X | D) = \frac{P(D|X)p(X|\pars)\pi(\pars)}{\mathcal{Z}}
 \eeq
-where $\pi(\pars)$ is the prior probabilities over the parameters of 
+where $\pi(\pars)$ is the prior distribution over the parameters of 
 interest and $\mathcal{Z}$ is the evidence, 
 \beq
 \mathcal{Z} = \int d\pars \; dX\; p(D|X) p(X|\pars) \pi(\pars). 
@@ -212,7 +208,7 @@ sampling with instrumental distribution
 \beq
 q(\pars, X) = p(X|\pars) \pi(\pars)
 \eeq
-and 
+and  The weighted difference of the number density of the observed galaxies and the analytic number density is also added to this. In this work, we investigate the how accurately we can infer the model parameters by relaxing the underlying assumptions of the parameter inference methods.
 \beq
 M = \frac{\mathrm{max}\; p(D|X)}{\mathcal{Z}} > 1.
 \eeq
@@ -220,106 +216,70 @@ The choices of $q(\pars, X)$ and $M$ satisfy the condition
 \beq
 p(\pars, X | D) < M q(\pars, X)
 \eeq
-so we can sample $p(\pars, X | D)$ by drawing ${\pars, X}$ from 
-the $q(\pars, X)$ distribution. In practice, this is done 
-by first drawing $\pars$ from the prior $\pi(\pars)$ then generating a 
-simulation $X = f(\pars)$ via the forward model. Afterwards, ${\pars, X}$ 
+so we can sample $p(\pars, X | D)$ by drawing ${\pars, X}$ from $q(\pars, X)$.
+In practice, this is done 
+by first drawing $\pars$ from the prior $\pi(\pars)$ and then generating a 
+simulation $X = f(\pars)$ via the forward model. ${\pars, X}$ 
 is accepted if
-\beq
-u < \frac{p(\pars, X | D)}{M q(\pars, X)} = \frac{p(D|X)}{\mathrm{max}\;p(D|X)}
+\beq \label{eq:reject_samp}
+\frac{p(\pars, X | D)}{M q(\pars, X)} = \frac{p(D|X)}{\mathrm{max}\;p(D|X)} > u 
 \eeq
-where $u$ is drawn from $\mathtt{Uniform}[0,1]$. 
+where $u$ is drawn from $\mathtt{Uniform}[0,1]$. The set of $\pars$ and $X$ 
+accepted through the repeated rejection sampling process, ultimately sample 
+$p(\pars, X |D)$.  
 
-At this point, ABC postulates that $p(D|X)$ 
-
-The method requires a prior probability over the parameters of interest 
-($\pi(\theta)$), a generative forward model of the data given a set of 
-parameters ($f(\theta)$) and a distance metric $\rho(x,D)$ which measures 
-the distance between the simulation $X = f(\theta)$ and the observed data $D$. 
-
-Technically in large scale structure studies, the observed data is the 
-total angular and redshift positions of galaxies on the sky. However, 
-in practice, this data is an intractably high dimensional object. As a result, we 
-utilize statistical summaries of galaxy positions as our observed 'data' 
-and the distance metric we use measures the closeness of the statistical 
-summaries of observed galaxy positions versus the simulated galaxy 
-positions. Common summary statistics used to encapsulate the galaxy position 
-information include the number density of the galaxy sample, the two-point 
-correlation function (2PCF), three-point correlation function, and galaxy 
-group statistics. 
-
-Therefore the distance metric measures the closeness of statistical summaries of the data and those of the simulation. When the observed data-set under study is the positions of all galaxies observed in the survey, possible statistical summaries of the data are the number density of galaxies, two-point correlation function, three-point correlation function, galaxy group statistics (counts in cells), and so on.
-
-Here, we provide a brief overview of rejection sampling algorithm and how it is used in a simulation-based inference. We want to draw samples from a probability distribution $p(\alpha)$. Now, let us assume that: (i) there exists an auxiliary density $q(\alpha)$ from which we can directly sample from, and (ii) there exist $M>1$ which is an appropriate bound on $p(\alpha)/q(\alpha)$. Given these assumptions, rejection sampling works in the following way. We draw a sample $\alpha$ from the auxiliary density $q(\alpha)$. Afterwards, we draw a random number $u$ from a uniform distribution between zero and one. Then we accept the draw $\alpha$ if the $u$ is less than the ratio $p(\alpha)/Mq(\alpha)$. This procedure is repeated until sufficient number of draws are accepted.
-
-In the context of a simulation-based inference, we main goal is to 
-sample from the joint probability of a simulation $X$ and parameters 
-$\pars$ given the observed data $D$: 
-\beq
-p(\pars,X | D)
+At this stage, ABC distinguishes itself by postulating that $p(D|X)$, 
+the probability of observing data $D$ given simulation $X$, is controlled 
+by a threshold $\epsilon$ and that 
+\beq \label{eq:abc_condition}
+p(D|X)= p_\epsilon(D|X)\equiv 
+\begin{cases}
+    1,		& \text{if}\;\; \rho(D, X) < \epsilon\\
+    0,      & \text{otherwise}
+\end{cases}
 \eeq
-According to Bayes rule $p(\pars, X | D)$ can be written as 
-\beq
-p(\pars,X | D)  = \frac{p(D|X)p(X|\pars)\pi(\pars)}{\mathcal{Z}}
-\eeq
-where $\mathcal{Z}$  is the evidence, 
-\beq
-\mathcal{Z} = \int \dev \pars \; \dev X \; p(D|X)p(X|\pars)\pi(\pars),
-\eeq
+where $\rho(D, X)$ is the distance between the data $D$ and simulation $X$. 
+Plugging Eq. \ref{eq:abc_condition} into the 
+rejection sampling acceptance criteria (Eq. \ref{eq:reject_samp}), we 
+derive the acceptance criteria for ABC, which states that $\pars$ is accepted 
+if $\rho(D, X) < \epsilon$. 
 
-There exists a constant $M>1$ 
-\beq 
-M = \frac{\mathrm{max}_{X} \; p(D|X)}{Z},
-\eeq 
-and auxiliary density $q(\pars ,X)$
-\beq 
-q(\pars ,X)=p(X|\pars )\pi(\pars ),
-\eeq 
-such that:
-\beq 
-p(\pars ,X|D)<Mq(\pars ,X).
-\eeq 
-Now in a simulation-based inference, we first draw a pair $\{\pars , X \}$ from the density $q(\pars , X)$. This requires drawing a sample $\pars$ from the prior $\pi(\pars)$, and generating a simulation $X=f(\pars)$ via the forward model. Then, we accept the pair $\{\pars , X \}$, if the following condition is met
+\todo{CHH: Paragraph that briefly describes qualitatively what distance is}
+The distance can be a vector with multiple components where each component is 
+a different summary statistic distance between the data and simulation. 
+In that case, the threshold $\epsilon$ in 
+Eq. \ref{eq:abc_condition} will also be a vector with the same dimensions.  
+$\pars$ is accepted if the distance vector is less than the threshold for 
+every component.
 
-\beq 
-u \sim \mathrm{Uniform}[0,1] < \frac{p(\pars,X|D)}{Mq(\pars,X)}=\frac{p(D|X)}{\mathrm{max}_{X}p(D|X)}.
-\eeq 
+The ABC procedure begins, in the same fashion as rejection sampling, by drawing 
+$\pars$ from the prior distribution $\pi(\pars)$. The simulation is generated from 
+$\pars$ using the forward model, $X = f(\pars)$. Then the distance between 
+the data and simulation, $\rho(D, X)$, is calculated and compared to 
+$\epsilon$. If every component of $\rho(D, X) < \epsilon$, $\pars$ is accepted. 
+This process is repeated until we are left with a sample of $\pars$ that all 
+satisfy the distance criteria. This final ensemble approximates the posterior 
+probability distribution $p(\pars, X|D)$. 
 
-ABC postulates that the probability of observing data $D$ given simulation $X$, $p(D|X)$ is controlled by a threshold $\epsilon$, and that this probability is one if the distance between the data and the simulation, $\rho(D,X)$ is less than $\epsilon$. That is
+As it is stated, the ABC method poses some practical challenges. If the 
+threshold $\epsilon$ is arbitrarily large, the algorithm essentially 
+samples from the prior $\pi(\pars)$. Therefore a sufficiently small threshold
+is necessary to sample from the posterior probability distribution. However,
+an appropriate value for the threshold is not known \emph{a priori}. Yet, 
+even if an appropriate threshold is selected, a small threshold requires 
+the entire process to be repeated for many draws of $\pars$ from $\pi(\pars)$ 
+until a sufficient sample is acquired. This often presents computation challenges. 
 
-\beq 
-p(D|X) = p_{\epsilon}(D|X) \equiv \begin{cases}
-                                    1 \ \ \  \mathrm{if} \ \rho(D,X)<\epsilon \; , \\
-                                    0 \ \ \ \mathrm{otherwise} \; .
-                                    \end{cases}
-\eeq 
+In this paper, we overcome some of the challenges posed by the above ABC method
+by using a Population Monte Carlo (PMC) algorithm as our sampling technique. 
+PMC is an iterative method that performs rejection sampling over a 
+sequence of $\pars$ distributions ($\{p_1(\pars), ..., p_T(\pars)\}$ for 
+$T$ iterations), with a distance threshold that decreases at every iteration of 
+the sequence. 
 
-Thus the set of parameters $\pars$ is accepted if $\rho(D,f(\pars))<\epsilon$. In principle, the distance function measures the distance 
-between the statistical summaries of the data and those of the simulation. 
-The distance, in general, can be a vector, with each component representing the distance between one summary statistics of the data (e.g. variance) and the same summary statistics of the simulation. That is
-\beq 
-\rho(D,X) = \Big[\rho_{1}(S_{1}(D) , S_{1}(X)), ... , \rho_{M}(S_{M}(D) , S_{M}(X)) \Big],
-\eeq 
-where $M$ is the number of statistical summaries used in the inference, $S_{i}$ is the i-th summary statistics, and $\rho_{i}$ is a scalar function that measures the distance between the i-th summary statistics of the data and that of the simulation. In this case, the threshold $\epsilon$ is an $M$ dimensional vector.
-
-We draw a large number of proposals from the prior distribution over the parameter space, 
-and reject the samples for which the distance between the data and the simulation corresponding to that 
-sample is more than a certain threshold $\bm{\epsilon}$. This requirement is satisfied \emph{if and only if}
-every component of the distance vector is less than its corresponding threshold. Note that, each summary statistics 
-has a separate threshold. This procedure is done iteratively until, we are left with a certain number
-of samples that satisfy the distance criteria. The final ensemble approximates the posterior probability distribution over the parameters of the generative model of the data.
-
-For a sufficiently small threshold, this algorithm samples from the posterior probability, $p(\pars | D)$, and for an arbitrarily large threshold, the algorithm samples from the prior $\pi(\pars)$. This rejection sampling technique requires repeated sampling from the prior, and a very small threshold to succeed.
-
-In this investigation instead, we use Population Monte Carlo Algorithm (PMC) as our sampling technique. PMC is an iterative method that performs rejected sampling from a sequence of distributions $\{p_{1}(\pars),...,p_{T}(\pars)\}$.These distributions are paired with a sequence of decreasing distance thresholds $\{\epsilon_{1} , ... , \epsilon_{T}\}$.
-
-At each iteration, $N$ proposals are drawn from a distribution over parameters, and a weight is assigned to each one. In the first step, the threshold is set to an arbitrarily large value. Therefore the algorithm makes $N$ draws from the prior and assigns equal weights to all the proposals.
-
-In the consequent iterations, the distance threshold is set to a smaller value. A proposal is weighted-sampled from the previous sample. It is perturbed by a kernel which is set to the covariance of the parameters in the previous sample. A simulation is then generated by feeding the perturbed parameter into the forward model. The perturbed parameter is then accepted if the distance between the data and the generated simulation is less than the value of the threshold in that iteration. This procedure is repeated until $N$ particles are sampled. Then the weights are updated according to the kernel, the prior, and the previous set of weights.
-
-\begin{algorithm}
+\begin{algorithm} 
 \caption{The procedure for ABC-PMC}
-\begin{algorithmic}[1]
+\begin{algorithmic}[1] \label{alg:abcpmc}
 %\STATE \DATA: D
 %\STATE \RESULT: ABC posterior sample of $\pars$
 \IF{$t=1:$}
@@ -349,25 +309,60 @@ In the consequent iterations, the distance threshold is set to a smaller value. 
 \end{algorithmic}
 \end{algorithm}
 
-%\begin{algorithm}[H]
-% \Data{this text}
-% \Result{how to write algorithm with \LaTeX2e }
-% initialization\;
-% \While{not at end of this document}{
-%  read current\;
-%  \eIf{understand}{
-%   go to next section\;
-%   current section becomes this one\;
-%   }{
-%   go back to the beginning of current section\;
-%  }
-% }
-% \caption{How to write algorithms}
-%\end{algorithm}
+As illustrated in Algorithm \ref{alg:abcpmc}, for the first iteration $t = 1$, 
+we begin with an arbitrarily large distance threshold $\epsilon_1$. We 
+draw $\pars^i$ (hereafter referred to as particles) from the prior distribution 
+$\pi(\pars)$. We forward model the simulation $X = f(\pars^i)$, calculate the 
+distance $\rho(D, X)$, compare this distance to $\epsilon_1$, and then 
+accept or reject the $\pars^i$ draw. Because we set $\epsilon_1$ arbitrarily large, 
+the particles essentially sample the prior distribution. This process 
+is repeated until we accept $N$ particles. We then assign equal weights to 
+the $N$ particles, $w_1^i = 1/N$.
 
+For subsequent iterations ($t > 1$), first, the distance threshold is set such that
+$\epsilon_{i,t} < \epsilon_{i,t-1}$ for all components $i$. Although there is 
+no general prescriptions, the distance threshold $\epsilon_{i,t}$ can be 
+assigned based on the empirical distribution of the accepted distances in the 
+previous iteration ($t-1$). In \todo{CITE CITE}, for example, the $75th$ percentile 
+of the $t-1$ iteration acceptance distance is set as $\epsilon_t$. We specify
+0our prescription for the distance threshold in Section \todo{REFREF}. 
 
-\subsection{Forward model of the large scale galaxy populations}\label{sec:halo}
-\subsubsection{halo occupation modeling}
+Once $\epsilon_t$ is set, we draw a particle from the previous 
+weighted set of particles ${\pars^i}_{t-1}$. 
+This particle is perturbed by a kernel set to the covariance of 
+${\pars^i}_{t-1}$. Then once again, we generate a simulation from 
+forward modeling $X = f(\pars^i)$, calculate the distance $\rho(X, D)$, 
+compare the distance to new distance threshold ($\epsilon_t$) in order 
+to accept or reject the particle. This process is repeated until we 
+assemble a new $N$ set of particles ${\pars^i}_t$. We then update the 
+particle weights according to the kernel, the prior distribution and the 
+previous set of weights. 
+
+\todo{Preliminary remarks about convergence}
+Three conditions can be inspected in order to confirm the convergence of the ABC-PMC algorithm. Firstly, we can set a shut-off parameter for the acceptance ratio in each iteration. That is, if the acceptance ratio falls bellow the shut-off parameter, the algorithm has converged. The second condition is satisfied when the fractional change in the distance threshold becomes smaller than a certain tolerance level. The third and the final convergence test is checking whether the derived uncertainties of the infered paramaters have stabilized.
+%In the context of large scale structure, technically, the observed data is the 
+%total angular and redshift positions of galaxies on the sky. However, 
+%in practice, this data is an intractably high dimensional object. As a result, 
+%we use statistical summaries of galaxy positions as our observed data.
+%So the distance metric $\rho(D, X)$ we use measures the closeness of the 
+%statistical summaries of observed galaxy positions versus the simulated galaxy 
+%positions. Common summary statistics used to encapsulate the galaxy position 
+%information include the number density of the galaxy sample, the two-point 
+%correlation function (2PCF), three-point correlation function, and galaxy 
+%group statistics. 
+
+%Here, we provide a brief overview of rejection sampling algorithm and how it is used in a simulation-based inference. We want to draw samples from a probability distribution $p(\alpha)$. Now, let us assume that: (i) there exists an auxiliary density $q(\alpha)$ from which we can directly sample from, and (ii) there exist $M>1$ which is an appropriate bound on $p(\alpha)/q(\alpha)$. Given these assumptions, rejection sampling works in the following way. We draw a sample $\alpha$ from the auxiliary density $q(\alpha)$. Afterwards, we draw a random number $u$ from a uniform distribution between zero and one. Then we accept the draw $\alpha$ if the $u$ is less than the ratio $p(\alpha)/Mq(\alpha)$. This procedure is repeated until sufficient number of draws are accepted.
+
+%For a sufficiently small threshold, this algorithm samples from the posterior probability, $p(\pars | D)$, and for an arbitrarily large threshold, the algorithm samples from the prior $\pi(\pars)$. This rejection sampling technique requires repeated sampling from the prior, and a very small threshold to succeed.
+
+%In this investigation instead, we use Population Monte Carlo Algorithm (PMC) as our sampling technique. PMC is an iterative method that performs rejected sampling from a sequence of distributions $\{p_{1}(\pars),...,p_{T}(\pars)\}$.These distributions are paired with a sequence of decreasing distance thresholds $\{\epsilon_{1} , ... , \epsilon_{T}\}$.
+
+%At each iteration, $N$ proposals are drawn from a distribution over parameters, and a weight is assigned to each one. In the first step, the threshold is set to an arbitrarily large value. Therefore the algorithm makes $N$ draws from the prior and assigns equal weights to all the proposals.
+
+%In the consequent iterations, the distance threshold is set to a smaller value. A proposal is weighted-sampled from the previous sample. It is perturbed by a kernel which is set to the covariance of the parameters in the previous sample. A simulation is then generated by feeding the perturbed parameter into the forward model. The perturbed parameter is then accepted if the distance between the data and the generated simulation is less than the value of the threshold in that iteration. This procedure is repeated until $N$ particles are sampled. Then the weights are updated according to the kernel, the prior, and the previous set of weights.
+
+\subsection{Forward model}\label{sec:halo}
+\subsubsection{Halo Occupation Modeling}
 
 \newcommand{\lcdm}{\Lambda {\rm CDM}}
 \newcommand{\dd}{\mathrm{d}}
@@ -393,6 +388,7 @@ In the consequent iterations, the distance threshold is set to a smaller value. 
 \newcommand{\xiggroneh}{\xi^{1h}_{\mathrm{gg}}(r)}
 \newcommand{\xiggrtwoh}{\xi^{2h}_{\mathrm{gg}}(r)}
 \newcommand{\ngalaxy}{\bar{n}_{\mathrm{g}}}
+\newcommand{\gmf}{\mathcal{\zeta}_{\rm g}}
 
 One of the most well-studied statistics of the galaxy distribution 
 is $\xigg,$ the galaxy-galaxy correlation function. Mathematically, $\xigg$ encodes the
@@ -474,17 +470,26 @@ where $N_\mathrm{cen}$ is the number of central galaxies, and $N_\mathrm{sat}$ i
 
 \subsubsection{Generating mock galaxy populations with halotools}
 
-\subsubsection{summary statistics of galaxy populations}
+\subsection{summary statistics of galaxy populations}
 
-\subsubsection{distance metrics}
+Computation of the distance between the data and the simulation requires specification and computation of a set of statistical summaries of the data and those of the simulations. We conssider the following summaries of the data in our investigation of applying the ABC algorithm to constraining the galaxy-halo connection:
+\begin{itemize}
+\item Galaxy number density $\ngalaxy$: This quantity is the comoving number density of galaxies and is computed by dividing the number of galaxies by the comoving volume. This quantity is measured in units of $(\mathrm{Mpc}/\mathrm{h})^{-3}$.  
+\item Galaxy-galaxy correlation function $\xigg(r)$: This quantity is the probability in excess of random of finding a pair of galaxies separated by the threee dimensional distance $r$. For computation of this statistics, we rely on CITE[landy and Szalay] estimator. Following the original notayion of the paper, we refer to data as $D$, and random as $R$. The correlation function can then be estimated in the following way:
+\beq
+\xigg(r) = \frac{DD - 2DR + RR}{RR}
+\eeq
+as a function of three-dimensional distance $r$. This quantity is measured in units of $(\mathrm{Mpc}/\mathrm{h})^{-3}$.
+\item Galaxy group multiplicity function $\gmf(N)$: This quantity is defined as the number denisty of galaxy groups in bins of group richness $N$. These richness bins can have a width of unity or more. In order to link galaxies to each other, we rely on friends-of-friends (Hereafter FoF) group-finder algorithm. If both transeverse and line-of-sight separations of a pair of galaxies are smaller than a specified pair of transverse and line-of-sight linking lengths, the two galaxies are assigned to the same group by FoF algorithm. Quantitatively, for a pair of galaxies with transverse (line-of-sight) separations of $d_{\perp , ij}$ ($d_{\parallel , ij}$), the linkning condition is satisfied if
+\begin{eqnarray}
+d_{\perp , ij} &<& \ngalaxy ^{-1/3} \; b_{\perp , ij}, \\
+d_{\parallel , ij} &<& \ngalaxy ^{-1/3} \;b_{\parallel , ij},
+\end{eqnarray}
+where $b_{\perp , ij}$ ($b_{\parallel , ij}$) are the maximum projected (line-of-sight) linking  lengths that are normalized to the mean separation between galaxies $\ngalaxy ^{-1/3}$. Once the FoF galaxy groups are identified, a histogram of the number of groups in bins of group richness is made. Once the bin heights are devided by the comoving volume, the group multiplicity function (as a function of richness bins) is found. This quantity is measured in units of $(\mathrm{Mpc}/\mathrm{h})^{-3}$.
 
+\end{itemize}
 
-\section{Experiments}\label{sec:data}
-
-\subsection{Mock observations}
-
-\newcommand{\gmf}{\mathcal{\zeta}_{\rm g}}
-
+\section{Mock observations}\label{sec:data}
 As a testbed of our method, we create a mock population of galaxies in the following way. We set the upper limit of the luminosity of the mock galaxies to -20. Then mock observations---positions of galaxies--- are generated by populating the pre-built halo catalogs in the bolshoi simulation according to \cite{Zheng:2007aa} HOD model, and the best-fit HOD parameters found by \citet{Zheng:2007aa} for SDSS galaxy samples with the same luminosity threshold.
 
 Afterwards, summary statistics of the mock observations are computed. These summary statistics include the man number density $\ngalaxy$ the galaxy-galaxy correlation function $\xigg$, the group multiplicity function $\gmf$. These quantities are measured in the following way. 
@@ -513,13 +518,51 @@ The second contribution to the error covariance matrix of $\gmf$ measurements st
 \end{eqnarray}
 where $V_{\mathrm{box}} = 250 \mathrm{Mpc}^3\mathrm{h}^{-3}$, and $\langle N_{i}\rangle$ is the estimated number of galaxies in the richness bin $i$.
 
-\subsection{Tests}
+%%%%%%%%%%%%%%%%%TEST%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tests}\label{sec:test}
+
+In order to test the performance of the ABC algorithm in finding constraints over HOD parameters as well as comparing the ABC oncstraints with those found by standard MCMC likelihood analysis, we perform three tests. A combination of the statistical summaries of the mock observations is used in each test. The first, second, and the third experiment the combinations $\{\ngalaxy , \xigg\}$, $\{\ngalaxy , \gmf\}$, and $\{\ngalaxy, \xigg, \gmf\}$ are used respectively. 
+
+The distance metrics used for the ABC analysis are multi-component. That is, a distance component is assigned to for every statsitical summary of the data used in a particular test. Hereafter, the distance components associated with $\ngalaxy$, $\xigg$, $\gmf$ are denoted by $\rho_{\ngalaxy}$, $\rho_{\xigg}$, and $\rho_{\gmf}$:
+
+\begin{eqnarray}
+\rho_{\ngalaxy} &=& \frac{(\ngalaxy^{d} - \ngalaxy^{m})^{2}}{\sigma^{2}_{\ngalaxy}},\\
+\rho_{\xigg}    &=& \sum_{k} \frac{[\xigg^{d}(r_k) - \xigg^{m}(r_k)]^{2}}{C_{\xi}[k,k]},\\
+\rho_{\gmf}     &=& \sum_{k} \frac{[\gmf^{d}(N_k) - \gmf^{m}(N_k)]^{2}}{C_{\zeta}[k,k]},
+\end{eqnarray}
+where the superscripts $d$ and $m$ denote data and model respectively.
+
+Another major component of any ABC analysis is the choice of prior. Uniform prior ranges are chosen for all paramters, except the scatter paramter which has a log-uniform prior between 0.1 and 0.7. All the prior ranges are specified in Table ~\ref{tab:prior}.
+
+So far, we have not specified the manner in which we change the threshold values in our ABC-PMC algorithm. 
+In the first iteration, we set the threshold value to $\infty$. Before thr seond and the third iteration, we set the the threshold to 50-percentile of the distances of the particles in the previous iterations. In the subsequent iterations, we set lower the threshold to the 75-percentile of the disatnces of the particles in the previous iterations.
+
+In order to test the convergence of the algorithm, we inspect all the convergence test methods outlined in Section \ref{sec:abc}. That is , we set the shut-off value for the acceptence ratio to 0.001. Moreover, we set the fractional change in the threshold values of the consequent iterations to 0.1.
 
 
+
+%%%%%%%%%%%%%%%%%%TABLES%%%%%%%%%%%%
+\begin{table*}
+  \label{tab:prior}
+  \caption{{\bf Prior Specifications}. Priors that contain the form [a, b] mean the
+parameter in question is restricted to values within that range. All mass parameters are in unit of $h^{-1}M_\sun$}
+\begin{tabular}{@{}lll}
+\\ \hline \hline
+    HOD Parameter & & Prior \\ \hline
+   $\log M_{0}$   & & Uniform on [10.0, 13.0] \\
+  $\log \sigma_{\rm M}$ & & Log--Uniform on [0.1, 0.7] \\
+  $\log M_{min}$ & &   Uniform on [11.02, 13.02] \\
+  $\alpha$ & & Uniform on [0.8, 1.3] \\
+  $\log M_{1}$ & & Uniform on [13.0, 14.0] \\
+ \hline
+  \end{tabular}
+\end{table*}
+
+%%%%%%%%%%%%%%%%%FIGURES%%%%%%%%%%%%%%
 
 %Plots showing 2pcf, gmf, ... of the mock data.
-%How we compute the covariance matrix from mocks...
-%Talk about error bars. Talk about poisson errors in group %populations .
+
 %--------------------------------------------------------
 % Covariance matrix of xi  
 %--------------------------------------------------------
@@ -562,7 +605,7 @@ ABC-PMC using nbar and xi vs MCMC
 \includegraphics[width=\textwidth]{nbar_xi_Mr20_Niter10000_Nburn100_mcmc_samples_test.png}
 \caption{Posterior likelihood of HOD parameters $\log M_0$, 
 $\sigma_{\log M}$, $\log M_{min}$, $\alpha$, and $\log M_1$ using the
-standard Markov Chain Monte Carlo method as described in Section \todo{CITECITE}. 
+standard MCMC method as described in Section \todo{CITECITE}. 
 \todo{THIS IS A SPACE MARKER NOT THE FINAL FIGURE.}}
 \label{fig:post_abc_nbarxi}
 \end{center}
@@ -594,7 +637,11 @@ once it finishes running}
 
 
 \section{Discussion}\label{sec:discussion}
+
 \todo{talk about cosmological inference and why this is good first step for likelihood free inference in large scale ...}
+
+\todo{I'll talk in the discussions that all of these are necessary conditions not suficient.}
+\todo{standard mcmc has the same problem. It has two widely used necessary conditions: autocorrelation of the chains, and the derived uncertainty of the infered parameters. We'll expand this discussion in the result and discussion sections. sounds good?}
 
 
 talk about halo model ...
@@ -664,4 +711,3 @@ Environment at NYU.
 \bibliographystyle{yahapj}
 \bibliography{ccppabc}
 \end{document}
-
