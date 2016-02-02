@@ -13,7 +13,7 @@ import numpy as np
 import emcee
 from numpy.linalg import solve
 from emcee.utils import MPIPool
-
+import scipy.optimize as op
 # --- Local ---
 import util
 import data as Data
@@ -23,8 +23,8 @@ from group_richness import richness
 from prior import PriorRange
 import corner
     
-def lnPost(theta, **kwargs):
-    '''log Posterior 
+def lnprior(theta, **kwargs):
+    '''log prior 
     '''
     fake_obs = kwargs['data']
     fake_obs_cov = kwargs['data_cov']
@@ -42,12 +42,17 @@ def lnPost(theta, **kwargs):
        prior_min[3] < theta[3] < prior_max[3] and \
        prior_min[4] < theta[4] < prior_max[4]:
            lnPrior = 0.0
-    else:
-        lnPrior = -np.inf
     
-    if not np.isfinite(lnPrior):
-        return -np.inf
+    return -np.inf
 
+def lnlike(theta, **kwargs):
+
+    fake_obs = kwargs['data']
+    fake_obs_cov = kwargs['data_cov']
+    kwargs.pop('data', None)
+    kwargs.pop('data_cov', None)
+    observables = kwargs['observables']
+    prior_range = kwargs['prior_range']
     # Likelihood
     model_obvs = HODsimulator(theta, **kwargs)
     ind = 0 
@@ -60,18 +65,31 @@ def lnPost(theta, **kwargs):
     if 'xi' in observables: 
         res_xi = fake_obs[ind] - model_obvs[ind]
     
-    chi_tot = 0.
+    neg_chi_tot = 0.
+
     ind = 0 
     if 'nbar' in observables: 
-        chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
+        neg_chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
         ind += 1
     if 'gmf' in observables: 
-        chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
+        neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
     if 'xi' in observables: 
-        chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
-    lnLike = chi_tot
+        neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
 
-    return lnPrior + lnLike
+    return neg_chi_tot
+
+
+def optimize(theta, **kwargs):
+
+    nll = lambda *args: -lnlike(*args)
+    result = op.minimize(nll, theta , args=**kwargs)
+    return result["x"]
+
+def lnPost(theta, **kwargs):
+    lp = lnprior(theta , **kwargs)
+    if not np.isfinite(lp):
+        return -np.inf
+    return lp + lnlike(theta, **kwargs)
 
 def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'], 
         data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', output_dir=None): 
