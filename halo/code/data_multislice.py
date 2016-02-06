@@ -157,9 +157,9 @@ def build_observations(Mr=20):
 
         subvol_ids = np.empty(xs.shape)
         for i in xrange(len(xs)):
-            xi = np.where(edges < xs)[-1]
-            yi = np.where(edges < ys)[-1]
-            zi = np.where(edges < zs)[-1]
+            xi = np.where(edges < xs[0][i])[-1]
+            yi = np.where(edges < ys[0][i])[-1]
+            zi = np.where(edges < zs[0][i])[-1]
             subvol_ids[i] = zi * 25 + yi * 5 + xi
 
         np.savetxt(subvol_id_fn, subvol_ids)
