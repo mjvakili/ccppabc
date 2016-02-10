@@ -1,7 +1,10 @@
 import numpy as np
 from halotools.sim_manager import CachedHaloCatalog
-
+from halotools.empirical_models import PrebuiltHodModelFactory
 import util
+from group_richness import gmf_bins
+from group_richness import richness
+from group_richness import gmf as GMF
 
 
 def hardcoded_xi_bins():
@@ -21,7 +24,7 @@ def build_xi_bins(Mr=20):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {sim_subvol: mk_id_column}
+    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
     datsubvol = lambda x: util.mask_func(x, 0)
     model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
     r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
@@ -30,21 +33,52 @@ def build_xi_bins(Mr=20):
     return None
 
 
-def build_xi_nbar_gmf_cov(Mr=20):
+# Build observables ---------------
+def build_nbar_xi_gmf(Mr=20):
     '''
-    Build covariance matrix for xi, variance for nbar, and a bunch of stuff for gmf
-    ...
-    using Nmock realizations of halotool mocks
+    Build "data" vector <nbar, xi, gmf> and write to file
     '''
-    xir = []
-    nbars = []
-    gmfs = []
-    gmf_counts = []
-
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {sim_subvol: mk_id_column}
+    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
+
+    datsubvol = lambda x: util.mask_func(x, 0)
+    model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
+
+    nbar = model.mock.number_density
+
+    data_xir = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1]
+
+    fullvec = np.append(nbar, data_xir)
+
+    rich = richness(model.mock.compute_fof_group_ids())
+    gmf = GMF(rich)  # GMF
+
+    fullvec = np.append(fullvec, gmf)
+
+    output_file = ''.join([util.multidat_dir(), 'data_vector.Mr', str(Mr), '.dat'])
+    np.savetxt(output_file, fullvec)
+
+    return None
+
+
+def build_xi_nbar_gmf_cov(Mr=20):
+    '''
+    Build covariance matrix for xi, nbar, gmf data vector
+    using realisations of galaxy mocks for "data" HOD
+    parameters in the halos from the other subvolumes of
+    the simulation.
+    '''
+    nbars = []
+    xir = []
+    gmfs = []
+    gmf_counts = []
+
+     thr = -1. * np.float(Mr)
+    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
+                                    halocat='multidark', redshift=0.)
+    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
 
     for i in xrange(1,125):
         print 'mock#', i
@@ -53,24 +87,14 @@ def build_xi_nbar_gmf_cov(Mr=20):
         mocksubvol = lambda x: util.mask_func(x, i)
         model.populate_mock(masking_function=mocksubvol, enforce_PBC=False)
 
-        # xi(r)
-        xir.append(model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1])
         # nbar
         nbars.append(model.mock.number_density)
+        # xi(r)
+        xir.append(model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1])
         # gmf
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
-
-    # save xi covariance
-    xi_covar = np.cov(np.array(xir).T)
-    output_file = ''.join([util.dat_dir(), 'xir_covariance.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, xi_covar)
-
-    # save nbar values
-    nbar_cov = np.var(nbars, axis=0)
-    output_file = ''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, [nbar_cov])
 
     # write GMF covariance
     gmf_cov = np.cov(np.array(gmfs).T)
@@ -123,10 +147,6 @@ def build_xi_nbar_gmf_cov(Mr=20):
     return None
 
 
-
-
-
-
 def build_observations(Mr=20):
     '''
     Build all the fake observations
@@ -142,32 +162,14 @@ def build_observations(Mr=20):
         dman = DownloadManager()
         dman.download_processed_halo_table('multidark', 'rockstar', 0.0)
 
-    # make the subvolume index column if it doesn't exist
-    subvol_id_fn = util.multidat_dir() + 'subvol_ids.dat'
-    try:
-        subvol_ids = np.loadtxt(subvol_id_fn)
-    except IOError:
-        halocat = CachedHaloCatalog(simname='multidark',
-                                    halo_finder='rockstar',
-                                    redshift=0.0)
-        edges = np.linspace(0, 800, 5)
-        xs = halocat.halo_table["halo_x"]
-        ys = halocat.halo_table["halo_y"]
-        zs = halocat.halo_table["halo_z"]
-
-        subvol_ids = np.empty(xs.shape)
-        for i in xrange(len(xs)):
-            xi = np.where(edges < xs[0][i])[-1]
-            yi = np.where(edges < ys[0][i])[-1]
-            zi = np.where(edges < zs[0][i])[-1]
-            subvol_ids[i] = zi * 25 + yi * 5 + xi
-
-        np.savetxt(subvol_id_fn, subvol_ids)
-
-
     # xi, nbar, gmf
-    print 'Building xi(r), nbar, GMF ... '
+    print 'Building nbar, xi(r), GMF data vector... '
     build_xi_bins(Mr=Mr)
-    build_xi_nbar_gmf(Mr=Mr)
+    build_nbar_xi_gmf(Mr=Mr)
+    print 'Computing covariance matrix of data...'
+    build_xi_nbar_gmf_cov(Mr=Mr):
 
 
+if __name__ == "__main__":
+
+    build_observations()

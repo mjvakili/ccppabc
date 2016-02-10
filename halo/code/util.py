@@ -4,6 +4,25 @@ Utility modules
 
 '''
 import os
+import numpy as np
+
+
+def mk_id_column(table=None):
+
+    # set up ids from 0 to 124 for the box split into 5 along each edge
+    edges = np.linspace(0, 800, 5)
+
+    xs = table["halo_x"]
+    ys = table["halo_y"]
+    zs = table["halo_z"]
+
+    subvol_ids = np.empty(xs.shape)
+    for i in xrange(len(xs)):
+        xi = np.where(edges < xs[i])[0][-1]
+        yi = np.where(edges < ys[i])[0][-1]
+        zi = np.where(edges < zs[i])[0][-1]
+        subvol_ids[i] = zi * 25 + yi * 5 + xi
+                                                                   return subvol_ids
 
 
 def mask_func(halo_table, subvol_index):
@@ -14,14 +33,6 @@ def mask_func(halo_table, subvol_index):
     '''
     ids = halo_table["sim_subvol"]
     return np.where(ids == subvol_index)[0]
-
-
-def mk_id_column():
-    '''
-    Function which adds a subvolume id column to the halo table
-    '''
-    subvol_id_fn = util.multidat_dir() + 'subvol_ids.dat'
-    return np.loadtxt(subvol_id_fn)
 
 
 def observable_id_flag(observables):
