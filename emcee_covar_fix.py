@@ -5,7 +5,7 @@ import emcee
 from numpy.linalg import solve
 from emcee.utils import MPIPool
 import util
-import data as Data
+import data_multislice as Data
 from hod_sim import HODsim
 from hod_sim import HODsimulator
 from group_richness import richness
@@ -82,39 +82,41 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
 
     # data observables
     fake_obs = []       # list of observables
-    nbt = gmt = xit = None
+    nbt = xit = gmt = None
     for obv in observables:
         if obv == 'nbar':
             data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
             fake_obs.append(data_nbar)
             nbt = True
         if obv == 'gmf':
-            data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
+            data_gmf = Data.data_gmf(**data_dict)
             fake_obs.append(data_gmf)
             gmt = True
         if obv == 'xi':
-            # import xir and full covariance matrix of xir
-            data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)
+            # import xi
+            data_xi = Data.data_xi(**data_dict)
             fake_obs.append(data_xi)
             xit = True
 
     if nbt:
-        if gmt:
-            if xit:
-                inv_cov = Data.data_nb_gmf_xi_fullicov(**data_dict)
+        if xit:
+            if gmt:
+                inv_cov = Data.data_inv_cov('nbar_xir_gmf_inv_cov',
+                                            **data_dict)
             else:
-                inv_cov = Data.data_nbar_gmf_inv_cov(**data_dict)
-        elif xit:
-            inv_cov = Data.data_nbar_xi_inv_cov(**data_dict)
+                inv_cov = Data.data_inv_cov('nbar_xi_inv_cov',
+                                            **data_dict)
+        elif gmt:
+            inv_cov = Data.data_inv_cov('nbar_gmf_inv_cov', **data_dict)
         else:
             inv_cov = 1. / data_nbar_var
-    elif gmt:
-        if xit:
-            inv_cov = Data.data_gmf_xi_inv_cov(**data_dict)
-        else:
-            inv_cov = 1. / data_gmf_sigma ** 2
     elif xit:
-        inv_cov = Data.data_xi_inv_cov(**data_dict)
+        if gmt:
+            inv_cov = Data.data_inv_cov('xi_gmf_inv_cov', **data_dict)
+        else:
+            inv_cov = Data.data_inv_cov('xi_inv_cov', **data_dict)
+    elif gmt:
+        inv_cov = Data.data_inv_cov('gmf_inv_cov', **data_dict)
     else:
         print "you must supply observables fool"
         assert(0)

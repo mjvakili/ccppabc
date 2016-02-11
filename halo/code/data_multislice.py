@@ -1,3 +1,7 @@
+'''
+module for building and loading all the possible data and covariance
+combinations that can come up in the generalised inference
+'''
 import numpy as np
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
@@ -7,6 +11,67 @@ from group_richness import richness
 from group_richness import gmf as GMF
 
 
+def data_hod_param(Mr=20):
+    '''
+    HOD parameters of 'observations'. Returns dictionary with hod parameters.
+    '''
+    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
+    return model.param_dict
+
+
+# --- nbar ---
+def data_nbar(Mr=20):
+    '''
+    Observed nbar from 'data'
+    '''
+    dat = np.loadtxt(''.join([util.multidat_dir(),
+                             'data_vector.Mr', str(Mr),
+                             '.dat']))
+    nbar = dat[0]
+    nbar_var = np.loadtxt(''.join([util.multidat_dir(),
+                                  'nbar_var.Mr', str(Mr),
+                                  '.dat'])
+    return [nbar, nbar_var]
+
+
+# --- 2PCF ---
+def data_xi(Mr=20):
+    '''
+    Observed xi (2PCF) from 'data'
+    '''
+    dat = np.loadtxt(''.join([util.multidat_dir(),
+                             'data_vector.Mr', str(Mr),
+                             '.dat']))
+    xi = dat[1:17]
+
+    return xi
+
+
+# --- GMF ---
+def data_gmf(Mr=20):
+    '''
+    Observed GMF from 'data'
+    '''
+    dat = np.loadtxt(''.join([util.multidat_dir(),
+                             'data_vector.Mr', str(Mr),
+                             '.dat']))
+    gmf = dat[17:]
+
+    return gmf
+
+
+# --- inverse covariance matrices ---
+def data_inv_cov(datcombo, Mr=20):
+
+    inv_cov_fn = ''.join([util.multidat_dir(),
+                         '{0}.Mr'.format(datcombo), str(Mr),
+                         '.dat'])
+    inv_cov = np.loadtxt(inv_cov_fn)
+
+    return inv_cov
+
+
+# --- functions to build initial fake data ---
 def hardcoded_xi_bins():
     '''
     hardcoded xi bin edges.They are spaced out unevenly due to sparseness
@@ -24,7 +89,7 @@ def build_xi_bins(Mr=20):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
+    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
     datsubvol = lambda x: util.mask_func(x, 0)
     model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
     r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
@@ -41,7 +106,7 @@ def build_nbar_xi_gmf(Mr=20):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
+    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
     datsubvol = lambda x: util.mask_func(x, 0)
     model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
@@ -63,9 +128,10 @@ def build_nbar_xi_gmf(Mr=20):
     return None
 
 
-def build_xi_nbar_gmf_cov(Mr=20):
+# --- function to build all the covariance matrices and their inverses ---
+def build_nbar_xi_gmf_cov(Mr=20):
     '''
-    Build covariance matrix for xi, nbar, gmf data vector
+    Build covariance matrix for nbar, xi, gmf data vector
     using realisations of galaxy mocks for "data" HOD
     parameters in the halos from the other subvolumes of
     the simulation.
@@ -75,10 +141,10 @@ def build_xi_nbar_gmf_cov(Mr=20):
     gmfs = []
     gmf_counts = []
 
-     thr = -1. * np.float(Mr)
+    thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {'sim_subvol': mk_id_column}
+    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
     for i in xrange(1,125):
         print 'mock#', i
@@ -96,53 +162,55 @@ def build_xi_nbar_gmf_cov(Mr=20):
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
 
-    # write GMF covariance
-    gmf_cov = np.cov(np.array(gmfs).T)
-    output_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, gmf_cov)
-    # write GMF Poisson
+    # save nbar variance
+    nbar_var = np.var(nbars, axis=0, ddof=1)
+    output_file = ''.join([util.multidat_dir(),
+                          'nbar_var.Mr', str(Mr),
+                          '.dat'])
+    np.savetxt(output_file, [nbar_var])
+
+    # determine extra poisson noise on gmf
     gmf_counts_mean = np.mean(gmf_counts, axis=0)
-    poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, poisson_gmf)
-    # write GMF standard dev
-    sigma_gmf = np.std(gmfs, axis=0)                    # sample variance
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, sigma_gmf)
-    # write GMF total noise
-    sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, sigma_tot)
 
     # write full covariance matrix of various combinations of the data
+    # and invert for the likelihood evaluations
 
-    # covariance for all three
+    # --- covariance for all three ---
     fulldatarr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                           np.array(gmfs), np.array(xir))
+                           np.array(xir),
+                           np.array(gmfs))
 
     fullcov = np.cov(fulldatarr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_gmf_xir_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    fullcorr = np.corrcoeff(fulldatarr.T)
+
+    # add in poisson noise for gmf
+    for i in range(len(gmf_counts_mean)):
+        fullcov[17 + i, 17 + i] += gmf_counts_mean[i]
+
+    # and save the covariance matrix
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_xir_gmf_cov.Mr', str(Mr),
+                    '.dat'])
     np.savetxt(outfn, fullcov)
+    # and a correlation matrix
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_xir_gmf_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, fullcorr)
 
-    # covariance for nbar and gmf
-    nbgmf_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                         np.array(gmfs))
-    nbgmf_cov = np.cov(nbgmf_arr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, nbgmf_cov)
+    # full covariance matrix inverse
+    N_bins = int(np.sqrt(fullcov.size))
+    f_unbias = (124 - 2. - N_bins) / 124.
+    inv_c = solve(np.eye(N_bins) , full_cov) * f_unbias
 
-    # covariance for nbar and xi
-    nbxi_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                         np.array(xir))
-    nbxi_cov = np.cov(nbxi_arr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, nbxi_cov)
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_xir_gmf_inv_cov.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, inv_c)
 
-    # covariance for gmf and xi
-    gmfxi_arr = np.hstack(np.array(gmfs), np.array(xir))
-    gmfxi_cov = np.cov(gmfxi_arr.T)
-    outfn = ''.join([util.dat_dir(), 'gmf_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, gmfxi_cov)
+    # inverse for nbar-xi data vector covariance
+
+
 
     return None
 
@@ -167,7 +235,7 @@ def build_observations(Mr=20):
     build_xi_bins(Mr=Mr)
     build_nbar_xi_gmf(Mr=Mr)
     print 'Computing covariance matrix of data...'
-    build_xi_nbar_gmf_cov(Mr=Mr):
+    build_nbar_xi_gmf_cov(Mr=Mr):
 
 
 if __name__ == "__main__":
