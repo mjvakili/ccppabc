@@ -3,6 +3,7 @@ module for building and loading all the possible data and covariance
 combinations that can come up in the generalised inference
 '''
 import numpy as np
+from numpy.linalg import solve
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
 import util
@@ -30,7 +31,7 @@ def data_nbar(Mr=20):
     nbar = dat[0]
     nbar_var = np.loadtxt(''.join([util.multidat_dir(),
                                   'nbar_var.Mr', str(Mr),
-                                  '.dat'])
+                                  '.dat']))
     return [nbar, nbar_var]
 
 
@@ -42,7 +43,7 @@ def data_xi(Mr=20):
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
                              '.dat']))
-    xi = dat[1:17]
+    xi = dat[1:16]
 
     return xi
 
@@ -55,7 +56,7 @@ def data_gmf(Mr=20):
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
                              '.dat']))
-    gmf = dat[17:]
+    gmf = dat[16:]
 
     return gmf
 
@@ -91,7 +92,9 @@ def build_xi_bins(Mr=20):
                                     halocat='multidark', redshift=0.)
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
     datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
+    model.populate_mock(simname='multidark',
+                        masking_function=datsubvol,
+                        enforce_PBC=False)
     r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
     output_file = ''.join([util.multidat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, r_bin)
@@ -109,7 +112,9 @@ def build_nbar_xi_gmf(Mr=20):
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
     datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(masking_function=datsubvol, enforce_PBC=False)
+    model.populate_mock(simname='multidark',
+                        masking_function=datsubvol,
+                        enforce_PBC=False)
 
     nbar = model.mock.number_density
 
@@ -151,7 +156,9 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
         # populate the mock subvolume
         mocksubvol = lambda x: util.mask_func(x, i)
-        model.populate_mock(masking_function=mocksubvol, enforce_PBC=False)
+        model.populate_mock(simname='multidark',
+                            masking_function=mocksubvol,
+                            enforce_PBC=False)
 
         # nbar
         nbars.append(model.mock.number_density)
@@ -176,16 +183,19 @@ def build_nbar_xi_gmf_cov(Mr=20):
     # and invert for the likelihood evaluations
 
     # --- covariance for all three ---
-    fulldatarr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                           np.array(xir),
-                           np.array(gmfs))
+    fulldatarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
+                            np.array(xir),
+                            np.array(gmfs)))
 
     fullcov = np.cov(fulldatarr.T)
-    fullcorr = np.corrcoeff(fulldatarr.T)
+    fullcorr = np.corrcoef(fulldatarr.T)
+
+    print len(gmf_counts_mean)
+    print fullcov.shape
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
-        fullcov[17 + i, 17 + i] += gmf_counts_mean[i]
+        fullcov[16 + i, 16 + i] += gmf_counts_mean[i]
 
     # and save the covariance matrix
     outfn = ''.join([util.multidat_dir(),
@@ -209,7 +219,7 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for nbar-xi data vector covariance
-    nbxicov = fullcov[:17, :17]
+    nbxicov = fullcov[:16, :16]
 
     N_bins = int(np.sqrt(nbxicov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -221,10 +231,10 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for nbar-gmf data vector covariance
-    nbgmfcov = np.empty((fullcov.shape[0] - 16, fullcov.shape[0] - 16))
-    nbgmfcov[1:,1:] = fullcov[17:, 17:]
+    nbgmfcov = np.empty((fullcov.shape[0] - 15, fullcov.shape[0] - 15))
+    nbgmfcov[1:,1:] = fullcov[16:, 16:]
     nbgmfcov[:, 0] = nbgmfcov[0, :] = np.append(fullcov[0, 0],
-                                                fullcov[0, 17:])
+                                                fullcov[0, 16:])
 
     N_bins = int(np.sqrt(nbgmfcov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -248,7 +258,7 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for xi data vector covariance
-    xicov = fullcov[1:17, 1:17]
+    xicov = fullcov[1:16, 1:16]
 
     N_bins = int(np.sqrt(xicov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -260,7 +270,7 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for gmf data vector covariance
-    gmfcov = fullcov[17:, 17:]
+    gmfcov = fullcov[16:, 16:]
 
     N_bins = int(np.sqrt(gmfcov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -294,7 +304,7 @@ def build_observations(Mr=20):
     build_xi_bins(Mr=Mr)
     build_nbar_xi_gmf(Mr=Mr)
     print 'Computing covariance matrix of data...'
-    build_nbar_xi_gmf_cov(Mr=Mr):
+    build_nbar_xi_gmf_cov(Mr=Mr)
 
 
 if __name__ == "__main__":
