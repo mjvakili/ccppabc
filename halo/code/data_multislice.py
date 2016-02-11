@@ -230,9 +230,13 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for nbar-xi data vector covariance
-    nbxicov = fullcov[:16, :16]
+    datarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
+                        np.array(xir)))
+
+    nbxicov = np.cov(datarr.T)
+
     # and generate and save a correlation matrix for inspection
-    nbxicor = cov2corr(nbxicov)
+    nbxicor = np.corrcoef(datarr.T)
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_xi_corr.Mr', str(Mr),
@@ -249,12 +253,15 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for nbar-gmf data vector covariance
-    nbgmfcov = np.empty((fullcov.shape[0] - 15, fullcov.shape[0] - 15))
-    nbgmfcov[1:,1:] = fullcov[16:, 16:]
-    nbgmfcov[:, 0] = nbgmfcov[0, :] = np.append(fullcov[0, 0],
-                                                fullcov[0, 16:])
+    datarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
+                        np.array(gmfs)))
 
-    nbgmfcor = cov2corr(nbgmfcov)
+    nbgmfcov = np.cov(datarr.T)
+    nbgmfcor = np.corrcoef(datarr.T)
+
+    # add in poisson noise for gmf
+    for i in range(len(gmf_counts_mean)):
+        nbgmfcov[1 + i, 1 + i] += gmf_counts_mean[i]
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_gmf_corr.Mr', str(Mr),
@@ -271,8 +278,15 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for xi-gmf data vector covariance
-    xigmfcov = fullcov[1:, 1:]
-    xigmfcor = cov2corr(xigmfcov)
+    datarr = np.hstack((np.array(xir),
+                        np.array(gmfs)))
+
+    xigmfcov = np.cov(datarr.T)
+    xigmfcor = np.corrcoef(datarr.T)
+
+    # add in poisson noise for gmf
+    for i in range(len(gmf_counts_mean)):
+        xigmfcov[15 + i, 15 + i] += gmf_counts_mean[i]
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_gmf_corr.Mr', str(Mr),
@@ -289,8 +303,8 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for xi data vector covariance
-    xicov = fullcov[1:16, 1:16]
-    xicor = cov2corr(xicov)
+    xicov = np.cov(np.array(xir).T)
+    xicor = np.corrcoef(np.array(xir).T)
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_corr.Mr', str(Mr),
@@ -307,8 +321,13 @@ def build_nbar_xi_gmf_cov(Mr=20):
     np.savetxt(outfn, inv_c)
 
     # inverse for gmf data vector covariance
-    gmfcov = fullcov[16:, 16:]
-    gmfcor = cov2corr(gmfcov)
+    gmfcov = np.cov(np.array(gmfs).T)
+    gmfcor = np.corrcoef(np.array(gmfs).T)
+
+    # add in poisson noise for gmf
+    for i in range(len(gmf_counts_mean)):
+        gmfcov[i, i] += gmf_counts_mean[i]
+
 
     outfn = ''.join([util.multidat_dir(),
                     'gmf_corr.Mr', str(Mr),
