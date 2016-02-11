@@ -302,6 +302,148 @@ def plot_covars(data_dict={'Mr':20}, harmattan=True):
         os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
                       .format(picname))
 
+    # --- and for the sub matrices ---
+
+    # the nbar-xi correlation matrix
+    covfn = ''.join([util.multidat_dir(),
+                    'nbar_xi_corr.Mr', str(data_dict['Mr']),
+                    '.dat'])
+
+    fullcovar = np.loadtxt(covfn)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+
+    caxr = ax.imshow(fullcovar, cmap=plt.cm.viridis)
+    divr = make_axes_locatable(plt.gca())
+    cbarr = divr.append_axes('right', '5%', pad='3%')
+    fig.colorbar(caxr, cax=cbarr)
+
+    picname = ''.join(['nbar_xi_covar'
+                       '.Mr', str(data_dict['Mr']),
+                       '.pdf'])
+    plotaddress = ''.join([util.fig_dir(), picname])
+
+    fig.savefig(plotaddress)
+
+    if harmattan:
+        os.system("scp {0} broiler:~/public_html/tinker/".format(plotaddress))
+        os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
+                      .format(picname))
+
+    # the nbar-gmf correlation matrix
+    covfn = ''.join([util.multidat_dir(),
+                    'nbar_gmf_corr.Mr', str(data_dict['Mr']),
+                    '.dat'])
+
+    fullcovar = np.loadtxt(covfn)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+
+    caxr = ax.imshow(fullcovar, cmap=plt.cm.viridis)
+    divr = make_axes_locatable(plt.gca())
+    cbarr = divr.append_axes('right', '5%', pad='3%')
+    fig.colorbar(caxr, cax=cbarr)
+
+    picname = ''.join(['nbar_gmf_covar'
+                       '.Mr', str(data_dict['Mr']),
+                       '.pdf'])
+    plotaddress = ''.join([util.fig_dir(), picname])
+
+    fig.savefig(plotaddress)
+
+    if harmattan:
+        os.system("scp {0} broiler:~/public_html/tinker/".format(plotaddress))
+        os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
+                      .format(picname))
+
+    # the xi-gmf correlation matrix
+    covfn = ''.join([util.multidat_dir(),
+                    'xi_gmf_corr.Mr', str(data_dict['Mr']),
+                    '.dat'])
+
+    fullcovar = np.loadtxt(covfn)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+
+    caxr = ax.imshow(fullcovar, cmap=plt.cm.viridis)
+    divr = make_axes_locatable(plt.gca())
+    cbarr = divr.append_axes('right', '5%', pad='3%')
+    fig.colorbar(caxr, cax=cbarr)
+
+    picname = ''.join(['xi_gmf_covar'
+                       '.Mr', str(data_dict['Mr']),
+                       '.pdf'])
+    plotaddress = ''.join([util.fig_dir(), picname])
+
+    fig.savefig(plotaddress)
+
+    if harmattan:
+        os.system("scp {0} broiler:~/public_html/tinker/".format(plotaddress))
+        os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
+                      .format(picname))
+
+    # the xi correlation matrix
+    covfn = ''.join([util.multidat_dir(),
+                    'xi_corr.Mr', str(data_dict['Mr']),
+                    '.dat'])
+
+    fullcovar = np.loadtxt(covfn)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+
+    caxr = ax.imshow(fullcovar, cmap=plt.cm.viridis)
+    divr = make_axes_locatable(plt.gca())
+    cbarr = divr.append_axes('right', '5%', pad='3%')
+    fig.colorbar(caxr, cax=cbarr)
+
+    picname = ''.join(['xi_covar'
+                       '.Mr', str(data_dict['Mr']),
+                       '.pdf'])
+    plotaddress = ''.join([util.fig_dir(), picname])
+
+    fig.savefig(plotaddress)
+
+    if harmattan:
+        os.system("scp {0} broiler:~/public_html/tinker/".format(plotaddress))
+        os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
+                      .format(picname))
+
+    # the gmf correlation matrix
+    covfn = ''.join([util.multidat_dir(),
+                    'gmf_corr.Mr', str(data_dict['Mr']),
+                    '.dat'])
+
+    fullcovar = np.loadtxt(covfn)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+
+    caxr = ax.imshow(fullcovar, cmap=plt.cm.viridis)
+    divr = make_axes_locatable(plt.gca())
+    cbarr = divr.append_axes('right', '5%', pad='3%')
+    fig.colorbar(caxr, cax=cbarr)
+
+    picname = ''.join(['gmf_covar'
+                       '.Mr', str(data_dict['Mr']),
+                       '.pdf'])
+    plotaddress = ''.join([util.fig_dir(), picname])
+
+    fig.savefig(plotaddress)
+
+    if harmattan:
+        os.system("scp {0} broiler:~/public_html/tinker/".format(plotaddress))
+        os.system("ssh broiler chmod 644 /home/kilian/public_html/tinker/{0}"
+                      .format(picname))
+
 
 if __name__=='__main__':
     plot_posterior_model('xi',

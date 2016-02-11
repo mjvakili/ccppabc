@@ -231,6 +231,7 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
     # inverse for nbar-xi data vector covariance
     nbxicov = fullcov[:16, :16]
+    # and generate and save a correlation matrix for inspection
     nbxicor = cov2corr(nbxicov)
 
     outfn = ''.join([util.multidat_dir(),
