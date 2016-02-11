@@ -12,6 +12,17 @@ from group_richness import richness
 from group_richness import gmf as GMF
 
 
+def cov2corr(mat):
+
+    numat = np.empty(mat.shape)
+
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[0]):
+            numat[i, j] = mat[i, j] / (mat[i, i] * mat[j, j])
+
+    return numat
+
+
 def data_hod_param(Mr=20):
     '''
     HOD parameters of 'observations'. Returns dictionary with hod parameters.
@@ -220,6 +231,12 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
     # inverse for nbar-xi data vector covariance
     nbxicov = fullcov[:16, :16]
+    nbxicor = cov2corr(nbxicov)
+
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_xi_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, nbxicor)
 
     N_bins = int(np.sqrt(nbxicov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -236,6 +253,13 @@ def build_nbar_xi_gmf_cov(Mr=20):
     nbgmfcov[:, 0] = nbgmfcov[0, :] = np.append(fullcov[0, 0],
                                                 fullcov[0, 16:])
 
+    nbgmfcor = cov2corr(nbgmfcov)
+
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_gmf_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, nbgmfcor)
+
     N_bins = int(np.sqrt(nbgmfcov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
     inv_c = solve(np.eye(N_bins) , nbgmfcov) * f_unbias
@@ -247,6 +271,12 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
     # inverse for xi-gmf data vector covariance
     xigmfcov = fullcov[1:, 1:]
+    xigmfcor = cov2corr(xigmfcov)
+
+    outfn = ''.join([util.multidat_dir(),
+                    'xi_gmf_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, xigmfcor)
 
     N_bins = int(np.sqrt(xigmfcov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -259,6 +289,12 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
     # inverse for xi data vector covariance
     xicov = fullcov[1:16, 1:16]
+    xicor = cov2corr(xicov)
+
+    outfn = ''.join([util.multidat_dir(),
+                    'xi_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, xicor)
 
     N_bins = int(np.sqrt(xicov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
@@ -271,6 +307,12 @@ def build_nbar_xi_gmf_cov(Mr=20):
 
     # inverse for gmf data vector covariance
     gmfcov = fullcov[16:, 16:]
+    gmfcor = cov2corr(gmfcov)
+
+    outfn = ''.join([util.multidat_dir(),
+                    'gmf_corr.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, gmfcor)
 
     N_bins = int(np.sqrt(gmfcov.size))
     f_unbias = (124 - 2. - N_bins) / 124.
