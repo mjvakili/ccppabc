@@ -1,3 +1,9 @@
+'''
+temporary test with one parameter. Just to make sure
+we can get mcmc to work.
+
+'''
+continue_chain = True
 import os
 import sys
 import numpy as np
@@ -6,7 +12,6 @@ from numpy.linalg import solve
 from emcee.utils import MPIPool
 import util
 import data as Data
-from hod_sim import HODsim
 from hod_sim import HODsimulator
 from group_richness import richness
 from prior import PriorRange
@@ -21,15 +26,15 @@ def lnPost(theta, **kwargs):
     inv_cov = kwargs['inv_cov']
     observables = kwargs['observables']
     prior_range = kwargs['prior_range']
-    prior_min = prior_range[:,0]
-    prior_max = prior_range[:,1]
+    prior_min = np.array(prior_range[:,0])
+    prior_max = np.array(prior_range[:,1])
 
     # Prior
-    if prior_min[0] < theta[0] < prior_max[0] and \
-       prior_min[1] < theta[1] < prior_max[1] and \
-       prior_min[2] < theta[2] < prior_max[2] and \
-       prior_min[3] < theta[3] < prior_max[3] and \
-       prior_min[4] < theta[4] < prior_max[4]:
+    if prior_min[0] < theta[0] < prior_max[0]:# and \
+       #prior_min[1] < theta[1] < prior_max[1] and \
+       #prior_min[2] < theta[2] < prior_max[2] and \
+       #prior_min[3] < theta[3] < prior_max[3] and \
+      # prior_min[4] < theta[4] < prior_max[4]:
            lnPrior = 0.0
     else:
         lnPrior = -np.inf
@@ -57,11 +62,13 @@ def lnPost(theta, **kwargs):
     return lnPrior + lnLike
 
 
-def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
+def mcmc_mpi(Nwalkers, Nchains_burn,
              observables=['nbar', 'gmf'],
-             data_dict={'Mr':20, 'Nmock':500},
+             data_dict={'Mr':21, 'Nmock':50},
              prior_name='first_try',
              output_dir=None):
+
+    fake_obs = []
     '''
     Standard MCMC implementaion
 
@@ -79,7 +86,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
     - data_dict :
         dictionary that specifies the observation keywords
     '''
-
+    '''
     # data observables
     fake_obs = []       # list of observables
     nbt = gmt = xit = None
@@ -101,7 +108,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
     if nbt:
         if gmt:
             if xit:
-                inv_cov = Data.data_nb_gmf_xi_fullicov(**data_dict)
+                inv_cov = Data.data_nbar_gmf_xi_fullicov(**data_dict)
             else:
                 inv_cov = Data.data_nbar_gmf_inv_cov(**data_dict)
         elif xit:
@@ -118,7 +125,17 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
     else:
         print "you must supply observables fool"
         assert(0)
+    '''
 
+    for obv in observables:
+        if obv == 'xi':
+            
+            data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)
+            fake_obs.append(data_xi)
+            inv_cov = Data.data_xi_inv_cov(**data_dict)
+    print data_xi
+    print inv_cov
+     
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
     data_hod = np.array([
@@ -131,7 +148,9 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
     Ndim = len(data_hod)
 
     # Priors
-    prior_min, prior_max = PriorRange(prior_name)
+    ##prior_min, prior_max = PriorRange(prior_name)
+    prior_min, prior_max = np.array([0.9]) , np.array([1.1])
+
     prior_range = np.zeros((len(prior_min),2))
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
@@ -163,9 +182,9 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro,
         Nchain = Niter
 
         # Initializing Walkers
-        random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+        random_guess = data_hod + 1e-4
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                         1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                         1e-4 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()
@@ -310,6 +329,8 @@ if __name__=="__main__":
         obv_list = ['nbar', 'xi']
     elif obv_flag == 'nbargmf':
         obv_list = ['nbar', 'gmf']
+    elif obv_flag == 'xi':
+        obv_list = ['xi']
     else:
         raise ValueError
     print 'Observables: ', ', '.join(obv_list)
@@ -319,6 +340,6 @@ if __name__=="__main__":
         if out_dir[-1] != '/':
             out_dir += '/'
         print 'Output to ', out_dir
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, continue_chain=True , output_dir=out_dir)
+        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
     else:
         mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=None)

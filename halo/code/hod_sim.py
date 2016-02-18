@@ -2,6 +2,14 @@
 
 HaloTools HOD Simulation
 
+temporary turned off parameters other than alpha.
+also turning off sub-box population and sample variance for now.
+Will go back to sample variance and full hod exploration once mcmc
+works. god bless us and save us.
+
+#   code commented out
+### comments 
+
 '''
 import numpy as np
 from halotools.empirical_models import PrebuiltHodModelFactory
@@ -16,13 +24,11 @@ from group_richness import richness
 
 class HODsim(object):
 
-    def __init__(self, Mr=20):
+    def __init__(self, Mr=21):
         '''
         Class object that describes our forward model used in AMC-PMC inference.
         Our model forward models the galaxy catalog using HOD parameters using HaloTools.
         '''
-
-        #self.model = zheng07()      # Zheng et al. (2007) model
         self.Mr = Mr
         self.model = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
 
@@ -35,12 +41,12 @@ class HODsim(object):
         theta : (self explanatory)
         prior_range : If specified, checks to make sure that theta is within the prior range.
         '''
-        # feed theta into model param_dict
-        self.model.param_dict['logM0'] = theta[0]
-        self.model.param_dict['sigma_logM'] = np.exp(theta[1])
-        self.model.param_dict['logMmin'] = theta[2]
-        self.model.param_dict['alpha'] = theta[3]
-        self.model.param_dict['logM1'] = theta[4]
+        ###self.model.param_dict['logM0'] = theta[0]
+        ###self.model.param_dict['sigma_logM'] = np.exp(theta[1])
+        ###self.model.param_dict['logMmin'] = theta[2]
+        ###self.model.param_dict['alpha'] = theta[3]
+        ###self.model.param_dict['logM1'] = theta[4]
+        self.model.param_dict['alpha'] = theta[0]
 
         if prior_range is None:
             self.model.populate_mock()                  # forward model HOD galaxy catalog
@@ -109,7 +115,7 @@ class HODsim(object):
                         obvs.append(np.zeros(len(bins)))
                 return obvs
 
-def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
+def HODsimulator(theta, prior_range, observables=['nbar', 'gmf'], Mr=20):
     '''
     Given theta, sum_stat calculates the observables from our forward model
 
@@ -119,23 +125,29 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
     prior_range : If specified, checks to make sure that theta is within the prior range.
     '''
     thr = -1. * np.float(Mr)
-    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                    halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+    model = PrebuiltHodModelFactory('zheng07', threshold=thr)
+    #model = PrebuiltHodModelFactory('zheng07', threshold=thr,
+    #                                halocat='multidark', redshift=0.)
+    #model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
-    rint = np.random.randint(1, 125)
-    simsubvol = lambda x: util.mask_func(x, rint)
+    #rint = np.random.randint(1, 125)
+    #simsubvol = lambda x: util.mask_func(x, rint)
 
-    # feed theta into model param_dict
-    model.param_dict['logM0'] = theta[0]
-    model.param_dict['sigma_logM'] = np.exp(theta[1])
-    model.param_dict['logMmin'] = theta[2]
-    model.param_dict['alpha'] = theta[3]
-    model.param_dict['logM1'] = theta[4]
+    ### feed theta into model param_dict
+
+    #model.param_dict['logM0'] = theta[0]
+    #model.param_dict['sigma_logM'] = np.exp(theta[1])
+    #model.param_dict['logMmin'] = theta[2]
+    #model.param_dict['alpha'] = theta[3]
+    #model.param_dict['logM1'] = theta[4]
+    model.param_dict['alpha'] = theta[0]
 
     if prior_range is None:
-        # forward model HOD galaxy catalog
-        model.populate_mock(masking_function=simsubvol, enforce_PBC=False)
+
+        ###forward model HOD galaxy catalog
+
+        #model.populate_mock(masking_function=simsubvol, enforce_PBC=False)
+        model.populate_mock()
 
         obvs = []
         for obv in observables:
@@ -149,17 +161,17 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                 r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                 obvs.append(xi_r)
             else:
-                raise NotImplementedError('Only nbar and GMF implemented so far')
+                raise NotImplementedError('Only nbar, gmf, xi are implemented so far')
 
         return obvs
 
     else:
         if np.all((prior_range[:,0] < theta) & (theta < prior_range[:,1])):
-            # if all theta_i is within prior range ...
+            ### if all theta_i is within prior range ...
             try:
-                model.populate_mock(masking_function=simsubvol,
-                                    enforce_PBC=False)
-
+                #model.populate_mock(masking_function=simsubvol,
+                #                    enforce_PBC=False)
+		model.populate_mock()
 
                 obvs = []
                 for obv in observables:
@@ -173,7 +185,7 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                         r, xi_r = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
                         obvs.append(xi_r)
                     else:
-                        raise NotImplementedError('Only nbar and GMF implemented so far')
+                        raise NotImplementedError('Only nbar, gmf, xi are implemented so far')
 
                 return obvs
 
@@ -190,15 +202,3 @@ def HODsimulator(theta, prior_range=None, observables=['nbar', 'gmf'], Mr=20):
                         bins = data_xi_bins(Mr=self.Mr)
                         obvs.append(np.zeros(len(bins)))
                 return obvs
-        else:
-            obvs = []
-            for obv in observables:
-                if obv == 'nbar':
-                    obvs.append(10.)
-                elif obv == 'gmf':
-                    bins = data_gmf_bins()
-                    obvs.append(np.ones_like(bins)[:-1]*1000.)
-                elif obv == 'xi':
-                    bins = data_xi_bins(Mr=self.Mr)
-                    obvs.append(np.zeros(len(bins)))
-            return obvs

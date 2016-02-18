@@ -13,7 +13,7 @@ from group_richness import richness
 from group_richness import gmf as GMF
 from halotools.empirical_models import PrebuiltHodModelFactory
 
-def data_hod_param(Mr=20):
+def data_hod_param(Mr=21):
     '''
     HOD parameters of 'observations'. Returns dictionary with hod parameters.
     '''
@@ -21,7 +21,7 @@ def data_hod_param(Mr=20):
     return model.param_dict
 
 # --- GMF ---
-def data_gmf(Mr=20, Nmock=500):
+def data_gmf(Mr=21, Nmock=500):
     ''' Observed GMF from 'data'
     '''
     gmf_dat_file = ''.join([util.dat_dir(), 'gmf.Mr', str(Mr), '.dat'])
@@ -33,7 +33,7 @@ def data_gmf_bins():
     '''
     return gmf_bins()
 
-def data_gmf_cov(Mr=20, Nmock=500):
+def data_gmf_cov(Mr=21, Nmock=500):
     '''
     GMF covariance matrix
     '''
@@ -41,7 +41,7 @@ def data_gmf_cov(Mr=20, Nmock=500):
     return np.loadtxt(cov_file)
 
 # --- nbar ---
-def data_nbar(Mr=20, Nmock=500):
+def data_nbar(Mr=21, Nmock=500):
     '''
     Observed nbar from 'data'
     '''
@@ -50,7 +50,7 @@ def data_nbar(Mr=20, Nmock=500):
     return [nbar, nbar_cov]
 
 # --- 2PCF ---
-def data_xi(Mr=20, Nmock=500):
+def data_xi(Mr=21, Nmock=500):
     '''
     Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
     '''
@@ -64,7 +64,7 @@ def data_xi(Mr=20, Nmock=500):
 
     return [xi, cii]
 
-def data_xi_full_cov(Mr=20, Nmock=500):
+def data_xi_full_cov(Mr=21, Nmock=500):
     '''
     Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
     '''
@@ -78,13 +78,13 @@ def data_xi_full_cov(Mr=20, Nmock=500):
 
     return [xi, cov]
 
-def data_xi_bins(Mr=20):
+def data_xi_bins(Mr=21):
     ''' r bins for xi(r)
     '''
     rbin_file = ''.join([util.dat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     return np.loadtxt(rbin_file)
 
-def data_xi_cov(Mr=20, Nmock=500):
+def data_xi_cov(Mr=21, Nmock=500):
     '''
     Observed xi covariance. The entire covariance matrix
     '''
@@ -94,7 +94,7 @@ def data_xi_cov(Mr=20, Nmock=500):
 
     return cov
 
-def data_xi_inv_cov(Mr=20, Nmock=500, unbias_str=True):
+def data_xi_inv_cov(Mr=21, Nmock=500, unbias_str=True):
     '''
     Observed inverse covariance of xi with/without the unbias estimator
     factor. Default multiplies by the unbias estimator factor.
@@ -112,7 +112,7 @@ def data_xi_inv_cov(Mr=20, Nmock=500, unbias_str=True):
     return inv_cov
 
 
-def data_full_cov(Mr=20, Nmock=500):
+def data_full_cov(Mr=21, Nmock=500):
 
     full_cov_fn = ''.join([util.dat_dir(),
                           'nbar_gmf_xir_cov.Mr', str(Mr),
@@ -123,7 +123,7 @@ def data_full_cov(Mr=20, Nmock=500):
     return fullcov
 
 
-def data_nbar_gmf_cov(Mr=20, Nmock=500):
+def data_nbar_gmf_cov(Mr=21, Nmock=500):
 
     nbgmf_cov_fn = ''.join([util.dat_dir(),
                           'nbar_gmf_cov.Mr', str(Mr),
@@ -134,7 +134,7 @@ def data_nbar_gmf_cov(Mr=20, Nmock=500):
     return nbgmf_cov
 
 
-def data_nbar_xi_cov(Mr=20, Nmock=500):
+def data_nbar_xi_cov(Mr=21, Nmock=500):
 
     nbxi_cov_fn = ''.join([util.dat_dir(),
                           'nbar_xi_cov.Mr', str(Mr),
@@ -145,7 +145,7 @@ def data_nbar_xi_cov(Mr=20, Nmock=500):
     return nbxi_cov
 
 
-def data_gmf_xi_cov(Mr=20, Nmock=500):
+def data_gmf_xi_cov(Mr=21, Nmock=500):
 
     gmfxi_cov_fn = ''.join([util.dat_dir(),
                           'gmf_xi_cov.Mr', str(Mr),
@@ -156,7 +156,7 @@ def data_gmf_xi_cov(Mr=20, Nmock=500):
     return gmfxi_cov
 
 
-def data_nb_gmf_xi_fullicov(Mr=20, Nmock=500):
+def data_nb_gmf_xi_fullicov(Mr=21, Nmock=500):
 
     inv_cov_fn = ''.join([util.dat_dir(),
                          'nbar_gmf_xir_inv_cov.Mr', str(Mr),
@@ -167,7 +167,7 @@ def data_nb_gmf_xi_fullicov(Mr=20, Nmock=500):
     return inv_cov
 
 
-def data_nbar_gmf_inv_cov(Mr=20, Nmock=500):
+def data_nbar_gmf_inv_cov(Mr=21, Nmock=500):
 
     inv_cov_fn = ''.join([util.dat_dir(),
                          'nbar_gmf_inv_cov.Mr', str(Mr),
@@ -178,7 +178,7 @@ def data_nbar_gmf_inv_cov(Mr=20, Nmock=500):
     return inv_cov
 
 
-def data_nbar_xi_inv_cov(Mr=20, Nmock=500):
+def data_nbar_xi_inv_cov(Mr=21, Nmock=500):
 
     inv_cov_fn = ''.join([util.dat_dir(),
                          'nbar_xi_inv_cov.Mr', str(Mr),
@@ -189,7 +189,7 @@ def data_nbar_xi_inv_cov(Mr=20, Nmock=500):
     return inv_cov
 
 
-def data_gmf_xi_inv_cov(Mr=20, Nmock=500):
+def data_gmf_xi_inv_cov(Mr=21, Nmock=500):
 
     inv_cov_fn = ''.join([util.dat_dir(),
                          'gmf_xi_inv_cov.Mr', str(Mr),
@@ -201,7 +201,7 @@ def data_gmf_xi_inv_cov(Mr=20, Nmock=500):
 
 
 # Build observables ---------------
-def build_xi_nbar_gmf(Mr=20):
+def build_xi_nbar_gmf(Mr=21):
     '''
     Build "data" xi, nbar, GMF values and write to file
     '''
@@ -226,7 +226,7 @@ def build_xi_nbar_gmf(Mr=20):
 
     return None
 
-def build_xi_bins(Mr=20):
+def build_xi_bins(Mr=21):
     ''' hardcoded r bins for xi.
     '''
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
@@ -243,16 +243,16 @@ def hardcoded_xi_bins():
     r_bins = np.concatenate([np.array([0.15]), np.logspace(np.log10(0.5), np.log10(20.), 15)])
     return r_bins
 
-def build_xi_nbar_gmf_cov(Mr=20, Nmock=500):
+def build_xi_nbar_gmf_cov(Mr=21, Nmock=500):
     '''
     Build covariance matrix for xi, variance for nbar, and a bunch of stuff for gmf
     ...
     using Nmock realizations of halotool mocks
     '''
     xir = []
-    nbars = []
-    gmfs = []
-    gmf_counts = []
+    #nbars = []
+    #gmfs = []
+    #gmf_counts = []
     for i in xrange(Nmock):
         print 'mock#', i
         model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
@@ -273,62 +273,62 @@ def build_xi_nbar_gmf_cov(Mr=20, Nmock=500):
     np.savetxt(output_file, xi_covar)
 
     # save nbar values
-    nbar_cov = np.var(nbars, axis=0)
-    output_file = ''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, [nbar_cov])
+    #nbar_cov = np.var(nbars, axis=0)
+    #output_file = ''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(output_file, [nbar_cov])
 
     # write GMF covariance
-    gmf_cov = np.cov(np.array(gmfs).T)
-    output_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, gmf_cov)
+    #gmf_cov = np.cov(np.array(gmfs).T)
+    #output_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(output_file, gmf_cov)
     # write GMF Poisson
-    gmf_counts_mean = np.mean(gmf_counts, axis=0)
-    poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, poisson_gmf)
+    #gmf_counts_mean = np.mean(gmf_counts, axis=0)
+    #poisson_gmf = np.sqrt(gmf_counts_mean) / 250.**3    # poisson errors
+    #output_file = ''.join([util.dat_dir(), 'gmf_sigma_poisson.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(output_file, poisson_gmf)
     # write GMF standard dev
-    sigma_gmf = np.std(gmfs, axis=0)                    # sample variance
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, sigma_gmf)
+    #sigma_gmf = np.std(gmfs, axis=0)                    # sample variance
+    #output_file = ''.join([util.dat_dir(), 'gmf_sigma_stddev.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(output_file, sigma_gmf)
     # write GMF total noise
-    sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
-    output_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(output_file, sigma_tot)
+    #sigma_tot = (sigma_gmf**2 + poisson_gmf**2)**0.5    # total sigma
+    #output_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(output_file, sigma_tot)
 
     # write full covariance matrix of various combinations of the data
 
     # covariance for all three
-    fulldatarr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                           np.array(gmfs), np.array(xir))
+    #fulldatarr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
+    #                       np.array(gmfs), np.array(xir))
 
-    fullcov = np.cov(fulldatarr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_gmf_xir_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, fullcov)
+    #fullcov = np.cov(fulldatarr.T)
+    #outfn = ''.join([util.dat_dir(), 'nbar_gmf_xir_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(outfn, fullcov)
 
     # covariance for nbar and gmf
-    nbgmf_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                         np.array(gmfs))
-    nbgmf_cov = np.cov(nbgmf_arr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, nbgmf_cov)
+    ##nbgmf_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
+    #                     np.array(gmfs))
+    #nbgmf_cov = np.cov(nbgmf_arr.T)
+    #outfn = ''.join([util.dat_dir(), 'nbar_gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(outfn, nbgmf_cov)
 
     # covariance for nbar and xi
-    nbxi_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
-                         np.array(xir))
-    nbxi_cov = np.cov(nbxi_arr.T)
-    outfn = ''.join([util.dat_dir(), 'nbar_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, nbxi_cov)
+    #nbxi_arr = np.hstack(np.array(nbars).reshape(nbars.shape[0], 1),
+    #                     np.array(xir))
+    #nbxi_cov = np.cov(nbxi_arr.T)
+    #outfn = ''.join([util.dat_dir(), 'nbar_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(outfn, nbxi_cov)
 
     # covariance for gmf and xi
-    gmfxi_arr = np.hstack(np.array(gmfs), np.array(xir))
-    gmfxi_cov = np.cov(gmfxi_arr.T)
-    outfn = ''.join([util.dat_dir(), 'gmf_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
-    np.savetxt(outfn, gmfxi_cov)
+    #gmfxi_arr = np.hstack(np.array(gmfs), np.array(xir))
+    #gmfxi_cov = np.cov(gmfxi_arr.T)
+    #outfn = ''.join([util.dat_dir(), 'gmf_xi_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
+    #np.savetxt(outfn, gmfxi_cov)
 
     return None
 
 
-def build_xi_inv_cov(Mr=20, Nmock=500, unbias=True):
+def build_xi_inv_cov(Mr=21, Nmock=500, unbias=True):
     '''
     Calculate the inverse covariance of xi multiplied by the unbiased
     estimator factor (Nmocks - 2 - Nbins)/(Nmocks - 1).
@@ -354,7 +354,7 @@ def build_xi_inv_cov(Mr=20, Nmock=500, unbias=True):
     return None
 
 
-def build_full_inv_covars(Mr=20, Nmock=500):
+def build_full_inv_covars(Mr=21, Nmock=50):
     '''
     Calculate the inverse covariance of full data vectors
     for MCMC inference
@@ -403,7 +403,7 @@ def build_full_inv_covars(Mr=20, Nmock=500):
     return None
 
 
-def build_observations(Mr=20, Nmock=500):
+def build_observations(Mr=21, Nmock=50):
     ''' Build all the fake observations
     '''
     # xi, nbar, gmf
@@ -417,7 +417,7 @@ def build_observations(Mr=20, Nmock=500):
     print 'Build inverse covariance for xi ...'
     build_xi_inv_cov(Mr=Mr, Nmock=Nmock, unbias=True)
     print 'Building the rest of the inverse covariances...'
-    build_full_inv_covars(Mr=Mr, Nmock=Nmock)
+    #build_full_inv_covars(Mr=Mr, Nmock=Nmock)
 
 
 if __name__=='__main__':
