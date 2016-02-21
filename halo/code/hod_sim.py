@@ -41,12 +41,12 @@ class HODsim(object):
         theta : (self explanatory)
         prior_range : If specified, checks to make sure that theta is within the prior range.
         '''
-        ###self.model.param_dict['logM0'] = theta[0]
-        ###self.model.param_dict['sigma_logM'] = np.exp(theta[1])
-        ###self.model.param_dict['logMmin'] = theta[2]
-        ###self.model.param_dict['alpha'] = theta[3]
-        ###self.model.param_dict['logM1'] = theta[4]
-        self.model.param_dict['alpha'] = theta[0]
+        self.model.param_dict['logM0'] = theta[0]
+        self.model.param_dict['sigma_logM'] = np.exp(theta[1])
+        self.model.param_dict['logMmin'] = theta[2]
+        self.model.param_dict['alpha'] = theta[3]
+        self.model.param_dict['logM1'] = theta[4]
+        #self.model.param_dict['alpha'] = theta[0]
 
         if prior_range is None:
             self.model.populate_mock()                  # forward model HOD galaxy catalog
@@ -115,7 +115,7 @@ class HODsim(object):
                         obvs.append(np.zeros(len(bins)))
                 return obvs
 
-def HODsimulator(theta, prior_range, observables=['nbar', 'gmf'], Mr=20):
+def HODsimulator(theta, prior_range, observables=['nbar', 'gmf'], Mr=21):
     '''
     Given theta, sum_stat calculates the observables from our forward model
 
@@ -135,12 +135,12 @@ def HODsimulator(theta, prior_range, observables=['nbar', 'gmf'], Mr=20):
 
     ### feed theta into model param_dict
 
-    #model.param_dict['logM0'] = theta[0]
-    #model.param_dict['sigma_logM'] = np.exp(theta[1])
-    #model.param_dict['logMmin'] = theta[2]
-    #model.param_dict['alpha'] = theta[3]
-    #model.param_dict['logM1'] = theta[4]
-    model.param_dict['alpha'] = theta[0]
+    model.param_dict['logM0'] = theta[0]
+    model.param_dict['sigma_logM'] = np.exp(theta[1])
+    model.param_dict['logMmin'] = theta[2]
+    model.param_dict['alpha'] = theta[3]
+    model.param_dict['logM1'] = theta[4]
+    #model.param_dict['alpha'] = theta[0]
 
     if prior_range is None:
 

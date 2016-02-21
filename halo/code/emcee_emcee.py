@@ -1,12 +1,3 @@
-'''
-
-
-Module for standard MCMC inference
-
-Author(s): Chang, MJ
-
-
-'''
 import os 
 import sys
 import numpy as np
@@ -22,77 +13,80 @@ from hod_sim import HODsimulator
 from group_richness import richness
 from prior import PriorRange
 import corner
+
+
+generator = HODsim(Mr = 21)
     
-def lnprior(theta, **kwargs):
-    '''log prior 
-    '''
-    fake_obs = kwargs['data']
-    fake_obs_cov = kwargs['data_cov']
-    kwargs.pop('data', None)
-    kwargs.pop('data_cov', None)
-    observables = kwargs['observables']
-    prior_range = kwargs['prior_range']
-    prior_min = prior_range[:,0]
-    prior_max = prior_range[:,1]
+continue_chain = False
 
-    # Prior 
-    if prior_min[0] < theta[0] < prior_max[0] and \
-       prior_min[1] < theta[1] < prior_max[1] and \
-       prior_min[2] < theta[2] < prior_max[2] and \
-       prior_min[3] < theta[3] < prior_max[3] and \
-       prior_min[4] < theta[4] < prior_max[4]:
-           lnPrior = 0.0
-    
-    return -np.inf
-
-def lnlike(theta, **kwargs):
-
-    fake_obs = kwargs['data']
-    fake_obs_cov = kwargs['data_cov']
-    kwargs.pop('data', None)
-    kwargs.pop('data_cov', None)
-    observables = kwargs['observables']
-    prior_range = kwargs['prior_range']
-    # Likelihood
-    model_obvs = HODsimulator(theta, **kwargs)
-    ind = 0 
-    if 'nbar' in observables: 
-        res_nbar = fake_obs[ind] - model_obvs[ind] 
-        ind += 1 
-    if 'gmf' in observables: 
-        res_gmf = fake_obs[ind] - model_obvs[ind]
-        ind += 1
-    if 'xi' in observables: 
-        res_xi = fake_obs[ind] - model_obvs[ind]
-    
-    neg_chi_tot = 0.
-
-    ind = 0 
-    if 'nbar' in observables: 
-        neg_chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
-        ind += 1
-    if 'gmf' in observables: 
-        neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
-    if 'xi' in observables: 
-        neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
-
-    return neg_chi_tot
-
-
-def optimize(theta, **kwargs):
-
-    nll = lambda *args: -lnlike(*args)
-    result = op.minimize(nll, theta , args=**kwargs)
-    return result["x"]
 
 def lnPost(theta, **kwargs):
+
+    print "q"    
+    def lnprior(theta, **kwargs):
+        '''log prior 
+        '''
+        fake_obs = kwargs['data']
+    	fake_obs_cov = kwargs['data_cov']
+    	kwargs.pop('data', None)
+    	kwargs.pop('data_cov', None)
+    	observables = kwargs['observables']
+    	prior_range = kwargs['prior_range']
+    	prior_min = prior_range[:,0]
+    	prior_max = prior_range[:,1]
+        #print prior_range
+    	# Prior 
+        if prior_min[0] < theta[0] < prior_max[0] and \
+       	    prior_min[1] < theta[1] < prior_max[1] and \
+            prior_min[2] < theta[2] < prior_max[2] and \
+            prior_min[3] < theta[3] < prior_max[3] and \
+            prior_min[4] < theta[4] < prior_max[4]:
+                return 0
+    
+        else:
+		return -np.inf
+
+    def lnlike(theta, **kwargs):
+
+    	fake_obs = kwargs['data']
+    	fake_obs_cov = kwargs['data_cov']
+    	kwargs.pop('data', None)
+    	kwargs.pop('data_cov', None)
+    	observables = kwargs['observables']
+    	prior_range = kwargs['prior_range']
+    	# Likelihood
+    	model_obvs = generator.sum_stat(theta, prior_range , observables)
+    	ind = 0 
+    	if 'nbar' in observables: 
+        	res_nbar = fake_obs[ind] - model_obvs[ind] 
+        	ind += 1 
+    	if 'gmf' in observables: 
+        	res_gmf = fake_obs[ind] - model_obvs[ind]
+        	ind += 1
+    	if 'xi' in observables: 
+        	res_xi = fake_obs[ind] - model_obvs[ind]
+    
+    	neg_chi_tot = 0.
+
+    	ind = 0 
+    	if 'nbar' in observables: 
+        	neg_chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
+        	ind += 1
+    	if 'gmf' in observables: 
+        	neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
+    	if 'xi' in observables: 
+        	neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
+        print neg_chi_tot
+    	return neg_chi_tot
+
     lp = lnprior(theta , **kwargs)
     if not np.isfinite(lp):
         return -np.inf
+    #print lp + lnlike(theta , **kwargs)
     return lp + lnlike(theta, **kwargs)
 
-def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'], 
-        data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', output_dir=None): 
+def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'], 
+        data_dict={'Mr':21, 'Nmock':200}, prior_name = 'first_try', output_dir=None): 
     '''
     Standard MCMC implementaion
     
@@ -152,6 +146,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
         '_Mr', str(data_dict["Mr"]), 
         '.mcmc_chain.dat'
         ])
+    print chain_file
 
     if os.path.isfile(chain_file) and continue_chain:   
         print 'Continuing previous MCMC chain!'
@@ -165,14 +160,14 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
 
         # Initializing Walkers from the end of the chain 
         pos0 = sample[-Nwalkers:]
-    else: 
+    else:
         # new chain 
         f = open(chain_file, 'w')
         f.close()
         Nchain = Niter
          
         # Initializing Walkers
-        random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
+        random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                          1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
@@ -196,7 +191,6 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
     pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                 1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
-
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
         f = open(chain_file, 'a')
@@ -207,6 +201,7 @@ def mcmc_mpi(Nwalkers, Nchains_burn, Nchains_pro, observables=['nbar', 'gmf'],
     
 
     pool.close()
+
     
 def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'], 
         data_dict={'Mr':20, 'Nmock':500}, prior_name = 'first_try', 
@@ -313,24 +308,31 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 
 if __name__=="__main__": 
 
-    Niter = int(sys.argv[1])
-    print 'N iterations = ', Niter
-    Nwalkers = int(sys.argv[2])
+    Nwalkers = int(sys.argv[1])
     print 'N walkers = ', Nwalkers
+    Niter = int(sys.argv[2])
+    print 'N iterations = ', Niter
     obv_flag = sys.argv[3]
     if obv_flag == 'nbarxi':
         obv_list = ['nbar', 'xi']
     elif obv_flag == 'nbargmf':
         obv_list = ['nbar', 'gmf']
+    elif obv_flag == 'xi':
+        obv_list = ['xi']
+
     else:
         raise ValueError
     print 'Observables: ', ', '.join(obv_list)
-
-    if len(sys.argv) > 4:
+    out_dir = sys.argv[4]
+    print 'Output to ', out_dir
+    mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
+    """
+    if len(sys.argv) == 4:
         out_dir = sys.argv[4]
         if out_dir[-1] != '/':
             out_dir += '/'
         print 'Output to ', out_dir
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, continue_chain=True , output_dir=out_dir)
+        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
     else:
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=None)
+        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
+    """

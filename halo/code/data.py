@@ -250,22 +250,22 @@ def build_xi_nbar_gmf_cov(Mr=21, Nmock=500):
     using Nmock realizations of halotool mocks
     '''
     xir = []
+    model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     #nbars = []
     #gmfs = []
     #gmf_counts = []
     for i in xrange(Nmock):
         print 'mock#', i
-        model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
         model.populate_mock()
 
         # xi(r)
         xir.append(model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1])
         # nbar
-        nbars.append(model.mock.number_density)
+        #nbars.append(model.mock.number_density)
         # gmf
-        rich = richness(model.mock.compute_fof_group_ids())
-        gmfs.append(GMF(rich))  # GMF
-        gmf_counts.append(GMF(rich, counts=True))   # Group counts
+        #rich = richness(model.mock.compute_fof_group_ids())
+        #gmfs.append(GMF(rich))  # GMF
+        #gmf_counts.append(GMF(rich, counts=True))   # Group counts
 
     # save xi covariance
     xi_covar = np.cov(np.array(xir).T)
@@ -403,7 +403,7 @@ def build_full_inv_covars(Mr=21, Nmock=50):
     return None
 
 
-def build_observations(Mr=21, Nmock=50):
+def build_observations(Mr=21, Nmock=200):
     ''' Build all the fake observations
     '''
     # xi, nbar, gmf
