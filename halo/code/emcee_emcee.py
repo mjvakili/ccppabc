@@ -22,7 +22,7 @@ continue_chain = False
 
 def lnPost(theta, **kwargs):
 
-    print "q"    
+    #print "q"    
     def lnprior(theta, **kwargs):
         '''log prior 
         '''
@@ -76,7 +76,7 @@ def lnPost(theta, **kwargs):
         	neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
     	if 'xi' in observables: 
         	neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
-        print neg_chi_tot
+        #print neg_chi_tot
     	return neg_chi_tot
 
     lp = lnprior(theta , **kwargs)
@@ -146,7 +146,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'],
         '_Mr', str(data_dict["Mr"]), 
         '.mcmc_chain.dat'
         ])
-    print chain_file
+    #print chain_file
 
     if os.path.isfile(chain_file) and continue_chain:   
         print 'Continuing previous MCMC chain!'
@@ -169,7 +169,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'],
         # Initializing Walkers
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                         1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                         1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()
@@ -187,10 +187,6 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'],
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=hod_kwargs)
     # Initializing Walkers 
-    random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
-    pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                1e-3 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
-
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
         f = open(chain_file, 'a')
