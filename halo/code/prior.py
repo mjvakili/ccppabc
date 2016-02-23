@@ -30,8 +30,8 @@ def prior_dict_table():
     '''
     dict_table = { 
             'first_try': {
-                'prior_min': [10., np.log(0.1), 11.02, 0.8, 13.],
-                'prior_max': [13., np.log(0.7), 13.02, 1.3, 14.]
+                'prior_min': [10.5, np.log(0.2), 11.8, 0.85, 13.],
+                'prior_max': [13.5, np.log(0.8), 13.8, 1.4, 15.5]
                 }
             }
             

@@ -169,7 +169,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'],
         # Initializing Walkers
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                         1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                         2.e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()
