@@ -13,7 +13,7 @@ from hod_sim import HODsimulator
 from group_richness import richness
 from prior import PriorRange
 import corner
-
+from numpy.linalg import solve
 
 generator = HODsim(Mr = 21)
     
@@ -75,7 +75,8 @@ def lnPost(theta, **kwargs):
     	if 'gmf' in observables: 
         	neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
     	if 'xi' in observables: 
-        	neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
+        	#neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
+        	neg_chi_tot += -0.5*np.sum(np.dot(res_xi , solve(fake_obs_cov[ind] , res_xi)))
         #print neg_chi_tot
     	return neg_chi_tot
 
