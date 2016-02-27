@@ -12,6 +12,8 @@ from group_richness import gmf_bins
 from group_richness import richness
 from group_richness import gmf as GMF
 from halotools.empirical_models import PrebuiltHodModelFactory
+from halotools.mock_observables import tpcf
+from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
 
 def data_hod_param(Mr=21):
     '''
@@ -22,20 +24,22 @@ def data_hod_param(Mr=21):
 
 # --- GMF ---
 def data_gmf(Mr=21, Nmock=500):
-    ''' Observed GMF from 'data'
+    '''
+    This loads the observed GMF from the mock 'data' and the covariance matrix (or sigma) corresponding to that.
+    Note to self. Return the inverse covariance matrix motherfucker!
     '''
     gmf_dat_file = ''.join([util.dat_dir(), 'gmf.Mr', str(Mr), '.dat'])
     gmf_sig_file = ''.join([util.dat_dir(), 'gmf_sigma.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     return [np.loadtxt(gmf_dat_file), np.loadtxt(gmf_sig_file)]
 
 def data_gmf_bins():
-    ''' Just for consistency
+    ''' Just for consistency, returns the bins
     '''
     return gmf_bins()
 
 def data_gmf_cov(Mr=21, Nmock=500):
     '''
-    GMF covariance matrix
+    Returns the GMF covariance matrix
     '''
     cov_file = ''.join([util.dat_dir(), 'gmf_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat'])
     return np.loadtxt(cov_file)
@@ -43,7 +47,7 @@ def data_gmf_cov(Mr=21, Nmock=500):
 # --- nbar ---
 def data_nbar(Mr=21, Nmock=500):
     '''
-    Observed nbar from 'data'
+    Observed nbar measured from the mock 'data' and the covariance matrix
     '''
     nbar = np.loadtxt(''.join([util.dat_dir(), 'nbar.Mr', str(Mr), '.dat']))
     nbar_cov = np.loadtxt(''.join([util.dat_dir(), 'nbar_cov.Mr', str(Mr), '.Nmock', str(Nmock), '.dat']))
@@ -52,7 +56,7 @@ def data_nbar(Mr=21, Nmock=500):
 # --- 2PCF ---
 def data_xi(Mr=21, Nmock=500):
     '''
-    Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
+    Observed xi (2PCF) from the mock 'data' and the diagonal elements of the xi covariance matrix
     '''
     xi_dat_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     xi = np.loadtxt(xi_dat_file, unpack=True)
@@ -66,7 +70,7 @@ def data_xi(Mr=21, Nmock=500):
 
 def data_xi_full_cov(Mr=21, Nmock=500):
     '''
-    Observed xi (2PCF) from 'data' and the diagonal elements of the xi covariance matrix
+    Observed xi (2PCF) from the 'data' and the diagonal elements of the xi covariance matrix
     '''
     xi_dat_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     xi = np.loadtxt(xi_dat_file, unpack=True)
@@ -79,7 +83,8 @@ def data_xi_full_cov(Mr=21, Nmock=500):
     return [xi, cov]
 
 def data_xi_bins(Mr=21):
-    ''' r bins for xi(r)
+    ''' 
+    r bins for xi(r)
     '''
     rbin_file = ''.join([util.dat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     return np.loadtxt(rbin_file)
@@ -199,6 +204,35 @@ def data_gmf_xi_inv_cov(Mr=21, Nmock=500):
 
     return inv_cov
 
+#function for loading the precomputed RRs
+
+def data_RR(NR):
+    '''
+    loads precomputed RR
+    NR = number of random points
+    it should probably also accept the size of the box.
+    note to self: put the size of the box in there later after 
+    merging the sample variance with the rest of the thing
+    '''
+
+    rr = ''.join([util.dat_dir(),
+		 'RR_NR' , str(NR) , '.dat'])
+
+    rr = np.loadtxt(rr)
+
+    return rr
+
+
+def build_data_rr(nr):
+
+from halotools.sim_manager import CachedHaloCatalog
+halocat = CachedHaloCatalog(simname = 'bolshoi', redshift = 0)
+num_randoms = 1e5
+xran = np.random.uniform(xmin, xmax, num_randoms)
+yran = np.random.uniform(ymin, ymax, num_randoms)
+zran = np.random.uniform(zmin, zmax, num_randoms)
+randoms = np.vstack((xran, yran, zran)).T
+Lbox = halocat.Lbox
 
 # Build observables ---------------
 def build_xi_nbar_gmf(Mr=21):
@@ -206,10 +240,24 @@ def build_xi_nbar_gmf(Mr=21):
     Build "data" xi, nbar, GMF values and write to file
     '''
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
-    model.populate_mock() # population mock realization
+    model.populate_mock(halocat = halocat , enforce_PBC = False) # population mock realization
+    pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
 
     # write xi
-    data_xir = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1]
+    rbins = hardcoded_xi_bins()
+    rmax = rbins.max()
+    approx_cell1_size = [rmax, rmax, rmax]
+    approx_cell2_size = approx_cell1_size
+    approx_cellran_size = [rmax, rmax, rmax]
+    period = np.array([Lbox , Lbox , Lbox]) 
+    data_xir = tpcf(
+            sample1, rbins, sample2 = sample2, 
+            randoms=randoms, period = period, 
+            max_sample_size=int(1e4), estimator='Landy-Szalay', 
+            approx_cell1_size=approx_cell1_size, 
+            approx_cellran_size=approx_cellran_size, 
+            RR_precomputed = RR, 
+            NR_precomputed = NR1) 
     output_file = ''.join([util.dat_dir(), 'xir.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, data_xir)
 
