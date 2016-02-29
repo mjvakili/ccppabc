@@ -23,7 +23,7 @@ def cov2corr(mat):
     return numat
 
 
-def data_hod_param(Mr=20):
+def data_hod_param(Mr=21):
     '''
     HOD parameters of 'observations'. Returns dictionary with hod parameters.
     '''
@@ -32,7 +32,7 @@ def data_hod_param(Mr=20):
 
 
 # --- nbar ---
-def data_nbar(Mr=20):
+def data_nbar(Mr=21):
     '''
     Observed nbar from 'data'
     '''
@@ -47,7 +47,7 @@ def data_nbar(Mr=20):
 
 
 # --- 2PCF ---
-def data_xi(Mr=20):
+def data_xi(Mr=21):
     '''
     Observed xi (2PCF) from 'data'
     '''
@@ -60,7 +60,7 @@ def data_xi(Mr=20):
 
 
 # --- GMF ---
-def data_gmf(Mr=20):
+def data_gmf(Mr=21):
     '''
     Observed GMF from 'data'
     '''
@@ -73,7 +73,7 @@ def data_gmf(Mr=20):
 
 
 # --- inverse covariance matrices ---
-def data_inv_cov(datcombo, Mr=20):
+def data_inv_cov(datcombo, Mr=21):
 
     inv_cov_fn = ''.join([util.multidat_dir(),
                          '{0}.Mr'.format(datcombo), str(Mr),
@@ -94,28 +94,24 @@ def hardcoded_xi_bins():
     return r_bins
 
 
-def build_xi_bins(Mr=20):
+def build_xi_bins(Mr=21):
     '''
-    hardcoded r bins for xi.
+    hardcoded r_bin centers for xi.
     '''
-    thr = -1. * np.float(Mr)
-    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                    halocat='multidark', redshift=0.)
-    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
-    datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(simname='multidark',
-                        masking_function=datsubvol,
-                        enforce_PBC=False)
-    r_bin  = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[0]
+    rbins=hardcoded_xi_bins()
+    rbin = .5 * (rbins[1:] + rbins[:-1])
     output_file = ''.join([util.multidat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
     np.savetxt(output_file, r_bin)
     return None
 
 
 # Build observables ---------------
-def build_nbar_xi_gmf(Mr=20):
+def build_nbar_xi_gmf(Mr=21):
     '''
     Build "data" vector <nbar, xi, gmf> and write to file
+    
+    Note to self : need to load randoms and precomputed RR for tpcf
+    calculations
     '''
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
@@ -127,9 +123,25 @@ def build_nbar_xi_gmf(Mr=20):
                         masking_function=datsubvol,
                         enforce_PBC=False)
 
+    pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+    rbins = hardcoded_xi_bins()
+    rmax = rbins.max()
+    period = None
+    approx_cell1_size = [rmax , rmax , rmax]
+    approx_cell_ransize = [rmax , rmax , rmax]
+
     nbar = model.mock.number_density
 
-    data_xir = model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1]
+
+    data_xir = tpcf(
+            pos, rbins, pos, 
+            randoms=randoms, period = period, 
+            max_sample_size=int(1e5), estimator='Landy-Szalay', 
+            approx_cell1_size=approx_cell1_size, 
+            approx_cellran_size=approx_cellran_size, 
+            RR_precomputed = RR, 
+            NR_precomputed = NR)
+
 
     fullvec = np.append(nbar, data_xir)
 
@@ -145,24 +157,36 @@ def build_nbar_xi_gmf(Mr=20):
 
 
 # --- function to build all the covariance matrices and their inverses ---
-def build_nbar_xi_gmf_cov(Mr=20):
+
+def build_nbar_xi_gmf_cov(Mr=21):
     '''
     Build covariance matrix for nbar, xi, gmf data vector
     using realisations of galaxy mocks for "data" HOD
     parameters in the halos from the other subvolumes of
     the simulation.
+
+    Note to self: need to load randoms and precomputed RRs
     '''
     nbars = []
     xir = []
     gmfs = []
     gmf_counts = []
 
+
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
-
+    
+    #some settings for tpcf calculations
+    rbins = hardcoded_xi_bins()
+    rmax = rbins.max()
+    period = None
+    approx_cell1_size = [rmax , rmax , rmax]
+    approx_cell_ransize = [rmax , rmax , rmax]
+    
     for i in xrange(1,125):
+
         print 'mock#', i
 
         # populate the mock subvolume
@@ -172,15 +196,29 @@ def build_nbar_xi_gmf_cov(Mr=20):
                             enforce_PBC=False)
 
         # nbar
+
         nbars.append(model.mock.number_density)
+
         # xi(r)
-        xir.append(model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins())[1])
+   
+        pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+        xi = tpcf(
+            pos, rbins, pos, 
+            randoms=randoms, period = period, 
+            max_sample_size=int(1e5), estimator='Landy-Szalay', 
+            approx_cell1_size=approx_cell1_size, 
+            approx_cellran_size=approx_cellran_size)
+
+        xir.append(xi)
+
         # gmf
+
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
 
     # save nbar variance
+
     nbar_var = np.var(nbars, axis=0, ddof=1)
     output_file = ''.join([util.multidat_dir(),
                           'nbar_var.Mr', str(Mr),
@@ -371,4 +409,4 @@ def build_observations(Mr=20):
 
 if __name__ == "__main__":
 
-    build_observations()
+    build_observations(Mr = 21)
