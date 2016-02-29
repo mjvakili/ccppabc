@@ -5,7 +5,6 @@ combinations that can come up in the generalised inference
 
 #general python modules
 import numpy as np
-from __future__ import division
 from multiprocessing import cpu_count
 from numpy.linalg import solve
 
@@ -105,7 +104,7 @@ def data_random():
     '''
 
     random_file = ''.join([util.multidat_dir(),
-                         '{0}.Mr'.format(randoms),
+                         'randoms',
                          '.dat'])
     randoms = np.loadtxt(random_file)
 
@@ -120,7 +119,7 @@ def data_RR():
     '''
 
     RR_file = ''.join([util.multidat_dir(),
-                         '{0}.Mr'.format(RR),
+                         'RR',
                          '.dat'])
     RR = np.loadtxt(RR_file)
 
@@ -146,7 +145,7 @@ def build_xi_bins(Mr=21):
     rbins=hardcoded_xi_bins()
     rbin = .5 * (rbins[1:] + rbins[:-1])
     output_file = ''.join([util.multidat_dir(),'xir_rbin.Mr', str(Mr),'.dat'])
-    np.savetxt(output_file, r_bin)
+    np.savetxt(output_file, rbin)
     return None
 
 #Build Randoms and precomputed RRs
@@ -172,6 +171,7 @@ def build_randoms_RR(Nr=5e5):
     zran = np.random.uniform(zmin, zmax, num_randoms)
     randoms = np.vstack((xran, yran, zran)).T
     verbose = False
+    period = None
     num_threads = cpu_count()
     rbins = hardcoded_xi_bins()
     rmax = rbins.max()
@@ -226,7 +226,7 @@ def build_nbar_xi_gmf(Mr=21):
     rmax = rbins.max()
     period = None
     approx_cell1_size = [rmax , rmax , rmax]
-    approx_cell_ransize = [rmax , rmax , rmax]
+    approx_cellran_size = [rmax , rmax , rmax]
 
     #compute number density    
 
@@ -525,4 +525,5 @@ def build_observations(Mr=20):
 
 if __name__ == "__main__":
 
+    build_randoms_RR(Nr=5e5)
     build_observations(Mr = 21)
