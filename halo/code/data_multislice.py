@@ -2,10 +2,21 @@
 module for building and loading all the possible data and covariance
 combinations that can come up in the generalised inference
 '''
+
+#general python modules
 import numpy as np
+from __future__ import division
+from multiprocessing import cpu_count
 from numpy.linalg import solve
+
+#haltools functions
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
+from halotools.mock_observables import tpcf
+from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
+from halotools.mock_observables.pair_counters import npairs
+
+#our ccppabc functions
 import util
 from group_richness import gmf_bins
 from group_richness import richness
@@ -31,10 +42,10 @@ def data_hod_param(Mr=21):
     return model.param_dict
 
 
-# --- nbar ---
+# ---load  nbar ---
 def data_nbar(Mr=21):
     '''
-    Observed nbar from 'data'
+    loads the observed nbar from 'data'
     '''
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
@@ -46,10 +57,10 @@ def data_nbar(Mr=21):
     return [nbar, nbar_var]
 
 
-# --- 2PCF ---
+# --- load 2PCF ---
 def data_xi(Mr=21):
     '''
-    Observed xi (2PCF) from 'data'
+    loads the observed xi (2PCF) from 'data'
     '''
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
@@ -59,10 +70,10 @@ def data_xi(Mr=21):
     return xi
 
 
-# --- GMF ---
+# --- load GMF ---
 def data_gmf(Mr=21):
     '''
-    Observed GMF from 'data'
+    loads the observed GMF from 'data'
     '''
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
@@ -72,8 +83,12 @@ def data_gmf(Mr=21):
     return gmf
 
 
-# --- inverse covariance matrices ---
+# --- load inverse covariance matrices ---
 def data_inv_cov(datcombo, Mr=21):
+
+    '''
+    loads the inverse covariance matrix 
+    '''
 
     inv_cov_fn = ''.join([util.multidat_dir(),
                          '{0}.Mr'.format(datcombo), str(Mr),
@@ -82,37 +97,117 @@ def data_inv_cov(datcombo, Mr=21):
 
     return inv_cov
 
+#--- load randoms ---
+def data_random():
 
-# --- functions to build initial fake data ---
+    '''
+    loads pregenerated random points
+    '''
+
+    random_file = ''.join([util.multidat_dir(),
+                         '{0}.Mr'.format(randoms),
+                         '.dat'])
+    randoms = np.loadtxt(random_file)
+
+    return randoms
+
+
+#--- load RR ---
+def data_RR():
+
+    '''
+    loads precomputed RR
+    '''
+
+    RR_file = ''.join([util.multidat_dir(),
+                         '{0}.Mr'.format(RR),
+                         '.dat'])
+    RR = np.loadtxt(RR_file)
+
+    return RR
+
+# Build bin edges for 2PCF calculations
+
 def hardcoded_xi_bins():
     '''
-    hardcoded xi bin edges.They are spaced out unevenly due to sparseness
+    loads the hardcoded xi bin edges.They are spaced out unevenly due to sparseness
     at inner r bins. So the first bin ranges from 0.15 to 0.5
     '''
     r_bins = np.concatenate([np.array([0.15]),
                              np.logspace(np.log10(0.5), np.log10(20.), 15)])
     return r_bins
 
+#Build centers of bins for 2PCF calculations
 
 def build_xi_bins(Mr=21):
     '''
-    hardcoded r_bin centers for xi.
+    builds and saves the hardcoded r_bin centers for xi.
     '''
     rbins=hardcoded_xi_bins()
     rbin = .5 * (rbins[1:] + rbins[:-1])
-    output_file = ''.join([util.multidat_dir(), 'xir_rbin.Mr', str(Mr), '.dat'])
+    output_file = ''.join([util.multidat_dir(),'xir_rbin.Mr', str(Mr),'.dat'])
     np.savetxt(output_file, r_bin)
     return None
 
+#Build Randoms and precomputed RRs
+
+def build_randoms_RR(Nr=5e5):
+    '''
+    builds Nr number of random points using numpy.random.uniform 
+    in a subvolume and precomputes the RR.
+
+    The set of randoms and  precomputed RR will be used to compute tpcf
+    with Landay-Szalay estimator in each subvolume. 
+    '''
+
+    L = 200 #this is L_md / 5   
+ 
+    xmin , ymin , zmin = 0., 0., 0.
+    xmax , ymax , zmax = L, L, L
+   
+    
+    num_randoms = Nr
+    xran = np.random.uniform(xmin, xmax, num_randoms)
+    yran = np.random.uniform(ymin, ymax, num_randoms)
+    zran = np.random.uniform(zmin, zmax, num_randoms)
+    randoms = np.vstack((xran, yran, zran)).T
+    verbose = False
+    num_threads = cpu_count()
+    rbins = hardcoded_xi_bins()
+    rmax = rbins.max()
+    approx_cellran_size = [rmax, rmax, rmax]
+    
+   
+    
+    RR = npairs(
+            randoms, randoms, rbins, period,
+            verbose, num_threads,
+            approx_cellran_size, approx_cellran_size)
+    RR = np.diff(RR)
+  
+
+    output_file_random = ''.join([util.multidat_dir(),'randoms','.dat'])
+    np.savetxt(output_file_random, randoms)
+    
+
+    output_file_RR = ''.join([util.multidat_dir(),'RR','.dat'])
+    np.savetxt(output_file_RR, RR)
+
+    return None
 
 # Build observables ---------------
 def build_nbar_xi_gmf(Mr=21):
     '''
-    Build "data" vector <nbar, xi, gmf> and write to file
+    Builds and saves "data" vector <nbar, xi, gmf> and write to file
+
+    This data vector is built from the zeroth slice of the multidark
+
+    The other slices will be used for building the covariance matrix.
     
-    Note to self : need to load randoms and precomputed RR for tpcf
-    calculations
+    Note to self : need to shift the positions of random points
     '''
+
+    
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                     halocat='multidark', redshift=0.)
@@ -122,7 +217,10 @@ def build_nbar_xi_gmf(Mr=21):
     model.populate_mock(simname='multidark',
                         masking_function=datsubvol,
                         enforce_PBC=False)
+    
+    #all the things necessary for tpcf calculation
 
+ 
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
     rbins = hardcoded_xi_bins()
     rmax = rbins.max()
@@ -130,8 +228,17 @@ def build_nbar_xi_gmf(Mr=21):
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cell_ransize = [rmax , rmax , rmax]
 
+    #compute number density    
+
     nbar = model.mock.number_density
 
+    #load randoms and RRs
+    
+    randoms = data_random()
+    RR = data_RR()
+    NR = len(randoms)
+    
+    #compue tpcf with Landy-Szalay estimator
 
     data_xir = tpcf(
             pos, rbins, pos, 
@@ -144,6 +251,8 @@ def build_nbar_xi_gmf(Mr=21):
 
 
     fullvec = np.append(nbar, data_xir)
+
+    #compute group richness    
 
     rich = richness(model.mock.compute_fof_group_ids())
     gmf = GMF(rich)  # GMF
@@ -162,10 +271,11 @@ def build_nbar_xi_gmf_cov(Mr=21):
     '''
     Build covariance matrix for nbar, xi, gmf data vector
     using realisations of galaxy mocks for "data" HOD
-    parameters in the halos from the other subvolumes of
+    parameters in the halos from the other subvolumes
+    (subvolume 1 to subvolume 125) of
     the simulation.
 
-    Note to self: need to load randoms and precomputed RRs
+    Note to self: need to shift the positions of random points 
     '''
     nbars = []
     xir = []
@@ -185,6 +295,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cell_ransize = [rmax , rmax , rmax]
     
+    #load randoms and RRs
+    
+    randoms = data_random()
+    RR = data_RR()
+    NR = len(randoms)
+
     for i in xrange(1,125):
 
         print 'mock#', i
