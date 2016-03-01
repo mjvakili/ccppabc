@@ -293,7 +293,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     rmax = rbins.max()
     period = None
     approx_cell1_size = [rmax , rmax , rmax]
-    approx_cell_ransize = [rmax , rmax , rmax]
+    approx_cellran_size = [rmax , rmax , rmax]
     
     #load randoms and RRs
     
@@ -310,24 +310,38 @@ def build_nbar_xi_gmf_cov(Mr=21):
         model.populate_mock(simname='multidark',
                             masking_function=mocksubvol,
                             enforce_PBC=False)
-
-        # nbar
+        # calculate nbar
 
         nbars.append(model.mock.number_density)
 
-        # xi(r)
-   
+        # translate the positions of randoms to the new subbox
+        # 200 comes from the fact that we divid each edge of multidark into 5 equal parts  
+ 
+        zi = (i / 25)*200.
+        i2 = i % 25
+        yi = (i2 / 5)*200.
+        i3 = i2 % 5
+	xi = (i3)*200.
+
+        randoms[:,0] += xi
+        randoms[:,1] += yi
+        randoms[:,2] += zi
+
+        #calculate xi(r)        
+
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
         xi = tpcf(
             pos, rbins, pos, 
             randoms=randoms, period = period, 
             max_sample_size=int(1e5), estimator='Landy-Szalay', 
             approx_cell1_size=approx_cell1_size, 
-            approx_cellran_size=approx_cellran_size)
+            approx_cellran_size=approx_cellran_size,
+            RR_precomputed = RR,
+	    NR_precomputed = NR)
 
         xir.append(xi)
 
-        # gmf
+        # calculate gmf
 
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
@@ -360,6 +374,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
+
         fullcov[16 + i, 16 + i] += gmf_counts_mean[i]
 
     # and save the covariance matrix
@@ -374,8 +389,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
     np.savetxt(outfn, fullcorr)
 
     # full covariance matrix inverse
-    N_bins = int(np.sqrt(fullcov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    N_bins = len(fullcov[0])
+
+    """
+    math:C_{estimate}^-1 = ( (Nmocks - 2 - N_bins) / (Nmock - 1) ) C^-1
+    """
+    f_unbias = (124 - 2. - N_bins) / (124. - 1) 
     inv_c = solve(np.eye(N_bins) , fullcov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -389,6 +408,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     nbxicov = np.cov(datarr.T)
 
+    # and save the nbar-xi covariance matrix
+    outfn = ''.join([util.multidat_dir(),
+                    'nbar_xir_cov.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, nbxicov)
+
     # and generate and save a correlation matrix for inspection
     nbxicor = np.corrcoef(datarr.T)
 
@@ -396,9 +421,9 @@ def build_nbar_xi_gmf_cov(Mr=21):
                     'nbar_xi_corr.Mr', str(Mr),
                     '.dat'])
     np.savetxt(outfn, nbxicor)
-
+    # and save the inverse covariance matrix for nbar , xi
     N_bins = int(np.sqrt(nbxicov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    f_unbias = (124 - 2. - N_bins) / (124. - 1)
     inv_c = solve(np.eye(N_bins) , nbxicov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -418,12 +443,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
         nbgmfcov[1 + i, 1 + i] += gmf_counts_mean[i]
 
     outfn = ''.join([util.multidat_dir(),
-                    'nbar_gmf_corr.Mr', str(Mr),
+                    'nbar_gmf_cov.Mr', str(Mr),
                     '.dat'])
-    np.savetxt(outfn, nbgmfcor)
+    np.savetxt(outfn, nbgmfcov)
 
     N_bins = int(np.sqrt(nbgmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    f_unbias = (124 - 2. - N_bins) / (124 - 1.)
     inv_c = solve(np.eye(N_bins) , nbgmfcov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -447,8 +472,15 @@ def build_nbar_xi_gmf_cov(Mr=21):
                     '.dat'])
     np.savetxt(outfn, xigmfcor)
 
+    # save the covariance matrix for gmf and xi
+    outfn = ''.join([util.multidat_dir(),
+                    'xi_gmf_cov.Mr', str(Mr),
+                    '.dat'])
+    np.savetxt(outfn, xigmfcov)
+   
+    # save the inverse covariance matrix fot xi and gmf 
     N_bins = int(np.sqrt(xigmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    f_unbias = (124 - 2. - N_bins) / (124 - 1.)
     inv_c = solve(np.eye(N_bins) , xigmfcov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -466,7 +498,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     np.savetxt(outfn, xicor)
 
     N_bins = int(np.sqrt(xicov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    f_unbias = (124 - 2. - N_bins) / (124. - 1)
     inv_c = solve(np.eye(N_bins) , xicov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -489,7 +521,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     np.savetxt(outfn, gmfcor)
 
     N_bins = int(np.sqrt(gmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / 124.
+    f_unbias = (124 - 2. - N_bins) / (124. - 1)
     inv_c = solve(np.eye(N_bins) , gmfcov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
@@ -500,7 +532,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     return None
 
 
-def build_observations(Mr=20):
+def build_observations(Mr=21):
     '''
     Build all the fake observations
     '''
@@ -525,5 +557,5 @@ def build_observations(Mr=20):
 
 if __name__ == "__main__":
 
-    build_randoms_RR(Nr=5e5)
+    #build_randoms_RR(Nr=5e5)
     build_observations(Mr = 21)
