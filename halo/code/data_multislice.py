@@ -134,6 +134,9 @@ def hardcoded_xi_bins():
     '''
     r_bins = np.concatenate([np.array([0.15]),
                              np.logspace(np.log10(0.5), np.log10(20.), 15)])
+    
+    #r_bins = np.logspace(-1. , np.log10(17) , 15)
+   
     return r_bins
 
 #Build centers of bins for 2PCF calculations
@@ -230,7 +233,7 @@ def build_nbar_xi_gmf(Mr=21):
 
     #compute number density    
 
-    nbar = model.mock.number_density
+    nbar = len(pos) / 200**3.
 
     #load randoms and RRs
     
@@ -310,39 +313,27 @@ def build_nbar_xi_gmf_cov(Mr=21):
         model.populate_mock(simname='multidark',
                             masking_function=mocksubvol,
                             enforce_PBC=False)
-        # calculate nbar
-
-        nbars.append(model.mock.number_density)
-
-        # translate the positions of randoms to the new subbox
-        # 200 comes from the fact that we divid each edge of multidark into 5 equal parts  
- 
-        zi = (i / 25)*200.
-        i2 = i % 25
-        yi = (i2 / 5)*200.
-        i3 = i2 % 5
-	xi = (i3)*200.
-
-        randoms[:,0] += xi
-        randoms[:,1] += yi
-        randoms[:,2] += zi
-
-        #calculate xi(r)        
-
+        # returning the positions of galaxies
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+        # calculate nbar
+        nbars.append(len(pos) / 200**3.)
+        # translate the positions of randoms to the new subbox
+        xi , yi , zi = util.random_shifter(i)
+        temp_randoms = randoms.copy()
+        temp_randoms[:,0] += xi
+        temp_randoms[:,1] += yi
+        temp_randoms[:,2] += zi
+        #calculate xi(r)        
         xi = tpcf(
             pos, rbins, pos, 
-            randoms=randoms, period = period, 
+            randoms=temp_randoms, period = period, 
             max_sample_size=int(1e5), estimator='Landy-Szalay', 
             approx_cell1_size=approx_cell1_size, 
             approx_cellran_size=approx_cellran_size,
             RR_precomputed = RR,
 	    NR_precomputed = NR)
-
         xir.append(xi)
-
         # calculate gmf
-
         rich = richness(model.mock.compute_fof_group_ids())
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
@@ -375,7 +366,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
 
-        fullcov[16 + i, 16 + i] += gmf_counts_mean[i]
+        fullcov[16 + i, 16 + i] += gmf_counts_mean[i] / 200**6.
 
     # and save the covariance matrix
     outfn = ''.join([util.multidat_dir(),
@@ -440,7 +431,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
-        nbgmfcov[1 + i, 1 + i] += gmf_counts_mean[i]
+        nbgmfcov[1 + i, 1 + i] += gmf_counts_mean[i] / 200**6.
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_gmf_cov.Mr', str(Mr),
@@ -465,7 +456,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
-        xigmfcov[15 + i, 15 + i] += gmf_counts_mean[i]
+        xigmfcov[15 + i, 15 + i] += gmf_counts_mean[i] / 200**6.
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_gmf_corr.Mr', str(Mr),
@@ -512,7 +503,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
-        gmfcov[i, i] += gmf_counts_mean[i]
+        gmfcov[i, i] += gmf_counts_mean[i] / 200**6.
 
 
     outfn = ''.join([util.multidat_dir(),

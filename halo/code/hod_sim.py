@@ -62,6 +62,12 @@ class HODsim(object):
         self.model.param_dict['alpha'] = theta[3]
         self.model.param_dict['logM1'] = theta[4]
 
+        rbins = hardcoded_xi_bins()
+        rmax = rbins.max()
+        period = None
+        approx_cell1_size = [rmax , rmax , rmax]
+        approx_cellran_size = [rmax , rmax , rmax]
+
         if prior_range is None:
             
             rint = np.random.randint(1, 125)
@@ -71,19 +77,14 @@ class HODsim(object):
                             enforce_PBC=False)
            
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
-            rbins = hardcoded_xi_bins()
-            rmax = rbins.max()
-            period = None
-            approx_cell1_size = [rmax , rmax , rmax]
-            approx_cellran_size = [rmax , rmax , rmax]
 
             xi , yi , zi = util.random_shifter(i)
             temp_randoms = randoms.copy()
             temp_randoms[:,0] += xi
             temp_randoms[:,1] += yi
             temp_randoms[:,2] += zi
-            obvs = []
 
+            obvs = []
             for obv in observables:
                 if obv == 'nbar':
                     obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
@@ -111,21 +112,43 @@ class HODsim(object):
             if np.all((prior_range[:,0] < theta) & (theta < prior_range[:,1])):
                 # if all theta_i is within prior range ...
                 try:
-                    self.model.populate_mock()
 
-                    obvs = []
-                    for obv in observables:
+
+                    rint = np.random.randint(1, 125)
+                    simsubvol = lambda x: util.mask_func(x, rint)
+                    self.model.populate_mock(simname='multidark',
+                                masking_function=mocksubvol,
+                                enforce_PBC=False)
+           
+                    pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
+
+            	    xi , yi , zi = util.random_shifter(i)
+            	    temp_randoms = randoms.copy()
+            	    temp_randoms[:,0] += xi
+            	    temp_randoms[:,1] += yi
+            	    temp_randoms[:,2] += zi
+            	    obvs = []
+
+            	    for obv in observables:
                         if obv == 'nbar':
-                            obvs.append(self.model.mock.number_density)     # nbar
+                    	    obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                         elif obv == 'gmf':
-                            group_id = self. model.mock.compute_fof_group_ids(num_threads=1)
-                            group_richness = richness(group_id)         # group richness of the galaxies
-                            obvs.append(gmf(group_richness))                 # calculate GMF
+                            group_id = self.model.mock.compute_fof_group_ids(num_threads=1)
+                    	    group_richness = richness(group_id)         # group richness of the galaxies
+                    	    obvs.append(gmf(group_richness))                 # calculate GMF
                         elif obv == 'xi':
-                            r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
-                            obvs.append(xi_r)
+                    	    xi = tpcf(
+                                     pos, rbins, pos, 
+                        	     randoms=temp_randoms, period = period, 
+                                     max_sample_size=int(1e5), estimator='Landy-Szalay', 
+                                     approx_cell1_size=approx_cell1_size, 
+                                     approx_cellran_size=approx_cellran_size,
+                                     RR_precomputed = RR,
+	                             NR_precomputed = NR)
+
+                    	    obvs.append(xi)
                         else:
-                            raise NotImplementedError('Only nbar and GMF implemented so far')
+                            raise NotImplementedError('Only nbar, tpcf, and gmf are implemented so far')
 
                     return obvs
 
@@ -139,8 +162,7 @@ class HODsim(object):
                             bins = data_gmf_bins()
                             obvs.append(np.ones_like(bins)[:-1]*1000.)
                         elif obv == 'xi':
-                            bins = data_xi_bins(Mr=self.Mr)
-                            obvs.append(np.zeros(len(bins)))
+                            obvs.append(np.zeros(len(rbins)))
                     return obvs
             else:
                 obvs = []
@@ -151,9 +173,9 @@ class HODsim(object):
                         bins = data_gmf_bins()
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi':
-                        bins = data_xi_bins(Mr=self.Mr)
-                        obvs.append(np.zeros(len(bins)))
+                        obvs.append(np.zeros(len(rbins)))
                 return obvs
+
 
 def HODsimulator(theta, prior_range, observables=['nbar', 'gmf'], Mr=21):
     '''
