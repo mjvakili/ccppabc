@@ -12,9 +12,18 @@ works. god bless us and save us.
 
 '''
 import numpy as np
-from halotools.empirical_models import PrebuiltHodModelFactory
 
+#haltools functions
+from halotools.sim_manager import CachedHaloCatalog
+from halotools.empirical_models import PrebuiltHodModelFactory
+from halotools.mock_observables import tpcf
+from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
+from halotools.mock_observables.pair_counters import npairs
+#ccppabc functions
 import util
+import data_multislice
+from data_multislice import data_random
+from data_multislice import data_RR
 from data import data_xi_bins
 from data import data_gmf_bins
 from data import hardcoded_xi_bins
@@ -30,7 +39,13 @@ class HODsim(object):
         Our model forward models the galaxy catalog using HOD parameters using HaloTools.
         '''
         self.Mr = Mr
-        self.model = PrebuiltHodModelFactory('zheng07', threshold=-1*Mr)
+
+        self.model = PrebuiltHodModelFactory('zheng07', threshold=thr,
+                                           halocat='multidark', redshift=0.)
+        self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+        RR = data_RR()
+        randoms = data_random()
+        NR = len(randoms)
 
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         '''
@@ -46,24 +61,49 @@ class HODsim(object):
         self.model.param_dict['logMmin'] = theta[2]
         self.model.param_dict['alpha'] = theta[3]
         self.model.param_dict['logM1'] = theta[4]
-        #self.model.param_dict['alpha'] = theta[0]
 
         if prior_range is None:
-            self.model.populate_mock()                  # forward model HOD galaxy catalog
+            
+            rint = np.random.randint(1, 125)
+            simsubvol = lambda x: util.mask_func(x, rint)
+            self.model.populate_mock(simname='multidark',
+                            masking_function=mocksubvol,
+                            enforce_PBC=False)
+           
+            pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
+            rbins = hardcoded_xi_bins()
+            rmax = rbins.max()
+            period = None
+            approx_cell1_size = [rmax , rmax , rmax]
+            approx_cellran_size = [rmax , rmax , rmax]
 
+            xi , yi , zi = util.random_shifter(i)
+            temp_randoms = randoms.copy()
+            temp_randoms[:,0] += xi
+            temp_randoms[:,1] += yi
+            temp_randoms[:,2] += zi
             obvs = []
+
             for obv in observables:
                 if obv == 'nbar':
-                    obvs.append(self.model.mock.number_density)       # nbar of the galaxy catalog
+                    obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                 elif obv == 'gmf':
                     group_id = self.model.mock.compute_fof_group_ids(num_threads=1)
                     group_richness = richness(group_id)         # group richness of the galaxies
                     obvs.append(gmf(group_richness))                 # calculate GMF
                 elif obv == 'xi':
-                    r, xi_r = self.model.mock.compute_galaxy_clustering(rbins=hardcoded_xi_bins(), num_threads=1)
-                    obvs.append(xi_r)
+                    xi = tpcf(
+                        pos, rbins, pos, 
+                        randoms=temp_randoms, period = period, 
+                        max_sample_size=int(1e5), estimator='Landy-Szalay', 
+                        approx_cell1_size=approx_cell1_size, 
+                        approx_cellran_size=approx_cellran_size,
+                        RR_precomputed = RR,
+	                NR_precomputed = NR)
+
+                    obvs.append(xi)
                 else:
-                    raise NotImplementedError('Only nbar and GMF implemented so far')
+                    raise NotImplementedError('Only nbar 2pcf, gmf implemented so far')
 
             return obvs
 
