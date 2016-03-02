@@ -6,6 +6,15 @@ Utility modules
 import os
 import numpy as np
 
+def random_shifter(index):
+
+    zi = (index / 25) * 200.
+    i2 = index % 25
+    yi = (i2 / 5) * 200.
+    i3 = i2 % 5
+    xi = (i3) * 200.
+
+    return xi , yi , zi
 
 def mk_id_column(table=None):
 
