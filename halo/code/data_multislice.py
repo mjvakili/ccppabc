@@ -41,6 +41,8 @@ def data_hod_param(Mr=21):
     return model.param_dict
 
 
+## UTILITY FUNCTIONS FOR LOADING OBSERVABLES, COV and INVERSECOV MATRICES ##
+
 # ---load  nbar ---
 def data_nbar(Mr=21):
     '''
@@ -82,11 +84,14 @@ def data_gmf(Mr=21):
     return gmf
 
 
-# --- load inverse covariance matrices ---
+# --- load the inverse covariance matrices depending on the observable combination---
 def data_inv_cov(datcombo, Mr=21):
 
     '''
     loads the inverse covariance matrix 
+
+    arguement = datcombo
+    datcombo = {'gmf','nbar_gmf','nbar_xi','nbar_xi_gmf','xi' }
     '''
 
     inv_cov_fn = ''.join([util.multidat_dir(),
@@ -95,6 +100,21 @@ def data_inv_cov(datcombo, Mr=21):
     inv_cov = np.loadtxt(inv_cov_fn)
 
     return inv_cov
+
+# --- load the covariance matrix---
+
+def data_cov(datcombo, Mr=21):
+
+    '''
+    loads the covariance matrix 
+    '''
+
+    cov_fn = ''.join([util.multidat_dir(),
+                         '{0}.Mr', str(Mr),
+                         '.dat'])
+    cov = np.loadtxt(cov_fn)
+
+    return cov
 
 #--- load randoms ---
 def data_random():
@@ -370,12 +390,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     # and save the covariance matrix
     outfn = ''.join([util.multidat_dir(),
-                    'nbar_xir_gmf_cov.Mr', str(Mr),
+                    'nbar_xi_gmf_cov.Mr', str(Mr),
                     '.dat'])
     np.savetxt(outfn, fullcov)
     # and a correlation matrix
     outfn = ''.join([util.multidat_dir(),
-                    'nbar_xir_gmf_corr.Mr', str(Mr),
+                    'nbar_xi_gmf_corr.Mr', str(Mr),
                     '.dat'])
     np.savetxt(outfn, fullcorr)
 
@@ -389,7 +409,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     inv_c = solve(np.eye(N_bins) , fullcov) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
-                    'nbar_xir_gmf_inv_cov.Mr', str(Mr),
+                    'nbar_xi_gmf_inv_cov.Mr', str(Mr),
                     '.dat'])
     np.savetxt(outfn, inv_c)
 
