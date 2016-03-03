@@ -65,7 +65,7 @@ def test_precomputed_rr(Nr, Mr = 21):
     RR = npairs(
             randoms, randoms, rbins, period,
             verbose, num_threads,
-            approx_cell1_size, approx_cell2_size)
+            approx_cellran_size, approx_cellran_size)
     RR = np.diff(RR)
     #count data random pairs 
     DR = npairs(
