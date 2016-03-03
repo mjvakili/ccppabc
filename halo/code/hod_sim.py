@@ -1,15 +1,5 @@
 '''
-
 HaloTools HOD Simulation
-
-temporary turned off parameters other than alpha.
-also turning off sub-box population and sample variance for now.
-Will go back to sample variance and full hod exploration once mcmc
-works. god bless us and save us.
-
-#   code commented out
-### comments 
-
 '''
 import numpy as np
 

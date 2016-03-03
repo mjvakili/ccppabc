@@ -23,9 +23,9 @@ def lnPost(theta, **kwargs):
         '''log prior 
         '''
         fake_obs = kwargs['data']
-    	fake_obs_cov = kwargs['data_cov']
+    	fake_obs_icov = kwargs['data_icov']
     	kwargs.pop('data', None)
-    	kwargs.pop('data_cov', None)
+    	kwargs.pop('data_icov', None)
     	observables = kwargs['observables']
     	prior_range = kwargs['prior_range']
     	prior_min = prior_range[:,0]
@@ -45,32 +45,21 @@ def lnPost(theta, **kwargs):
     def lnlike(theta, **kwargs):
 
     	fake_obs = kwargs['data']
-    	fake_obs_cov = kwargs['data_cov']
+    	fake_obs_icov = kwargs['data_icov']
     	kwargs.pop('data', None)
-    	kwargs.pop('data_cov', None)
+    	kwargs.pop('data_icov', None)
     	observables = kwargs['observables']
     	prior_range = kwargs['prior_range']
     	# Likelihood
     	model_obvs = generator.sum_stat(theta, prior_range , observables)
-    	ind = 0 
-    	if 'nbar' in observables: 
-        	res_nbar = fake_obs[ind] - model_obvs[ind] 
-        	ind += 1 
-    	if 'xi' in observables: 
-        	res_xi = fake_obs[ind] - model_obvs[ind]
-                ind +=1
-    	if 'gmf' in observables: 
-        	res_gmf = fake_obs[ind] - model_obvs[ind]
-        	ind += 1
-    	neg_chi_tot = 0.
-    	ind = 0 
-    	if 'nbar' in observables: 
-        	neg_chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
-        	ind += 1
-    	if 'gmf' in observables: 
-        	neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
-    	if 'xi' in observables: 
-        	neg_chi_tot += -0.5*np.sum(np.dot(res_xi , solve(fake_obs_cov[ind] , res_xi)))
+    	if observables == ['xi']:
+            res = fake_obs - model_obvs[0]
+    	if observables == ['nbar','xi']:
+            res = fake_obs - np.hstack([model_obvs[0],model_obvs[1]])
+    	if observables == ['nbar','gmf']:
+            res = fake_obs - np.hstack([model_obvs[0],model_obvs[1]])
+    	
+        neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res , fake_obs_icov) , res))
         #print neg_chi_tot
     	return neg_chi_tot
 
@@ -95,26 +84,16 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         list of observables. Options are: ['nbar','xi'],['nbar','gmf'],['xi']
     - data_dict : dictionary that specifies the observation keywords
     '''
-    
-    fake_obs = []            #list of observables 
-    fake_obs_icov = []       #inverse covariance matrix (one matrix)
-    fake_obs_cov = []        #covariance matrix (one matrix) 
-    for obv in observables: 
-        if obv == 'nbar': 
-            data_nbar = Data.data_nbar(**data_dict)
-            fake_obs.append(data_nbar)
-        if obv == 'xi': 
-            data_xi = Data.data_xi(**data_dict)   
-            fake_obs.append(data_xi)
-        if obv == 'gmf': 
-            data_gmf = Data.data_gmf(**data_dict)
-            fake_obs.append(data_gmf)
-    
+     
+    #Initializing the vector of observables and inverse covariance matrix
     if observables == ['xi']:
+        fake_obs = Data.data_xi
         fake_obs_icov = Data.data_inv_cov('xi', **data_dict)
     if observables == ['nbar','xi']:
+        fake_obs = np.hstack([Data.data_nbar , Data.data_xi])
         fake_obs_icov = Data.data_inv_cov('nbar_xi', **data_dict)
     if observables == ['nbar','gmf']:
+        fake_obs = np.hstack([Data.data_nbar , Data.data_gmf])
         fake_obs_icov = Data.data_inv_cov('nbar_gmf', **data_dict)
           
     # True HOD parameters
