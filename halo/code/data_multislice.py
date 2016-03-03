@@ -95,7 +95,7 @@ def data_inv_cov(datcombo, Mr=21):
     '''
 
     inv_cov_fn = ''.join([util.multidat_dir(),
-                         '{0}.Mr'.format(datcombo), str(Mr),
+                         '{0}_inv_cov.Mr'.format(datcombo), str(Mr),
                          '.dat'])
     inv_cov = np.loadtxt(inv_cov_fn)
 
@@ -144,6 +144,11 @@ def data_RR():
     RR = np.loadtxt(RR_file)
 
     return RR
+
+def data_gmf_bins():
+    ''' Just for consistency, returns the bins
+    '''
+    return gmf_bins()
 
 # Build bin edges for 2PCF calculations
 

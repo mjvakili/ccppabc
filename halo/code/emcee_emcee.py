@@ -155,7 +155,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
     hod_kwargs = {
             'prior_range': prior_range, 
             'data': fake_obs, 
-            'data_cov': fake_obs_cov, 
+            'data_icov': fake_obs_icov, 
             'observables': observables, 
             'Mr': data_dict['Mr']
             }

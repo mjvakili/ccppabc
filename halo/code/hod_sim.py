@@ -14,9 +14,8 @@ import util
 import data_multislice
 from data_multislice import data_random
 from data_multislice import data_RR
-from data import data_xi_bins
-from data import data_gmf_bins
-from data import hardcoded_xi_bins
+from data_multislice import data_gmf_bins
+from data_multislice import hardcoded_xi_bins
 from group_richness import gmf
 from group_richness import richness
 
@@ -29,7 +28,7 @@ class HODsim(object):
         Our model forward models the galaxy catalog using HOD parameters using HaloTools.
         '''
         self.Mr = Mr
-
+        thr = -1. * np.float(Mr)
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                            halocat='multidark', redshift=0.)
         self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
@@ -63,7 +62,7 @@ class HODsim(object):
             rint = np.random.randint(1, 125)
             simsubvol = lambda x: util.mask_func(x, rint)
             self.model.populate_mock(simname='multidark',
-                            masking_function=mocksubvol,
+                            masking_function=simsubvol,
                             enforce_PBC=False)
            
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
@@ -107,7 +106,7 @@ class HODsim(object):
                     rint = np.random.randint(1, 125)
                     simsubvol = lambda x: util.mask_func(x, rint)
                     self.model.populate_mock(simname='multidark',
-                                masking_function=mocksubvol,
+                                masking_function=simsubvol,
                                 enforce_PBC=False)
            
                     pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
