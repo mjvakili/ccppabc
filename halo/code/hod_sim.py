@@ -32,9 +32,9 @@ class HODsim(object):
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr,
                                            halocat='multidark', redshift=0.)
         self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
-        RR = data_RR()
-        randoms = data_random()
-        NR = len(randoms)
+        self.RR = data_RR()
+        self.randoms = data_random()
+        self.NR = len(randoms)
 
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         '''
@@ -68,7 +68,7 @@ class HODsim(object):
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
 
             xi , yi , zi = util.random_shifter(rint)
-            temp_randoms = randoms.copy()
+            temp_randoms = self.randoms.copy()
             temp_randoms[:,0] += xi
             temp_randoms[:,1] += yi
             temp_randoms[:,2] += zi
@@ -88,8 +88,8 @@ class HODsim(object):
                         max_sample_size=int(1e5), estimator='Landy-Szalay', 
                         approx_cell1_size=approx_cell1_size, 
                         approx_cellran_size=approx_cellran_size,
-                        RR_precomputed = RR,
-	                NR_precomputed = NR)
+                        RR_precomputed = self.RR,
+	                NR_precomputed = self.NR)
 
                     obvs.append(xi)
                 else:
@@ -112,7 +112,7 @@ class HODsim(object):
                     pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
 
             	    xi , yi , zi = util.random_shifter(rint)
-            	    temp_randoms = randoms.copy()
+            	    temp_randoms = self.randoms.copy()
             	    temp_randoms[:,0] += xi
             	    temp_randoms[:,1] += yi
             	    temp_randoms[:,2] += zi
@@ -132,8 +132,8 @@ class HODsim(object):
                                      max_sample_size=int(1e5), estimator='Landy-Szalay', 
                                      approx_cell1_size=approx_cell1_size, 
                                      approx_cellran_size=approx_cellran_size,
-                                     RR_precomputed = RR,
-	                             NR_precomputed = NR)
+                                     RR_precomputed = self.RR,
+	                             NR_precomputed = self.NR)
 
                     	    obvs.append(xi)
                         else:

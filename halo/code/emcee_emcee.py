@@ -66,7 +66,7 @@ def lnPost(theta, **kwargs):
     lp = lnprior(theta , **kwargs)
     if not np.isfinite(lp):
         return -np.inf
-    #print lp + lnlike(theta , **kwargs)
+    print lp + lnlike(theta , **kwargs)
     return lp + lnlike(theta, **kwargs)
 
 def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'], 
@@ -87,13 +87,13 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
      
     #Initializing the vector of observables and inverse covariance matrix
     if observables == ['xi']:
-        fake_obs = Data.data_xi
+        fake_obs = Data.data_xi(**data_dict)
         fake_obs_icov = Data.data_inv_cov('xi', **data_dict)
     if observables == ['nbar','xi']:
-        fake_obs = np.hstack([Data.data_nbar , Data.data_xi])
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
         fake_obs_icov = Data.data_inv_cov('nbar_xi', **data_dict)
     if observables == ['nbar','gmf']:
-        fake_obs = np.hstack([Data.data_nbar , Data.data_gmf])
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
         fake_obs_icov = Data.data_inv_cov('nbar_gmf', **data_dict)
           
     # True HOD parameters
