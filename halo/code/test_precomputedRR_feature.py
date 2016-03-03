@@ -42,9 +42,7 @@ def test_precomputed_rr(Nr, Mr = 21):
     verbose = False
     num_threads = cpu_count()
 
-    period = np.array([L,L,L])
-    #period = None
-    rmax = L/10.
+    period = None
     approx_cell1_size = [rmax, rmax, rmax]
     approx_cell2_size = approx_cell1_size
     approx_cellran_size = [rmax, rmax, rmax]
@@ -67,7 +65,7 @@ def test_precomputed_rr(Nr, Mr = 21):
     RR = npairs(
             randoms, randoms, rbins, period,
             verbose, num_threads,
-            approx_cell1_size, approx_cell2_size)
+            approx_cellran_size, approx_cellran_size)
     RR = np.diff(RR)
     #count data random pairs 
     DR = npairs(
