@@ -411,7 +411,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     math:C_{estimate}^-1 = ( (Nmocks - 2 - N_bins) / (Nmock - 1) ) C^-1
     """
     f_unbias = (124 - 2. - N_bins) / (124. - 1) 
-    inv_c = solve(np.eye(N_bins) , fullcov) * f_unbias
+    inv_c = solve(fullcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_xi_gmf_inv_cov.Mr', str(Mr),
@@ -440,7 +440,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     # and save the inverse covariance matrix for nbar , xi
     N_bins = int(np.sqrt(nbxicov.size))
     f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(np.eye(N_bins) , nbxicov) * f_unbias
+    inv_c = solve(nbxicov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_xi_inv_cov.Mr', str(Mr),
@@ -465,7 +465,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     N_bins = int(np.sqrt(nbgmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    inv_c = solve(np.eye(N_bins) , nbgmfcov) * f_unbias
+    inv_c = solve(nbgmfcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_gmf_inv_cov.Mr', str(Mr),
@@ -497,7 +497,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     # save the inverse covariance matrix fot xi and gmf 
     N_bins = int(np.sqrt(xigmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    inv_c = solve(np.eye(N_bins) , xigmfcov) * f_unbias
+    inv_c = solve(xigmfcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_gmf_inv_cov.Mr', str(Mr),
@@ -515,7 +515,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     N_bins = int(np.sqrt(xicov.size))
     f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(np.eye(N_bins) , xicov) * f_unbias
+    inv_c = solve(xicov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_inv_cov.Mr', str(Mr),
@@ -538,7 +538,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     N_bins = int(np.sqrt(gmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(np.eye(N_bins) , gmfcov) * f_unbias
+    inv_c = solve(gmfcov, np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'gmf_inv_cov.Mr', str(Mr),
