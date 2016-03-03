@@ -7,7 +7,7 @@ from emcee.utils import MPIPool
 import scipy.optimize as op
 # --- Local ---
 import util
-import data as Data
+import data_multislice as Data
 from hod_sim import HODsim
 from hod_sim import HODsimulator 
 from group_richness import richness
@@ -15,14 +15,10 @@ from prior import PriorRange
 import corner
 from numpy.linalg import solve
 
-generator = HODsim(Mr = 21)
-    
-continue_chain = False
 
 
 def lnPost(theta, **kwargs):
 
-    #print "q"    
     def lnprior(theta, **kwargs):
         '''log prior 
         '''
@@ -60,14 +56,13 @@ def lnPost(theta, **kwargs):
     	if 'nbar' in observables: 
         	res_nbar = fake_obs[ind] - model_obvs[ind] 
         	ind += 1 
+    	if 'xi' in observables: 
+        	res_xi = fake_obs[ind] - model_obvs[ind]
+                ind +=1
     	if 'gmf' in observables: 
         	res_gmf = fake_obs[ind] - model_obvs[ind]
         	ind += 1
-    	if 'xi' in observables: 
-        	res_xi = fake_obs[ind] - model_obvs[ind]
-    
     	neg_chi_tot = 0.
-
     	ind = 0 
     	if 'nbar' in observables: 
         	neg_chi_tot += -0.5*(res_nbar)**2. / fake_obs_cov[ind] 
@@ -75,7 +70,6 @@ def lnPost(theta, **kwargs):
     	if 'gmf' in observables: 
         	neg_chi_tot += -0.5*(res_gmf)**2. / fake_obs_cov[ind] 
     	if 'xi' in observables: 
-        	#neg_chi_tot += -0.5*np.sum(np.dot(np.dot(res_xi , fake_obs_cov[ind]) , res_xi))
         	neg_chi_tot += -0.5*np.sum(np.dot(res_xi , solve(fake_obs_cov[ind] , res_xi)))
         #print neg_chi_tot
     	return neg_chi_tot
@@ -86,43 +80,43 @@ def lnPost(theta, **kwargs):
     #print lp + lnlike(theta , **kwargs)
     return lp + lnlike(theta, **kwargs)
 
-def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'gmf'], 
-        data_dict={'Mr':21, 'Nmock':200}, prior_name = 'first_try', output_dir=None): 
+def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'], 
+        data_dict={'Mr':21}, prior_name = 'first_try', output_dir=None): 
     '''
     Standard MCMC implementaion
     
-
     Parameters
     -----------
     - Nwalker : 
         Number of walkers
-    - Nchains_burn : 
-        Number of burn-in chains
-    - Nchains_pro : 
-        Number of production chains   
+    - Nchains : 
+        Number of MCMC chains   
     - observables : 
-        list of observables. Options are 'nbar', 'gmf', 'xi'
+        list of observables. Options are: ['nbar','xi'],['nbar','gmf'],['xi']
     - data_dict : dictionary that specifies the observation keywords
     '''
-    # data observables
-    fake_obs = []       # list of observables 
-    fake_obs_cov = [] 
+    
+    fake_obs = []            #list of observables 
+    fake_obs_icov = []       #inverse covariance matrix (one matrix)
+    fake_obs_cov = []        #covariance matrix (one matrix) 
     for obv in observables: 
         if obv == 'nbar': 
-            data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
+            data_nbar = Data.data_nbar(**data_dict)
             fake_obs.append(data_nbar)
-            fake_obs_cov.append(data_nbar_var)
-        if obv == 'gmf': 
-            data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
-            fake_obs.append(data_gmf)
-            fake_obs_cov.append(data_gmf_sigma**2.)
         if obv == 'xi': 
-            # import xir and full covariance matrix of xir
-            data_xi, data_xi_cov = Data.data_xi_full_cov(**data_dict)   
-            data_xi_invcov = Data.data_xi_inv_cov(**data_dict)
+            data_xi = Data.data_xi(**data_dict)   
             fake_obs.append(data_xi)
-            fake_obs_cov.append(data_xi_invcov)
-
+        if obv == 'gmf': 
+            data_gmf = Data.data_gmf(**data_dict)
+            fake_obs.append(data_gmf)
+    
+    if observables == ['xi']:
+        fake_obs_icov = Data.data_inv_cov('xi', **data_dict)
+    if observables == ['nbar','xi']:
+        fake_obs_icov = Data.data_inv_cov('nbar_xi', **data_dict)
+    if observables == ['nbar','gmf']:
+        fake_obs_icov = Data.data_inv_cov('nbar_gmf', **data_dict)
+          
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
     data_hod = np.array([
@@ -305,6 +299,8 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 
 if __name__=="__main__": 
 
+    generator = HODsim(Mr = 21)
+    continue_chain = False
     Nwalkers = int(sys.argv[1])
     print 'N walkers = ', Nwalkers
     Niter = int(sys.argv[2])
