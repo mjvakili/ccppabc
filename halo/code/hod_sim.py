@@ -67,7 +67,7 @@ class HODsim(object):
            
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
 
-            xi , yi , zi = util.random_shifter(i)
+            xi , yi , zi = util.random_shifter(rint)
             temp_randoms = randoms.copy()
             temp_randoms[:,0] += xi
             temp_randoms[:,1] += yi
@@ -111,7 +111,7 @@ class HODsim(object):
            
                     pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
 
-            	    xi , yi , zi = util.random_shifter(i)
+            	    xi , yi , zi = util.random_shifter(rint)
             	    temp_randoms = randoms.copy()
             	    temp_randoms[:,0] += xi
             	    temp_randoms[:,1] += yi
