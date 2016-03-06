@@ -52,10 +52,11 @@ def data_nbar(Mr=21):
                              'data_vector.Mr', str(Mr),
                              '.dat']))
     nbar = dat[0]
-    nbar_var = np.loadtxt(''.join([util.multidat_dir(),
-                                  'nbar_var.Mr', str(Mr),
-                                  '.dat']))
-    return [nbar, nbar_var]
+    #nbar_var = np.loadtxt(''.join([util.multidat_dir(),
+    #                              'nbar_var.Mr', str(Mr),
+    #                              '.dat']))
+    return nbar
+    #reutrn [nbar, nbar_var]
 
 
 # --- load 2PCF ---
@@ -103,17 +104,16 @@ def data_inv_cov(datcombo, Mr=21):
 
 # --- load the covariance matrix---
 
-def data_cov(datcombo, Mr=21):
+def data_cov(Mr=21):
 
     '''
-    loads the covariance matrix 
+    loads the entire covariance matrix 
     '''
 
     cov_fn = ''.join([util.multidat_dir(),
-                         '{0}.Mr', str(Mr),
+                         'nbar_xir_gmf_cov.Mr', str(Mr),
                          '.dat'])
     cov = np.loadtxt(cov_fn)
-
     return cov
 
 #--- load randoms ---
@@ -411,12 +411,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
     math:C_{estimate}^-1 = ( (Nmocks - 2 - N_bins) / (Nmock - 1) ) C^-1
     """
     f_unbias = (124 - 2. - N_bins) / (124. - 1) 
-    inv_c = solve(fullcov , np.eye(N_bins)) * f_unbias
+    ###inv_c = solve(fullcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_xi_gmf_inv_cov.Mr', str(Mr),
                     '.dat'])
-    np.savetxt(outfn, inv_c)
+    ###np.savetxt(outfn, inv_c)
 
     # inverse for nbar-xi data vector covariance
     datarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
@@ -465,12 +465,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     N_bins = int(np.sqrt(nbgmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    inv_c = solve(nbgmfcov , np.eye(N_bins)) * f_unbias
+    #inv_c = solve(nbgmfcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'nbar_gmf_inv_cov.Mr', str(Mr),
                     '.dat'])
-    np.savetxt(outfn, inv_c)
+    #np.savetxt(outfn, inv_c)
 
     # inverse for xi-gmf data vector covariance
     datarr = np.hstack((np.array(xir),
@@ -497,12 +497,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
     # save the inverse covariance matrix fot xi and gmf 
     N_bins = int(np.sqrt(xigmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    inv_c = solve(xigmfcov , np.eye(N_bins)) * f_unbias
+    ###inv_c = solve(xigmfcov , np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'xi_gmf_inv_cov.Mr', str(Mr),
                     '.dat'])
-    np.savetxt(outfn, inv_c)
+    ###np.savetxt(outfn, inv_c)
 
     # inverse for xi data vector covariance
     xicov = np.cov(np.array(xir).T)
@@ -538,12 +538,12 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
     N_bins = int(np.sqrt(gmfcov.size))
     f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(gmfcov, np.eye(N_bins)) * f_unbias
+    ###inv_c = solve(gmfcov, np.eye(N_bins)) * f_unbias
 
     outfn = ''.join([util.multidat_dir(),
                     'gmf_inv_cov.Mr', str(Mr),
                     '.dat'])
-    np.savetxt(outfn, inv_c)
+    ###np.savetxt(outfn, inv_c)
 
     return None
 

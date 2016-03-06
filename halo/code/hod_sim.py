@@ -34,7 +34,7 @@ class HODsim(object):
         self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
         self.RR = data_RR()
         self.randoms = data_random()
-        self.NR = len(randoms)
+        self.NR = len(self.randoms)
 
     def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         '''
