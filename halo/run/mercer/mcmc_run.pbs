@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#PBS -l nodes=4:ppn=20,mem=720GB
+#PBS -l walltime=48:00:00
+#PBS -N openmpi_mcmc_run
+#PBS -M mjvakili@nyu.edu
+#PBS -m abe
+#PBS -j oe
+
+module purge
+module load mpi4py/openmpi/intel/1.3.1
+module load numpy/intel/1.10.1
+
+cd /scratch/mv1003/mcmc
+
+hostfile=hostfile
+
+np=10
+
+{
+    for node in $(cat $PBS_NODEFILE | uniq); do
+        for((i=0; i<$np; i++)); do
+            echo $node
+        done
+    done
+} > $hostfile
+
+mpiexec -hostfile $hostfile \
+    python /work/mv1003/ccppabc/halo/code/emcee_emcee.py \
+    10 6000 "xi" $(pwd)
+
+# leave a blank line at the end
+
