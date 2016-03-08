@@ -54,15 +54,20 @@ def lnPost(theta, **kwargs):
         #print "model=" , model_obvs
     	if observables == ['xi']:
             res = fake_obs - model_obvs[0]
+ 	    nbin = len(res)
+            f = (124 - 2 - nbin)/(124 - 1)
     	if observables == ['nbar','xi']:
             #print model_obvs[0] , fake_obs[0]
             #print model_obvs[1] , fake_obs[1:]
             res = fake_obs - np.hstack([model_obvs[0], model_obvs[1]])
+            nbin = len(res)
+            f = (124 - 2 - nbin)/(124 - 1)
     	if observables == ['nbar','gmf']:
             res = fake_obs - np.hstack([model_obvs[0],model_obvs[1]])
-    	
+	    nbin = len(res)
+            f = (124 - 2 - nbin)/(124 - 1)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
-        neg_chi_tot = - 0.5 * np.sum(np.dot(res , solve(fake_obs_icov , res)))
+        neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
         #print neg_chi_tot
     	return neg_chi_tot
 
