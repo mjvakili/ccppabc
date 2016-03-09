@@ -8,6 +8,7 @@ from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
 from halotools.mock_observables import tpcf
 from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
+from halotools.mock_observables import FoFGroups
 from halotools.mock_observables.pair_counters import npairs
 #ccppabc functions
 import util
@@ -78,9 +79,18 @@ class HODsim(object):
                 if obv == 'nbar':
                     obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                 elif obv == 'gmf':
-                    group_id = self.model.mock.compute_fof_group_ids(num_threads=1)
-                    group_richness = richness(group_id)         # group richness of the galaxies
-                    obvs.append(gmf(group_richness))                 # calculate GMF
+                    #compute group richness    
+    		    galaxy_sample = model.mock.galaxy_table
+    	 	    x = galaxy_sample['x']
+    	            y = galaxy_sample['y']
+    	            z = galaxy_sample['z']
+    	            vz = galaxy_sample['vz']
+    	            pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		    b_para, b_perp = 0.7, 0.15
+    	 	    groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+                    gids = groups.group_ids
+                    richness = richness(gids)
+                    obvs.append(gmf(richness))                 # calculate GMF
                 elif obv == 'xi':
                     xi = tpcf(
                         pos, rbins, pos, 
@@ -124,7 +134,18 @@ class HODsim(object):
                         elif obv == 'gmf':
                             group_id = self.model.mock.compute_fof_group_ids(num_threads=1)
                     	    group_richness = richness(group_id)         # group richness of the galaxies
-                    	    obvs.append(gmf(group_richness))                 # calculate GMF
+                            #compute group richness    
+    		    	    galaxy_sample = model.mock.galaxy_table
+    	 	            x = galaxy_sample['x']
+    	                    y = galaxy_sample['y']
+    	                    z = galaxy_sample['z']
+    	                    vz = galaxy_sample['vz']
+    	                    pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		            b_para, b_perp = 0.7, 0.15
+    	 	            groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+                            gids = groups.group_ids
+                            richness = richness(gids)
+                            obvs.append(gmf(richness))                 # calculate GMF
                         elif obv == 'xi':
                     	    xi = tpcf(
                                      pos, rbins, pos, 
