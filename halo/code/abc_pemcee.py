@@ -16,7 +16,7 @@ python abc_pemcee.py Niter Npart ObsStr OutputDir
     String that specifies the observables. 
     'nbarxi' is ['nbar', 'xi']
     'nbargmf' is ['nbar', 'gmf']
-    'nbarxigmf' is ['nbar', 'xi', 'gmf']
+    'xi' is ['xi']
 - OutputDir : string
     String that specifies the output directory
 
@@ -25,22 +25,19 @@ import sys
 import time
 import pickle
 import numpy as np
-
 import abcpmc
 from abcpmc import mpi_util
-
 # --- Local --- 
 import util
-import data as Data
+import data_multislice as Data
 from hod_sim import HODsim
 from prior import PriorRange
 from group_richness import richness
-
 # --- Plotting ---
 from plotting import plot_thetas
 
-def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'gmf'], 
-        data_dict={'Mr':20, 'Nmock': 500}, output_dir=None):
+def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nbar', 'xi'], 
+        data_dict={'Mr':21}, output_dir=None):
     '''
     ABC-PMC implementation. 
 
@@ -56,19 +53,23 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         output_dir = util.dat_dir()
     else: 
         pass
-    # data observables
-    fake_obs = []       # list of observables 
-    for obv in observables: 
-        if obv == 'nbar': 
-            data_nbar, data_nbar_var = Data.data_nbar(**data_dict)
-            fake_obs.append(data_nbar)
-        if obv == 'gmf': 
-            data_gmf, data_gmf_sigma = Data.data_gmf(**data_dict)
-            fake_obs.append(data_gmf)
-        if obv == 'xi': 
-            data_xi, data_cov_ii = Data.data_xi(**data_dict)
-            fake_obs.append(data_xi)
-
+    #Initializing the vector of observables and inverse covariance matrix
+    if observables == ['xi']:
+        fake_obs = Data.data_xi(**data_dict)
+        fake_obs_cov = Data.data_cov(**data_dict)[1:16 , 1:16]
+        xi_Cii = np.diag(fake_obs_cov)
+    if observables == ['nbar','xi']:
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
+        fake_obs_cov = Data.data_cov(**data_dict)[:16 , :16]
+        Cii = np.diag(fake_obs_cov)
+        xi_Cii = Cii[1:,1:]
+        nbar_Cii = Cii[0,0]
+    if observables == ['nbar','gmf']:
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
+        fake_obs_cov = Data.data_cov('nbar_gmf', **data_dict)
+        Cii = np.diag(fake_obs_cov)
+        gmf_Cii = Cii[1:,1:]
+        nbar_Cii = Cii[0,0]
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
     data_hod = np.array([
@@ -87,7 +88,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     prior_range[:,1] = prior_max
 
     # simulator
-    our_model = HODsim()    # initialize model
+    our_model = HODsim(Mr=data_dict['Mr'])    # initialize model
     kwargs = {'prior_range': prior_range, 'observables': observables}
     def simz(tt): 
         sim = our_model.sum_stat(tt, **kwargs)
@@ -101,26 +102,25 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         dists = [] 
         for i_obv, obv in enumerate(observables): 
             if obv == 'nbar': 
-                dist_nz = (datum[i_obv] - model[i_obv])**2. / data_nbar_var 
-                dists.append(dist_nz)
+                dist_nbar = (datum[i_obv] - model[i_obv])**2. / nbar_Cii 
+                dists.append(dist_nbar)
             if obv == 'gmf': 
-                dist_gr = np.sum((datum[i_obv] - model[i_obv])**2. / data_gmf_sigma**2.)
-                dists.append(dist_gr)
+                dist_gmf = np.sum((datum[i_obv] - model[i_obv])**2. / gmf_Cii)
+                dists.append(dist_gmf)
             if obv == 'xi': 
-                dist_xi = np.sum((datum[i_obv] - model[i_obv])**2. / data_cov_ii)
+                dist_xi = np.sum((datum[i_obv] - model[i_obv])**2. / xi_Cii)
                 dists.append(dist_xi)
         return np.array(dists)
 
     mpi_pool = mpi_util.MpiPool()
     abcpmc_sampler = abcpmc.Sampler(
-            N=N_part,       # N_particles
-            Y=fake_obs,         # data
-            postfn=simz,    # simulator 
-            dist=multivariate_rho,       # distance function  
+            N=N_part,               #N_particles
+            Y=fake_obs,             #data
+            postfn=simz,            #simulator 
+            dist=multivariate_rho,  #distance function  
             pool=mpi_pool)  
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
 
-    #eps = abcpmc.ConstEps(T, [1.e13,1.e13])
     eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
     f = open("abc_tolerance.dat" , "w")
@@ -176,8 +176,8 @@ if __name__=="__main__":
         obv_list = ['nbar', 'xi']
     elif obv_flag == 'nbargmf':  
         obv_list = ['nbar', 'gmf']
-    elif obv_flag == 'nbarxigmf':
-        obv_list = ['nbar', 'xi', 'gmf']
+    elif obv_flag == 'xi':
+        obv_list = ['xi']
     else: 
         raise ValueError
     print 'Observables: ', ', '.join(obv_list)
