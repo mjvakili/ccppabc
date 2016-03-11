@@ -19,7 +19,6 @@ python abc_pemcee.py Niter Npart ObsStr OutputDir
     'xi' is ['xi']
 - OutputDir : string
     String that specifies the output directory
-
 '''
 import sys 
 import time
@@ -62,14 +61,14 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
         fake_obs_cov = Data.data_cov(**data_dict)[:16 , :16]
         Cii = np.diag(fake_obs_cov)
-        xi_Cii = Cii[1:,1:]
-        nbar_Cii = Cii[0,0]
+        xi_Cii = Cii[1:]
+        nbar_Cii = Cii[0]
     if observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
         fake_obs_cov = Data.data_cov('nbar_gmf', **data_dict)
         Cii = np.diag(fake_obs_cov)
-        gmf_Cii = Cii[1:,1:]
-        nbar_Cii = Cii[0,0]
+        gmf_Cii = Cii[1:]
+        nbar_Cii = Cii[0]
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
     data_hod = np.array([
@@ -79,14 +78,12 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         data_hod_dict['alpha'],                 # alpha
         data_hod_dict['logM1']                  # log M1
         ])
-    
     # Priors
     prior_min, prior_max = PriorRange(prior_name)
     prior = abcpmc.TophatPrior(prior_min, prior_max)
     prior_range = np.zeros((len(prior_min),2))
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
-
     # simulator
     our_model = HODsim(Mr=data_dict['Mr'])    # initialize model
     kwargs = {'prior_range': prior_range, 'observables': observables}
@@ -97,7 +94,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             pickle.dump(kwargs, open('simz_crash_kwargs.p', 'wb'))
             raise ValueError('Simulator is giving NonetType')
         return sim
-
     def multivariate_rho(datum, model): 
         dists = [] 
         for i_obv, obv in enumerate(observables): 
@@ -111,7 +107,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
                 dist_xi = np.sum((datum[i_obv] - model[i_obv])**2. / xi_Cii)
                 dists.append(dist_xi)
         return np.array(dists)
-
     mpi_pool = mpi_util.MpiPool()
     abcpmc_sampler = abcpmc.Sampler(
             N=N_part,               #N_particles
@@ -120,7 +115,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             dist=multivariate_rho,  #distance function  
             pool=mpi_pool)  
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
-
     eps = abcpmc.MultiConstEps(T, eps_val)
     pools = []
     f = open("abc_tolerance.dat" , "w")
@@ -134,7 +128,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             eps_str = new_eps_str
             f.write(eps_str)
             f.close()
-
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
         print eps(pool.t)
         # plot theta
@@ -148,7 +141,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.mercer.dat'])
         np.savetxt(theta_file, pool.thetas)
         np.savetxt(w_file, pool.ws)
-
         if pool.t < 3: 
             eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
         elif (pool.t > 2) and (pool.t < 20):
@@ -159,9 +151,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
         #if eps.eps < eps_min:
         #    eps.eps = eps_min
-
         pools.append(pool)
-
     #abcpmc_sampler.close()
     return pools
 
