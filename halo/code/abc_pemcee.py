@@ -94,19 +94,24 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             pickle.dump(kwargs, open('simz_crash_kwargs.p', 'wb'))
             raise ValueError('Simulator is giving NonetType')
         return sim
+
     def multivariate_rho(datum, model): 
         dists = [] 
-        for i_obv, obv in enumerate(observables): 
-            if obv == 'nbar': 
-                dist_nbar = (datum[i_obv] - model[i_obv])**2. / nbar_Cii 
-                dists.append(dist_nbar)
-            if obv == 'gmf': 
-                dist_gmf = np.sum((datum[i_obv] - model[i_obv])**2. / gmf_Cii)
-                dists.append(dist_gmf)
+        if observables == ['nbar','xi']: 
+            dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
+ 	    dist_xi = np.sum((datum[1:] - model[1:])**2. / xi_Cii)
+            dists = [dist_nbar , dist_xi]
+        if observables == ['nbar','gmf']:
+            dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
+            dist_gmf = np.sum((datum[1:] - model[1:])**2. / gmf_Cii)
+            dists = [dist_nbar , dist_gmf]
             if obv == 'xi': 
-                dist_xi = np.sum((datum[i_obv] - model[i_obv])**2. / xi_Cii)
-                dists.append(dist_xi)
+        if observables == ['xi']: 
+            dist_xi = np.sum((datum- model)**2. / xi_Cii)
+    	    dists = [dist_xi]
+        print np.array(dists)
         return np.array(dists)
+
     mpi_pool = mpi_util.MpiPool()
     abcpmc_sampler = abcpmc.Sampler(
             N=N_part,               #N_particles
