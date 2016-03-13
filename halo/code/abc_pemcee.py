@@ -57,13 +57,13 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         fake_obs = Data.data_xi(**data_dict)
         fake_obs_cov = Data.data_cov(**data_dict)[1:16 , 1:16]
         xi_Cii = np.diag(fake_obs_cov)
-    if observables == ['nbar','xi']:
+    elif observables == ['nbar','xi']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
         fake_obs_cov = Data.data_cov(**data_dict)[:16 , :16]
         Cii = np.diag(fake_obs_cov)
         xi_Cii = Cii[1:]
         nbar_Cii = Cii[0]
-    if observables == ['nbar','gmf']:
+    elif observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
         fake_obs_cov = Data.data_cov('nbar_gmf', **data_dict)
         Cii = np.diag(fake_obs_cov)
@@ -101,12 +101,11 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
  	    dist_xi = np.sum((datum[1:] - model[1:])**2. / xi_Cii)
             dists = [dist_nbar , dist_xi]
-        if observables == ['nbar','gmf']:
+        elif observables == ['nbar','gmf']:
             dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
             dist_gmf = np.sum((datum[1:] - model[1:])**2. / gmf_Cii)
             dists = [dist_nbar , dist_gmf]
-            if obv == 'xi': 
-        if observables == ['xi']: 
+        elif observables == ['xi']: 
             dist_xi = np.sum((datum- model)**2. / xi_Cii)
     	    dists = [dist_xi]
         print np.array(dists)
