@@ -1,8 +1,12 @@
 '''
+
+
 module for building and loading all the possible data and covariance
 combinations that can come up in the generalised inference
-'''
 
+
+
+'''
 #general python modules
 import numpy as np
 from multiprocessing import cpu_count
@@ -24,7 +28,8 @@ from group_richness import gmf as GMF
 
 
 def cov2corr(mat):
-
+    ''' @MJ: What is this code for? 
+    '''
     numat = np.empty(mat.shape)
 
     for i in range(mat.shape[0]):
@@ -33,21 +38,16 @@ def cov2corr(mat):
 
     return numat
 
-
 def data_hod_param(Mr=21):
-    '''
-    HOD parameters of 'observations'. Returns dictionary with hod parameters.
+    ''' HOD parameters of 'observations'. Returns dictionary with hod parameters.
     '''
     model = PrebuiltHodModelFactory('zheng07', threshold = -1.0*np.float(Mr))
     return model.param_dict
 
-
 ## UTILITY FUNCTIONS FOR LOADING OBSERVABLES, COV and INVERSECOV MATRICES ##
 
-# ---load  nbar ---
 def data_nbar(Mr=21):
-    '''
-    loads the observed nbar from 'data'
+    ''' Load the observed nbar from 'data'
     '''
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
@@ -56,46 +56,34 @@ def data_nbar(Mr=21):
     #nbar_var = np.loadtxt(''.join([util.multidat_dir(),
     #                              'nbar_var.Mr', str(Mr),
     #                              '.dat']))
-    return nbar
     #reutrn [nbar, nbar_var]
+    return nbar
 
-
-# --- load 2PCF ---
 def data_xi(Mr=21):
+    ''' Load the observed xi (2PCF) from 'data'
     '''
-    loads the observed xi (2PCF) from 'data'
-    '''
-    dat = np.loadtxt(''.join([util.multidat_dir(),
-                             'data_vector.Mr', str(Mr),
-                             '.dat']))
+    dat = np.loadtxt(''.join([util.multidat_dir(), 'data_vector.Mr', str(Mr), '.dat'])) 
     xi = dat[1:16]
-
     return xi
 
-
-# --- load GMF ---
 def data_gmf(Mr=21):
-    '''
-    loads the observed GMF from 'data'
+    ''' Load the observed GMF from 'data'
     '''
     dat = np.loadtxt(''.join([util.multidat_dir(),
                              'data_vector.Mr', str(Mr),
                              '.dat']))
     gmf = dat[16:]
-
     return gmf
 
-
-# --- load the inverse covariance matrices depending on the observable combination---
 def data_inv_cov(datcombo, Mr=21):
-
+    ''' Load the inverse covariance matrix for given 'datcombo'
+    
+    Parameters
+    ----------
+    datcombo : (string)
+        One of the following strings to specify the observables: 
+        'gmf', 'nbar_gmf', 'nbar_xi', 'nbar_xi_gmf', 'xi' 
     '''
-    loads the inverse covariance matrix 
-
-    arguement = datcombo
-    datcombo = {'gmf','nbar_gmf','nbar_xi','nbar_xi_gmf','xi' }
-    '''
-
     inv_cov_fn = ''.join([util.multidat_dir(),
                          '{0}_inv_cov.Mr'.format(datcombo), str(Mr),
                          '.dat'])
@@ -103,27 +91,18 @@ def data_inv_cov(datcombo, Mr=21):
 
     return inv_cov
 
-# --- load the covariance matrix---
-
 def data_cov(Mr=21):
-
+    ''' Load the entire covariance matrix 
     '''
-    loads the entire covariance matrix 
-    '''
-
     cov_fn = ''.join([util.multidat_dir(),
                          'nbar_xir_gmf_cov.Mr', str(Mr),
                          '.dat'])
     cov = np.loadtxt(cov_fn)
     return cov
 
-#--- load randoms ---
 def data_random():
-
+    ''' Load pregenerated random points
     '''
-    loads pregenerated random points
-    '''
-
     random_file = ''.join([util.multidat_dir(),
                          'randoms',
                          '.dat'])
@@ -132,18 +111,11 @@ def data_random():
     return randoms
 
 
-#--- load RR ---
 def data_RR():
-
+    ''' Load precomputed RR pairs
     '''
-    loads precomputed RR
-    '''
-
-    RR_file = ''.join([util.multidat_dir(),
-                         'RR',
-                         '.dat'])
+    RR_file = ''.join([util.multidat_dir(), 'RR', '.dat'])
     RR = np.loadtxt(RR_file)
-
     return RR
 
 def data_gmf_bins():
@@ -151,27 +123,22 @@ def data_gmf_bins():
     '''
     return gmf_bins()
 
-# Build bin edges for 2PCF calculations
-
 def hardcoded_xi_bins():
-    '''
-    loads the hardcoded xi bin edges.They are spaced out unevenly due to sparseness
+    ''' Load hardcoded xi r-bin edges. They are spaced out unevenly due to sparseness
     at inner r bins. So the first bin ranges from 0.15 to 0.5
     '''
     r_bins = np.concatenate([np.array([0.15]),
                              np.logspace(np.log10(0.5), np.log10(20.), 15)])
     
     #r_bins = np.logspace(-1. , np.log10(17) , 15)
-   
     return r_bins
 
 #Build centers of bins for 2PCF calculations
 
 def build_xi_bins(Mr=21):
+    ''' Build hardcoded r_bin centers for xi and then save to file.
     '''
-    builds and saves the hardcoded r_bin centers for xi.
-    '''
-    rbins=hardcoded_xi_bins()
+    rbins = hardcoded_xi_bins()
     rbin = .5 * (rbins[1:] + rbins[:-1])
     output_file = ''.join([util.multidat_dir(),'xir_rbin.Mr', str(Mr),'.dat'])
     np.savetxt(output_file, rbin)
@@ -226,16 +193,12 @@ def build_randoms_RR(Nr=5e5):
 
 # Build observables ---------------
 def build_nbar_xi_gmf(Mr=21):
-    '''
-    Builds and saves "data" vector <nbar, xi, gmf> and write to file
-
+    ''' Build data vector [nbar, xi, gmf] and save to file 
     This data vector is built from the zeroth slice of the multidark
-
     The other slices will be used for building the covariance matrix.
     
     Note to self : need to shift the positions of random points
     '''
-
     
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
@@ -306,7 +269,6 @@ def build_nbar_xi_gmf(Mr=21):
 
 
 # --- function to build all the covariance matrices and their inverses ---
-
 def build_nbar_xi_gmf_cov(Mr=21):
     '''
     Build covariance matrix for nbar, xi, gmf data vector
@@ -595,6 +557,5 @@ def build_observations(Mr=21):
 
 
 if __name__ == "__main__":
-
     #build_randoms_RR(Nr=5e5)
     build_observations(Mr = 21)
