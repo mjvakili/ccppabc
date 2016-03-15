@@ -258,6 +258,7 @@ def build_nbar_xi_gmf(Mr=21):
                       Lbox = 200 , num_threads='max')
     gids = groups.group_ids
     rich = richness(gids)
+
     gmf = GMF(rich)  # GMF
 
     fullvec = np.append(fullvec, gmf)
@@ -270,20 +271,18 @@ def build_nbar_xi_gmf(Mr=21):
 
 # --- function to build all the covariance matrices and their inverses ---
 def build_nbar_xi_gmf_cov(Mr=21):
-    '''
-    Build covariance matrix for nbar, xi, gmf data vector
-    using realisations of galaxy mocks for "data" HOD
-    parameters in the halos from the other subvolumes
-    (subvolume 1 to subvolume 125) of
-    the simulation.
+    ''' Build covariance matrix for the full nbar, xi, gmf data vector
+    using realisations of galaxy mocks for "data" HOD parameters in the 
+    halos from the other subvolumes (subvolume 1 to subvolume 125) of
+    the simulation. Covariance matrices for different sets of observables
+    can be extracted from the full covariance matrix by slicing through 
+    the indices. 
 
-    Note to self: need to shift the positions of random points 
     '''
     nbars = []
     xir = []
     gmfs = []
     gmf_counts = []
-
 
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr,
@@ -304,7 +303,6 @@ def build_nbar_xi_gmf_cov(Mr=21):
     NR = len(randoms)
 
     for i in xrange(1,125):
-
         print 'mock#', i
 
         # populate the mock subvolume
@@ -349,12 +347,9 @@ def build_nbar_xi_gmf_cov(Mr=21):
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
 
     # save nbar variance
-
     nbar_var = np.var(nbars, axis=0, ddof=1)
-    output_file = ''.join([util.multidat_dir(),
-                          'nbar_var.Mr', str(Mr),
-                          '.dat'])
-    np.savetxt(output_file, [nbar_var])
+    nbar_file = ''.join([util.multidat_dir(), 'nbar_var.Mr', str(Mr), '.dat'])
+    np.savetxt(nbar_file, [nbar_var])
 
     # determine extra poisson noise on gmf
     gmf_counts_mean = np.mean(gmf_counts, axis=0)
@@ -366,170 +361,27 @@ def build_nbar_xi_gmf_cov(Mr=21):
     fulldatarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
                             np.array(xir),
                             np.array(gmfs)))
-
     fullcov = np.cov(fulldatarr.T)
     fullcorr = np.corrcoef(fulldatarr.T)
 
-    print len(gmf_counts_mean)
-    print fullcov.shape
+    # and save the covariance matrix
+    nopoisson_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_cov.no_poisson.Mr', str(Mr), '.dat'])
+    np.savetxt(nopoisson_file, fullcov)
 
     # add in poisson noise for gmf
     for i in range(len(gmf_counts_mean)):
-
-        fullcov[16 + i, 16 + i] += gmf_counts_mean[i] / 200**6.
+        fullcov[1+len(xi) + i, 1+len(xi)+ i] += gmf_counts_mean[i] / 200**6.
+    # save poisson noise for GMF
+    gmf_poisson_file = ''.join([util.multidat_dir(),
+                    'gmf_poisson.Mr', str(Mr), '.dat'])
+    np.savetxt(gmf_poisson_file, gmf_counts_mean)
 
     # and save the covariance matrix
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xi_gmf_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, fullcov)
+    full_cov_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_cov.Mr', str(Mr), '.dat'])
+    np.savetxt(full_cov_file, fullcov)
     # and a correlation matrix
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xi_gmf_corr.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, fullcorr)
-
-    # full covariance matrix inverse
-    N_bins = len(fullcov[0])
-
-    """
-    math:C_{estimate}^-1 = ( (Nmocks - 2 - N_bins) / (Nmock - 1) ) C^-1
-    """
-    f_unbias = (124 - 2. - N_bins) / (124. - 1) 
-    ###inv_c = solve(fullcov , np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xi_gmf_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    ###np.savetxt(outfn, inv_c)
-
-    # inverse for nbar-xi data vector covariance
-    datarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
-                        np.array(xir)))
-
-    nbxicov = np.cov(datarr.T)
-
-    # and save the nbar-xi covariance matrix
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xir_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, nbxicov)
-
-    # and generate and save a correlation matrix for inspection
-    nbxicor = np.corrcoef(datarr.T)
-
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xi_corr.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, nbxicor)
-    # and save the inverse covariance matrix for nbar , xi
-    N_bins = int(np.sqrt(nbxicov.size))
-    f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(nbxicov , np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_xi_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, inv_c)
-
-    # inverse for nbar-gmf data vector covariance
-    datarr = np.hstack((np.array(nbars).reshape(len(nbars), 1),
-                        np.array(gmfs)))
-
-    nbgmfcov = np.cov(datarr.T)
-    nbgmfcor = np.corrcoef(datarr.T)
-
-    # add in poisson noise for gmf
-    for i in range(len(gmf_counts_mean)):
-        nbgmfcov[1 + i, 1 + i] += gmf_counts_mean[i] / 200**6.
-
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_gmf_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, nbgmfcov)
-
-    N_bins = int(np.sqrt(nbgmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    #inv_c = solve(nbgmfcov , np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'nbar_gmf_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    #np.savetxt(outfn, inv_c)
-
-    # inverse for xi-gmf data vector covariance
-    datarr = np.hstack((np.array(xir),
-                        np.array(gmfs)))
-
-    xigmfcov = np.cov(datarr.T)
-    xigmfcor = np.corrcoef(datarr.T)
-
-    # add in poisson noise for gmf
-    for i in range(len(gmf_counts_mean)):
-        xigmfcov[15 + i, 15 + i] += gmf_counts_mean[i] / 200**6.
-
-    outfn = ''.join([util.multidat_dir(),
-                    'xi_gmf_corr.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, xigmfcor)
-
-    # save the covariance matrix for gmf and xi
-    outfn = ''.join([util.multidat_dir(),
-                    'xi_gmf_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, xigmfcov)
-   
-    # save the inverse covariance matrix fot xi and gmf 
-    N_bins = int(np.sqrt(xigmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / (124 - 1.)
-    ###inv_c = solve(xigmfcov , np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'xi_gmf_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    ###np.savetxt(outfn, inv_c)
-
-    # inverse for xi data vector covariance
-    xicov = np.cov(np.array(xir).T)
-    xicor = np.corrcoef(np.array(xir).T)
-
-    outfn = ''.join([util.multidat_dir(),
-                    'xi_corr.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, xicor)
-
-    N_bins = int(np.sqrt(xicov.size))
-    f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    inv_c = solve(xicov , np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'xi_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, inv_c)
-
-    # inverse for gmf data vector covariance
-    gmfcov = np.cov(np.array(gmfs).T)
-    gmfcor = np.corrcoef(np.array(gmfs).T)
-
-    # add in poisson noise for gmf
-    for i in range(len(gmf_counts_mean)):
-        gmfcov[i, i] += gmf_counts_mean[i] / 200**6.
-
-
-    outfn = ''.join([util.multidat_dir(),
-                    'gmf_corr.Mr', str(Mr),
-                    '.dat'])
-    np.savetxt(outfn, gmfcor)
-
-    N_bins = int(np.sqrt(gmfcov.size))
-    f_unbias = (124 - 2. - N_bins) / (124. - 1)
-    ###inv_c = solve(gmfcov, np.eye(N_bins)) * f_unbias
-
-    outfn = ''.join([util.multidat_dir(),
-                    'gmf_inv_cov.Mr', str(Mr),
-                    '.dat'])
-    ###np.savetxt(outfn, inv_c)
-
+    full_corr_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_corr.Mr', str(Mr), '.dat'])
+    np.savetxt(full_corr_file, fullcorr)
     return None
 
 

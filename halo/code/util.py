@@ -66,7 +66,6 @@ def dat_dir():
 
 
 def multidat_dir():
-    '''
-    Dat directory
+    ''' Dat directory
     '''
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/multidark/'

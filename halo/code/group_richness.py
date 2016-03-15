@@ -25,7 +25,9 @@ def gmf_bins():
     '''
     Observed GMF bins. Hardcoded.
     '''
+    bins = np.logspace(np.log10(3.), np.log10(20.), 10)
 
+    """
     bins = np.array([
         3.000000000000000000e+00,
         4.000000000000000000e+00,
@@ -38,8 +40,7 @@ def gmf_bins():
         1.70000000000000000e+01,
         2.500000000000000000e+01,
         4.30000000000000000e+01
-        ]) # same hardcoded bins as data
-    """
+        ]) 
     bins = np.array([
         3.000000000000000000e+00,
         4.000000000000000000e+00,
@@ -70,11 +71,12 @@ def gmf_bins():
     """
     return bins
 
-def gmf(group_richness, counts=False):
+def gmf(group_richness, counts=False, bins=None):
     '''
     Calculate Group Multiplicity Function (GMF) given group richness (see above module).
     '''
-    bins = gmf_bins()
+    if bins is None: 
+        bins = gmf_bins()
 
     if not counts:
         gmeff = np.histogram(group_richness , bins)[0] / 200.**3.   # calculate GMF
