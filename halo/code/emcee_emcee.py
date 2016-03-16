@@ -21,9 +21,9 @@ def lnPost(theta, **kwargs):
         '''log prior 
         '''
         fake_obs = kwargs['data']
-    	fake_obs_icov = kwargs['data_icov']
+    	fake_obs_icov = kwargs['data_cov']
     	kwargs.pop('data', None)
-    	kwargs.pop('data_icov', None)
+    	kwargs.pop('data_cov', None)
     	observables = kwargs['observables']
     	prior_range = kwargs['prior_range']
     	prior_min = prior_range[:,0]
@@ -162,7 +162,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
     hod_kwargs = {
             'prior_range': prior_range, 
             'data': fake_obs, 
-            'data_icov': fake_obs_icov, 
+            'data_cov': fake_obs_cov, 
             'observables': observables, 
             'Mr': data_dict['Mr']
             }
