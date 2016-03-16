@@ -43,7 +43,7 @@ def lnPost(theta, **kwargs):
     def lnlike(theta, **kwargs):
 
     	fake_obs = kwargs['data']
-    	fake_obs_icov = kwargs['data_icov']
+    	fake_obs_cov = kwargs['data_icov']
     	kwargs.pop('data', None)
     	kwargs.pop('data_icov', None)
     	observables = kwargs['observables']
@@ -66,7 +66,7 @@ def lnPost(theta, **kwargs):
 	    nbin = len(res)
             f = (124 - 2 - nbin)/(124 - 1)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
-        neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
+        neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_cov , res)))
         #print neg_chi_tot
     	return neg_chi_tot
 
@@ -96,14 +96,13 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
     if observables == ['xi']:
         fake_obs = Data.data_xi(**data_dict)
         #fake_obs_icov = Data.data_inv_cov('xi', **data_dict)
-        fake_obs_icov = Data.data_cov(**data_dict)[1:16 , 1:16]
+        fake_obs_cov = Data.data_cov(**data_dict)[1:16 , 1:16]
     if observables == ['nbar','xi']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
-        print fake_obs.shape
-        fake_obs_icov = Data.data_cov(**data_dict)[:16 , :16]
+        fake_obs_cov = Data.data_cov(**data_dict)[:16 , :16]
     if observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        fake_obs_icov = Data.data_inv_cov('nbar_gmf', **data_dict)
+        fake_obs_cov = Data.data_cov(**data_dict)[16:,16:]
           
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
