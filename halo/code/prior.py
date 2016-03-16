@@ -31,7 +31,7 @@ def prior_dict_table():
     dict_table = { 
             'first_try': {
                 'prior_min': [10.5, np.log(0.2), 11.8, 0.85, 13.],
-                'prior_max': [13.5, np.log(0.8), 13.8, 1.4, 15.5]
+                'prior_max': [13.5, np.log(0.8), 13.8, 1.45, 15.5]
                 }
             }
             
