@@ -89,8 +89,8 @@ class HODsim(object):
     		    b_para, b_perp = 0.7, 0.15
     	 	    groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                     gids = groups.group_ids
-                    richness = richness(gids)
-                    obvs.append(gmf(richness))                 # calculate GMF
+                    group_richness = richness(gids)
+                    obvs.append(gmf(group_richness))                 # calculate GMF
                 elif obv == 'xi':
                     xi = tpcf(
                         pos, rbins, pos, 
@@ -144,8 +144,8 @@ class HODsim(object):
     		            b_para, b_perp = 0.7, 0.15
     	 	            groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                             gids = groups.group_ids
-                            richness = richness(gids)
-                            obvs.append(gmf(richness))                 # calculate GMF
+                            group_richness = richness(gids)
+                            obvs.append(gmf(group_richness))                 # calculate GMF
                         elif obv == 'xi':
                     	    xi = tpcf(
                                      pos, rbins, pos, 
