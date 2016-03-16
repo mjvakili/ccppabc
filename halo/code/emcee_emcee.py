@@ -43,9 +43,9 @@ def lnPost(theta, **kwargs):
     def lnlike(theta, **kwargs):
 
     	fake_obs = kwargs['data']
-    	fake_obs_cov = kwargs['data_icov']
+    	fake_obs_cov = kwargs['data_cov']
     	kwargs.pop('data', None)
-    	kwargs.pop('data_icov', None)
+    	kwargs.pop('data_cov', None)
     	observables = kwargs['observables']
     	prior_range = kwargs['prior_range']
     	# Likelihood
