@@ -80,12 +80,12 @@ class HODsim(object):
                     obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                 elif obv == 'gmf':
                     #compute group richness    
-    		    galaxy_sample = model.mock.galaxy_table
+    		    galaxy_sample = self.model.mock.galaxy_table
     	 	    x = galaxy_sample['x']
     	            y = galaxy_sample['y']
     	            z = galaxy_sample['z']
     	            vz = galaxy_sample['vz']
-    	            pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    	            pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
     		    b_para, b_perp = 0.7, 0.15
     	 	    groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                     gids = groups.group_ids
@@ -135,12 +135,12 @@ class HODsim(object):
                             group_id = self.model.mock.compute_fof_group_ids(num_threads=1)
                     	    group_richness = richness(group_id)         # group richness of the galaxies
                             #compute group richness    
-    		    	    galaxy_sample = model.mock.galaxy_table
+    		    	    galaxy_sample = self.model.mock.galaxy_table
     	 	            x = galaxy_sample['x']
     	                    y = galaxy_sample['y']
     	                    z = galaxy_sample['z']
     	                    vz = galaxy_sample['vz']
-    	                    pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    	                    pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
     		            b_para, b_perp = 0.7, 0.15
     	 	            groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                             gids = groups.group_ids
