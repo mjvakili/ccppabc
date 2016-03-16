@@ -9,7 +9,6 @@ import scipy.optimize as op
 import util
 import data_multislice as Data
 from hod_sim import HODsim
-from hod_sim import HODsimulator 
 from group_richness import richness
 from prior import PriorRange
 import corner
