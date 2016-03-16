@@ -95,7 +95,7 @@ def data_cov(Mr=21):
     ''' Load the entire covariance matrix 
     '''
     cov_fn = ''.join([util.multidat_dir(),
-                         'nbar_xir_gmf_cov.Mr', str(Mr),
+                         'nbar_xi_gmf_cov.Mr', str(Mr),
                          '.dat'])
     cov = np.loadtxt(cov_fn)
     return cov
@@ -345,7 +345,6 @@ def build_nbar_xi_gmf_cov(Mr=21):
         rich = richness(gids)
         gmfs.append(GMF(rich))  # GMF
         gmf_counts.append(GMF(rich, counts=True))   # Group counts
-
     # save nbar variance
     nbar_var = np.var(nbars, axis=0, ddof=1)
     nbar_file = ''.join([util.multidat_dir(), 'nbar_var.Mr', str(Mr), '.dat'])
