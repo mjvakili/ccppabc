@@ -57,7 +57,7 @@ def test_subvol_gmf(Mr):
 
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
 
-    b_para, b_perp = 0.7, 0.15
+    b_para, b_perp = 0.2, 0.2
     groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
 
@@ -93,7 +93,7 @@ def test_GMFbinning(Mr):
 
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
 
-        b_para, b_perp = 0.7, 0.15
+        b_para, b_perp = 0.2, 0.2
         groups = FoFGroups(pos, b_perp, b_para, period = None, 
                           Lbox = 200 , num_threads='max')
         
@@ -103,20 +103,21 @@ def test_GMFbinning(Mr):
 
     gids = groups.group_ids
     rich = richness(gids)
-    
-    rbins = np.logspace(np.log10(3.), np.log10(20), 11)
+    #print "rich=" , rich
+    rbins = np.logspace(np.log10(3.), np.log10(20), 10)
+    rbins = np.array([1, 2.,3.,4.,5.,6.,7,9,11,14,17,20])
     gmf = GMF(rich, counts=False, bins=rbins)
     gmf_counts = GMF(rich, counts=True, bins=rbins)
 
     print rbins
     print gmf
-
+    print gmf_counts
     fig = plt.figure(1)
     sub = fig.add_subplot(111)
 
     sub.plot(0.5*(rbins[:-1] + rbins[1:]), gmf)
 
-    #sub.set_xscale('log') 
+    sub.set_xscale('log') 
     sub.set_yscale('log') 
     
     plt.show()

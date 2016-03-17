@@ -66,7 +66,7 @@ def lnPost(theta, **kwargs):
             f = (124. - 2. - nbin)/(124. - 1.)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
         neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
-        print neg_chi_tot
+        #print neg_chi_tot
     	return neg_chi_tot
 
     lp = lnprior(theta , **kwargs)
@@ -101,7 +101,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         fake_obs_icov = Data.data_cov(**data_dict)[:16 , :16]
     if observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        fake_obs_icov = np.zeros((10,10))
+        fake_obs_icov = np.zeros((12,12))
         fake_obs_icov[1:,1:] = Data.data_cov(**data_dict)[16: , 16:]
         fake_obs_icov[0,1:] = Data.data_cov(**data_dict)[0 , 16:]
         fake_obs_icov[1:,0] = Data.data_cov(**data_dict)[16: , 0]
@@ -129,7 +129,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         '_Mr', str(data_dict["Mr"]), 
         '.mcmc_chain.dat'
         ])
-    #print chain_file
+    print chain_file
 
     if os.path.isfile(chain_file) and continue_chain:   
         print 'Continuing previous MCMC chain!'
@@ -152,7 +152,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         # Initializing Walkers
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                         2.e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                         1.e-2 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()

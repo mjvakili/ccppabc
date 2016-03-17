@@ -27,17 +27,6 @@ from group_richness import richness
 from group_richness import gmf as GMF
 
 
-def cov2corr(mat):
-    ''' @MJ: What is this code for? 
-    '''
-    numat = np.empty(mat.shape)
-
-    for i in range(mat.shape[0]):
-        for j in range(mat.shape[0]):
-            numat[i, j] = mat[i, j] / (mat[i, i] * mat[j, j])
-
-    return numat
-
 def data_hod_param(Mr=21):
     ''' HOD parameters of 'observations'. Returns dictionary with hod parameters.
     '''
@@ -253,7 +242,7 @@ def build_nbar_xi_gmf(Mr=21):
     vz = galaxy_sample['vz']
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-    b_para, b_perp = 0.7, 0.15
+    b_para, b_perp = 0.2, 0.2
     groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
     gids = groups.group_ids
@@ -338,7 +327,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
         vz = galaxy_sample['vz']
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-        b_para, b_perp = 0.7, 0.15
+        b_para, b_perp = 0.2, 0.2
         groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
         gids = groups.group_ids
