@@ -129,7 +129,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         eps_str = ''
         for pool in abcpmc_sampler.sample(prior, eps):
             #while pool.ratio > 0.01:
-            new_eps_str = '\t'.join(pool.eps.astype('str'))+'\n'
+            new_eps_str = '\t'.join(np.array(pool.eps).astype('str'))+'\n'
             if eps_str != new_eps_str:  # if eps is different, open fiel and append 
                 f = open("abc_tolerance.dat" , "a")
                 eps_str = new_eps_str
@@ -167,28 +167,21 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         return pools
          
     print "Initial launch of the sampler"
-    pools = launch(eps_val)
-    """ 
+    #pools = launch(eps_val)
+     
     print "Restarting ABC-PMC"
 
-    last_thetas = np.loadtxt("/home/mj/abc/halo/gold/nbar_xi_Mr21_theta_t1.mercer.dat")
-    last_ws = np.loadtxt("/home/mj/abc/halo/dat/gold/nbar_xi_Mr21_w_t1.mercer.dat")
-    last_eps = [1.12132735353 , 127.215586776]
+    last_thetas = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_theta_t1.mercer.dat")
+    last_ws = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_w_t1.mercer.dat")
+    last_dists = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_dist_t1.mercer.dat")
+    last_eps = [43.2782109,492.19357011]
     last_time = 1
-
-    last_dists = [] 
-
-    for i in range(last_thetas.shape[0]):
-
-        model_temp = hod_sim(last_thetas)
-
-          
 
     print("Restarting after iteration: %s"%last_time)
     restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
     eps_start = last_eps
     pools2= launch(eps_start, restart_pool)
-    """ 
+     
 if __name__=="__main__": 
 
     Niter = int(sys.argv[1])
