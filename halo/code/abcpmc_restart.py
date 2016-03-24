@@ -113,7 +113,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         return np.array(dists)
 
     def launch(eps_start, init_pool=None):
-        
+        print eps_start 
         eps = abcpmc.ConstEps(T, eps_start)
         mpi_pool = mpi_util.MpiPool()
         pools = []
@@ -129,14 +129,14 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         eps_str = ''
         for pool in abcpmc_sampler.sample(prior, eps):
             #while pool.ratio > 0.01:
-            new_eps_str = '\t'.join(eps(pool.t).astype('str'))+'\n'
+            new_eps_str = '\t'.join(pool.eps.astype('str'))+'\n'
             if eps_str != new_eps_str:  # if eps is different, open fiel and append 
                 f = open("abc_tolerance.dat" , "a")
                 eps_str = new_eps_str
                 f.write(eps_str)
                 f.close()
             print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
-            print eps(pool.t)
+            print pool.eps
             # plot theta
             plot_thetas(pool.thetas, pool.ws , pool.t, 
                     Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, 
@@ -147,8 +147,11 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
                 '_Mr', str(data_dict["Mr"]), '_theta_t', str(pool.t), '.mercer.dat'])
             w_file = ''.join([output_dir, util.observable_id_flag(observables), 
                 '_Mr', str(data_dict["Mr"]), '_w_t', str(pool.t), '.mercer.dat'])
+            dist_file = ''.join([output_dir, util.observable_id_flag(observables), 
+                '_Mr', str(data_dict["Mr"]), '_dist_t', str(pool.t), '.mercer.dat'])
             np.savetxt(theta_file, pool.thetas)
             np.savetxt(w_file, pool.ws)
+            np.savetxt(dist_file , pool.dists)
             if pool.t < 3: 
                 eps.eps = np.percentile(np.atleast_2d(pool.dists), 50 , axis = 0)
             elif (pool.t > 2) and (pool.t < 20):
@@ -162,22 +165,30 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             pools.append(pool)
         abcpmc_sampler.close()
         return pools
-
+         
     print "Initial launch of the sampler"
     pools = launch(eps_val)
-
+    """ 
     print "Restarting ABC-PMC"
 
     last_thetas = np.loadtxt("/home/mj/abc/halo/gold/nbar_xi_Mr21_theta_t1.mercer.dat")
     last_ws = np.loadtxt("/home/mj/abc/halo/dat/gold/nbar_xi_Mr21_w_t1.mercer.dat")
     last_eps = [1.12132735353 , 127.215586776]
-    last_time = 7
-    
+    last_time = 1
+
+    last_dists = [] 
+
+    for i in range(last_thetas.shape[0]):
+
+        model_temp = hod_sim(last_thetas)
+
+          
+
     print("Restarting after iteration: %s"%last_time)
     restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
     eps_start = last_eps
     pools2= launch(eps_start, restart_pool)
-
+    """ 
 if __name__=="__main__": 
 
     Niter = int(sys.argv[1])
