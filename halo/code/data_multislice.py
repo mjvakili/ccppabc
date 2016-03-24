@@ -242,7 +242,7 @@ def build_nbar_xi_gmf(Mr=21):
     vz = galaxy_sample['vz']
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-    b_para, b_perp = 0.2, 0.2
+    b_para, b_perp = 0.75, 0.14
     groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
     gids = groups.group_ids
@@ -327,7 +327,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
         vz = galaxy_sample['vz']
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-        b_para, b_perp = 0.2, 0.2
+        b_para, b_perp = 0.75, 0.14
         groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
         gids = groups.group_ids

@@ -86,7 +86,7 @@ class HODsim(object):
     	            z = galaxy_sample['z']
     	            vz = galaxy_sample['vz']
     	            pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
-    		    b_para, b_perp = 0.2, 0.2
+    		    b_para, b_perp = 0.75, 0.14
     	 	    groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                     gids = groups.group_ids
                     group_richness = richness(gids)
@@ -141,7 +141,7 @@ class HODsim(object):
     	                    z = galaxy_sample['z']
     	                    vz = galaxy_sample['vz']
     	                    pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
-    		            b_para, b_perp = 0.2, 0.2
+    		            b_para, b_perp = 0.75, 0.14
     	 	            groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                             gids = groups.group_ids
                             group_richness = richness(gids)
