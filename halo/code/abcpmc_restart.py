@@ -64,10 +64,15 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         xi_Cii = Cii[1:]
         nbar_Cii = Cii[0]
     elif observables == ['nbar','gmf']:
+        print Data.data_nbar(**data_dict).shape
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
+        print fake_obs
+        print fake_obs.shape
         fake_obs_cov = Data.data_cov(**data_dict)
+        #print fake_obs_cov
+        #print fake_obs_cov.shape
         Cii = np.diag(fake_obs_cov)
-        gmf_Cii = Cii[17:]
+        gmf_Cii = Cii[16:]
         nbar_Cii = Cii[0]
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
@@ -167,20 +172,20 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         return pools
          
     print "Initial launch of the sampler"
-    #pools = launch(eps_val)
+    pools = launch(eps_val)
      
     print "Restarting ABC-PMC"
 
-    last_thetas = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_theta_t1.mercer.dat")
-    last_ws = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_w_t1.mercer.dat")
-    last_dists = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_dist_t1.mercer.dat")
-    last_eps = [43.2782109,492.19357011]
-    last_time = 1
+    #last_thetas = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_theta_t1.mercer.dat")
+    #last_ws = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_w_t1.mercer.dat")
+    #last_dists = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_dist_t1.mercer.dat")
+    #last_eps = [43.2782109,492.19357011]
+    #last_time = 1
 
-    print("Restarting after iteration: %s"%last_time)
-    restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
-    eps_start = last_eps
-    pools2= launch(eps_start, restart_pool)
+    #print("Restarting after iteration: %s"%last_time)
+    #restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
+    #eps_start = last_eps
+    #pools2= launch(eps_start, restart_pool)
      
 if __name__=="__main__": 
 
