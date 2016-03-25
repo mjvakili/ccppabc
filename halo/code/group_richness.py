@@ -26,7 +26,7 @@ def gmf_bins():
     Observed GMF bins. Hardcoded.
     '''
     #bins = np.logspace(np.log10(2.), np.log10(22), 10)
-    bins = np.array([1, 2.,3.,4.,5.,6.,7,9,11,14,17,20])
+    bins = np.array([2.,3.,4.,5.,6.,7,9,11,14,17,20])
 
     """
     bins = np.array([

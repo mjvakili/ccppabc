@@ -84,7 +84,7 @@ def data_cov(Mr=21):
     ''' Load the entire covariance matrix 
     '''
     cov_fn = ''.join([util.multidat_dir(),
-                         'nbar_xi_gmf_cov.Mr', str(Mr),
+                         'nbar_xi_gmf_cov.no_poisson.Mr', str(Mr),
                          '.dat'])
     cov = np.loadtxt(cov_fn)
     return cov
@@ -242,7 +242,7 @@ def build_nbar_xi_gmf(Mr=21):
     vz = galaxy_sample['vz']
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-    b_para, b_perp = 0.75, 0.14
+    b_para, b_perp = 0.5, 0.2
     groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
     gids = groups.group_ids
@@ -327,7 +327,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
         vz = galaxy_sample['vz']
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
                                , velocity = vz , velocity_distortion_dimension="z")
-        b_para, b_perp = 0.75, 0.14
+        b_para, b_perp = 0.5, 0.2
         groups = FoFGroups(pos, b_perp, b_para, period = None, 
                       Lbox = 200 , num_threads='max')
         gids = groups.group_ids

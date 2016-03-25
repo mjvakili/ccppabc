@@ -163,7 +163,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
                 eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
                 abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
             else:
-                eps.eps = np.percentile(np.atleast_2d(pool.dists), 90 , axis = 0)
+                eps.eps = np.percentile(np.atleast_2d(pool.dists), 75 , axis = 0)
                 abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
             #if eps.eps < eps_min:
             #eps.eps = eps_min
@@ -172,20 +172,20 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         return pools
          
     print "Initial launch of the sampler"
-    pools = launch(eps_val)
+    #pools = launch(eps_val)
      
     print "Restarting ABC-PMC"
 
-    #last_thetas = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_theta_t1.mercer.dat")
-    #last_ws = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_w_t1.mercer.dat")
-    #last_dists = np.loadtxt("/home/mj/abc/halo/dat/nbar_xi_Mr21_dist_t1.mercer.dat")
-    #last_eps = [43.2782109,492.19357011]
-    #last_time = 1
+    last_thetas = np.loadtxt("/home/mj/abc/halo/dat/nbar_gmf_Mr21_theta_t11.mercer.dat")
+    last_ws = np.loadtxt("/home/mj/abc/halo/dat/nbar_gmf_Mr21_w_t11.mercer.dat")
+    last_dists = np.loadtxt("/home/mj/abc/halo/dat/nbar_gmf_Mr21_dist_t11.mercer.dat")
+    last_eps = [0.0244727,10.20701988]
+    last_time = 11
 
-    #print("Restarting after iteration: %s"%last_time)
-    #restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
-    #eps_start = last_eps
-    #pools2= launch(eps_start, restart_pool)
+    print("Restarting after iteration: %s"%last_time)
+    restart_pool = abcpmc.PoolSpec(last_time, None, None, last_thetas, last_dists, last_ws)
+    eps_start = last_eps
+    pools2= launch(eps_start, restart_pool)
      
 if __name__=="__main__": 
 
