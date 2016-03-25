@@ -101,7 +101,9 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         fake_obs_icov = Data.data_cov(**data_dict)[:16 , :16]
     if observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        fake_obs_icov = np.zeros((12,12))
+        fake_obs_icov = np.zeros((11,11))
+        print Data.data_cov(**data_dict)[16: , 16:].shape
+
         fake_obs_icov[1:,1:] = Data.data_cov(**data_dict)[16: , 16:]
         fake_obs_icov[0,1:] = Data.data_cov(**data_dict)[0 , 16:]
         fake_obs_icov[1:,0] = Data.data_cov(**data_dict)[16: , 0]
@@ -152,7 +154,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         # Initializing Walkers
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
-                         1.e-2 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
+                         5.e-2 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
 
     # Initializing MPIPool
     pool = MPIPool()
