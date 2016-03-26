@@ -29,27 +29,29 @@ def plot_data(Mr = 21 , output_dir = None):
         fig_dir = output_dir
 
     cov = Data.data_cov()
-
     xi_err = np.sqrt(np.diag(cov)[1:16])
     gmf_err = np.sqrt(np.diag(cov)[16:]) 
    
-    fig , axes = pl.subplots(2, 1, figsize=(10, 10))
+    fig , axes = plt.subplots(1, 2, figsize=(10, 5))
     fig.subplots_adjust(wspace=0.4, hspace=0.4)
-    ax = axes[0, 0]
+    ax = axes[0]
     x = Data.hardcoded_xi_bins()
     y = Data.data_xi() 
     ax.errorbar(0.5*(x[:-1]+x[1:]), y, yerr=xi_err, fmt=".k", capsize=0)
-    ax.set_xlim(0, 20)
-    ax.set_xlabel("$r \,[\mathrm{Mpc}/h]$")
-    ax.set_ylabel("\xi(r)")
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.set_xlim(0.2, 22)
+    ax.set_xlabel(r'$r[\mathrm{Mpc}/h]$')
+    ax.set_ylabel(r'$\xi(r)$')
     
-    ax = axes[0, 1]
+    ax = axes[1]
     x = Data.gmf_bins()
     y = Data.data_gmf() 
     ax.errorbar(0.5*(x[:-1]+x[1:]), y, yerr=gmf_err, fmt=".k", capsize=0)
-    ax.set_xlim(1, 25)
-    ax.set_xlabel("Group Richness $N$")
-    ax.set_ylabel("\zeta(N)")
+    ax.set_xlim(1, 20)
+    ax.set_yscale('log')
+    ax.set_xlabel(r'Group Richness $N$')
+    ax.set_ylabel(r'$\zeta(N)$')
 
     fig_file = ''.join([fig_dir, "data", '_Mr', str(Mr),'.pdf'])
     plt.savefig(fig_file)
@@ -484,9 +486,4 @@ def plot_covars(data_dict={'Mr':20}, harmattan=True):
 
 
 if __name__=='__main__':
-    #plot_posterior_model('xi',
-    #        abc_theta_file="../dat/nbar_gmf_Mr20_theta_t18.dat",
-    #        data_dict={'Mr':20, 'Nmock':500}, clobber=True)
-    #plot_mcmc(100, Niter=1000, Mr=21, observables=['xi'])
-    #plot_mcmc(250, Niter=6000, Nchains_burn=150, Mr=21, observables=['nbar','gmf'])
     plot_data(Mr = 21)
