@@ -64,13 +64,8 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         xi_Cii = Cii[1:]
         nbar_Cii = Cii[0]
     elif observables == ['nbar','gmf']:
-        print **data_dict
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        #print fake_obs
-        #print fake_obs.shape
         fake_obs_cov = Data.data_cov(**data_dict)
-        #print fake_obs_cov
-        #print fake_obs_cov.shape
         Cii = np.diag(fake_obs_cov)
         gmf_Cii = Cii[16:]
         nbar_Cii = Cii[0]
