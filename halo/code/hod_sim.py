@@ -85,9 +85,9 @@ class HODsim(object):
     	            y = galaxy_sample['y']
     	            z = galaxy_sample['z']
     	            vz = galaxy_sample['vz']
-    	            pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    	            rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
     		    b_para, b_perp = 0.5, 0.2
-    	 	    groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+    	 	    groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                     gids = groups.group_ids
                     group_richness = richness(gids)
                     obvs.append(gmf(group_richness))                 # calculate GMF
@@ -138,9 +138,9 @@ class HODsim(object):
     	                    y = galaxy_sample['y']
     	                    z = galaxy_sample['z']
     	                    vz = galaxy_sample['vz']
-    	                    pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    	                    rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
     		            b_para, b_perp = 0.5, 0.2
-    	 	            groups = FoFGroups(pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+    	 	            groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
                             gids = groups.group_ids
                             group_richness = richness(gids)
                             obvs.append(gmf(group_richness))                 # calculate GMF
@@ -184,3 +184,130 @@ class HODsim(object):
                         obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
                 return obvs
 
+class HODsim2(object):
+
+    def __init__(self, Mr=21):
+        '''
+        Class object that describes our forward model used in AMC-PMC inference.
+        Our model forward models the galaxy catalog using HOD parameters using HaloTools.
+        '''
+        self.Mr = Mr
+        thr = -1. * np.float(Mr)
+        self.model = PrebuiltHodModelFactory('zheng07', threshold=thr,
+                                           halocat='multidark', redshift=0.)
+        self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+        self.RR = data_RR()
+        self.randoms = data_random()
+        self.NR = len(self.randoms)
+
+    def sum_stat(self, theta, prior_range=None, observables=['nbar', 'gmf']):
+        '''
+        Given theta, sum_stat calculates the observables from our forward model
+
+        Parameters
+        ----------
+        theta : (self explanatory)
+        prior_range : If specified, checks to make sure that theta is within the prior range.
+        '''
+        self.model.param_dict['logM0'] = theta[0]
+        self.model.param_dict['sigma_logM'] = np.exp(theta[1])
+        self.model.param_dict['logMmin'] = theta[2]
+        self.model.param_dict['alpha'] = theta[3]
+        self.model.param_dict['logM1'] = theta[4]
+
+        rbins = hardcoded_xi_bins()
+        rmax = rbins.max()
+        period = None
+        approx_cell1_size = [rmax , rmax , rmax]
+        approx_cellran_size = [rmax , rmax , rmax]
+
+        if prior_range is None:
+            
+            self.model.populate_mock(simname='multidark')
+            pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
+            obvs = []
+
+            for obv in observables:
+                if obv == 'nbar':
+                    obvs.append(len(pos) / 1000.**3.)       # nbar of the galaxy catalog
+                elif obv == 'gmf':
+                    #compute group richness    
+    		    galaxy_sample = self.model.mock.galaxy_table
+    	 	    x = galaxy_sample['x']
+    	            y = galaxy_sample['y']
+    	            z = galaxy_sample['z']
+    	            vz = galaxy_sample['vz']
+    	            pos_rsd = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		    b_para, b_perp = 0.5, 0.2
+                    groups = FoFGroups(pos_rsd, b_perp, b_para, Lbox = self.model.mock.Lbox, num_threads=1)
+                    gids = groups.group_ids
+                    group_richness = richness(gids)
+                    obvs.append(gmf(group_richness))                 # calculate GMF
+                elif obv == 'xi':
+                    xi = tpcf(pos, rbins, period = self.model.mock.Lbox, max_sample_size=int(2e5), estimator='Landy-Szalay', num_threads = 1)
+                    obvs.append(xi)
+                else:
+                    raise NotImplementedError('Only nbar 2pcf, gmf implemented so far')
+
+            return obvs
+
+        else:
+            if np.all((prior_range[:,0] < theta) & (theta < prior_range[:,1])):
+                # if all theta_i is within prior range ...
+                try:
+
+
+                    self.model.populate_mock(simname='multidark') 
+                    pos=three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
+            	    obvs = []
+
+            	    for obv in observables:
+                        if obv == 'nbar':
+                            #print len(pos)
+                    	    obvs.append(len(pos) / 1000**3.)       # nbar of the galaxy catalog
+                        elif obv == 'gmf':
+                            #compute group richness    
+    		    	    galaxy_sample = self.model.mock.galaxy_table
+    	 	            x = galaxy_sample['x']
+    	                    y = galaxy_sample['y']
+    	                    z = galaxy_sample['z']
+    	                    vz = galaxy_sample['vz']
+    	                    pos_rsd = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		            b_para, b_perp = 0.5, 0.2
+    	 	            groups = FoFGroups(pos_rsd, b_perp, b_para, Lbox = self.model.mock.Lbox , num_threads=1)
+                            gids = groups.group_ids
+                            group_richness = richness(gids)
+                            obvs.append(gmf(group_richness))                 # calculate GMF
+                        elif obv == 'xi':
+                            #print self.model.mock.Lbox
+                            xi = tpcf(pos, rbins, period = self.model.mock.Lbox, max_sample_size=int(2e5), estimator='Landy-Szalay', num_threads = 1)
+                            #print "khar"
+                    	    obvs.append(xi)
+                        else:
+                            raise NotImplementedError('Only nbar, tpcf, and gmf are implemented so far')
+
+                    return obvs
+
+                except ValueError:
+
+                    obvs = []
+                    for obv in observables:
+                        if obv == 'nbar':
+                            obvs.append(10.)
+                        elif obv == 'gmf':
+                            bins = data_gmf_bins()
+                            obvs.append(np.ones_like(bins)[:-1]*1000.)
+                        elif obv == 'xi':
+                            obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                    return obvs
+            else:
+                obvs = []
+                for obv in observables:
+                    if obv == 'nbar':
+                        obvs.append(10.)
+                    elif obv == 'gmf':
+                        bins = data_gmf_bins()
+                        obvs.append(np.ones_like(bins)[:-1]*1000.)
+                    elif obv == 'xi':
+                        obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                return obvs
