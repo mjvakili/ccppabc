@@ -55,17 +55,17 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     #Initializing the vector of observables and inverse covariance matrix
     if observables == ['xi']:
         fake_obs = Data.data_xi(**data_dict)
-        fake_obs_cov = Data.data_cov(**data_dict)[1:16 , 1:16]
+        fake_obs_cov = Data.data_abc_cov(**data_dict)[1:16 , 1:16]
         xi_Cii = np.diag(fake_obs_cov)
     elif observables == ['nbar','xi']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
-        fake_obs_cov = Data.data_cov(**data_dict)[:16 , :16]
+        fake_obs_cov = Data.data_abc_cov(**data_dict)[:16 , :16]
         Cii = np.diag(fake_obs_cov)
         xi_Cii = Cii[1:]
         nbar_Cii = Cii[0]
     elif observables == ['nbar','gmf']:
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        fake_obs_cov = Data.data_cov(**data_dict)
+        fake_obs_cov = Data.data_abc_cov(**data_dict)
         Cii = np.diag(fake_obs_cov)
         gmf_Cii = Cii[16:]
         nbar_Cii = Cii[0]
