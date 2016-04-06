@@ -81,10 +81,21 @@ def data_inv_cov(datcombo, Mr=21):
     return inv_cov
 
 def data_cov(Mr=21):
-    ''' Load the entire covariance matrix 
+    ''' Load the entire covariance matrix with sample variance,
+        Note: this is for MCMC
     '''
     cov_fn = ''.join([util.multidat_dir(),
                          'nbar_xi_gmf_cov.no_poisson.Mr', str(Mr),
+                         '.dat'])
+    cov = np.loadtxt(cov_fn)
+    return cov
+
+def data_abc_cov(Mr=21):
+    ''' Load the entire covariance matrix with shot noise,
+        Note: this is for ABC
+    '''
+    cov_fn = ''.join([util.multidat_dir(),
+                         'abc_nbar_xi_gmf_cov.no_poisson.Mr', str(Mr),
                          '.dat'])
     cov = np.loadtxt(cov_fn)
     return cov
