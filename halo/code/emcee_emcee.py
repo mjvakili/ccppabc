@@ -8,7 +8,7 @@ import scipy.optimize as op
 # --- Local ---
 import util
 import data_multislice as Data
-from hod_sim import HODsim
+from hod_sim import HODsim2
 from group_richness import richness
 from prior import PriorRange
 import corner
@@ -131,7 +131,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         '_Mr', str(data_dict["Mr"]), 
         '.mcmc_chain.dat'
         ])
-    print chain_file
+    #print chain_file
 
     if os.path.isfile(chain_file) and continue_chain:   
         print 'Continuing previous MCMC chain!'
@@ -171,6 +171,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
             'Mr': data_dict['Mr']
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=hod_kwargs)
+    #pos0 = np.loadtxt("../datnbar_xi_Mr21.mcmc_chain.dat")[:-100,:]
     # Initializing Walkers 
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
@@ -289,7 +290,7 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 
 if __name__=="__main__": 
 
-    generator = HODsim(Mr = 21)
+    generator = HODsim2(Mr = 21)
     continue_chain = False
     Nwalkers = int(sys.argv[1])
     print 'N walkers = ', Nwalkers
@@ -308,7 +309,7 @@ if __name__=="__main__":
     print 'Observables: ', ', '.join(obv_list)
     out_dir = sys.argv[4]
     print 'Output to ', out_dir
-    mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
+    mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)# , continue_chain = False)
     """
     if len(sys.argv) == 4:
         out_dir = sys.argv[4]
