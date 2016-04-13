@@ -30,8 +30,8 @@ class HODsim(object):
         '''
         self.Mr = Mr
         thr = -1. * np.float(Mr)
-        self.model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                           halocat='multidark', redshift=0.)
+        self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
+        self.halocat = CachedHaloCatalog('multidark', redshift=0. , halofinder = 'rockstar')
         self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
         self.RR = data_RR()
         self.randoms = data_random()
@@ -62,7 +62,7 @@ class HODsim(object):
             
             rint = np.random.randint(1, 125)
             simsubvol = lambda x: util.mask_func(x, rint)
-            self.model.populate_mock(simname='multidark',
+            self.model.populate_mock(self.halocat,
                             masking_function=simsubvol,
                             enforce_PBC=False)
            
@@ -115,7 +115,7 @@ class HODsim(object):
 
                     rint = np.random.randint(1, 125)
                     simsubvol = lambda x: util.mask_func(x, rint)
-                    self.model.populate_mock(simname='multidark',
+                    self.model.populate_mock(self.halocat,
                                 masking_function=simsubvol,
                                 enforce_PBC=False)
            
