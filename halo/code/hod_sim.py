@@ -31,8 +31,7 @@ class HODsim(object):
         self.Mr = Mr
         thr = -1. * np.float(Mr)
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
-        self.halocat = CachedHaloCatalog('multidark', redshift=0. , halofinder = 'rockstar')
-        self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+        self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
         self.RR = data_RR()
         self.randoms = data_random()
         self.NR = len(self.randoms)
@@ -79,18 +78,26 @@ class HODsim(object):
                 if obv == 'nbar':
                     obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                 elif obv == 'gmf':
-                    #compute group richness    
-    		    galaxy_sample = self.model.mock.galaxy_table
-    	 	    x = galaxy_sample['x']
-    	            y = galaxy_sample['y']
-    	            z = galaxy_sample['z']
-    	            vz = galaxy_sample['vz']
-    	            rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
-    		    b_para, b_perp = 0.75, 0.14
-    	 	    groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
-                    gids = groups.group_ids
-                    group_richness = richness(gids)
-                    obvs.append(gmf(group_richness))                 # calculate GMF
+                    #compute group richness 
+                    nbar = len(pos) / 200**3.
+    		    b_normal = 0.75
+    		    b = b_normal * (nbar)**(-1./3) 
+    		    groups = pyfof.friends_of_friends(pos , b)
+    		    w = np.array([len(x) for x in groups])
+    		    gbins = data_gmf_bins()
+    		    gmf = np.histogram(w , gbins)[0] / (200.**3.)
+                    obvs.append(gmf)   
+    		    #galaxy_sample = self.model.mock.galaxy_table
+    	 	    #x = galaxy_sample['x']
+    	            #y = galaxy_sample['y']
+    	            #z = galaxy_sample['z']
+    	            #vz = galaxy_sample['vz']
+    	            #rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		    #b_para, b_perp = 0.75, 0.14
+    	 	    #groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+                    #gids = groups.group_ids
+                    #group_richness = richness(gids)
+                    #obvs.append(gmf(group_richness))                 # calculate GMF
                 elif obv == 'xi':
                     xi = tpcf(
                         pos, rbins, pos, 
@@ -132,18 +139,27 @@ class HODsim(object):
                         if obv == 'nbar':
                     	    obvs.append(len(pos) / 200**3.)       # nbar of the galaxy catalog
                         elif obv == 'gmf':
+                            
+                            nbar = len(pos) / 200**3.
+    		    	    b_normal = 0.75
+    		            b = b_normal * (nbar)**(-1./3) 
+    		            groups = pyfof.friends_of_friends(pos , b)
+    		            w = np.array([len(x) for x in groups])
+    		    	    gbins =data_gmf_bins()
+    		            gmf = np.histogram(w , gbins)[0] / (200.**3.)
+                    	    obvs.append(gmf)   
                             #compute group richness    
-    		    	    galaxy_sample = self.model.mock.galaxy_table
-    	 	            x = galaxy_sample['x']
-    	                    y = galaxy_sample['y']
-    	                    z = galaxy_sample['z']
-    	                    vz = galaxy_sample['vz']
-    	                    rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
-    		            b_para, b_perp = 0.75, 0.14
-    	 	            groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
-                            gids = groups.group_ids
-                            group_richness = richness(gids)
-                            obvs.append(gmf(group_richness))                 # calculate GMF
+    		    	    #galaxy_sample = self.model.mock.galaxy_table
+    	 	            #x = galaxy_sample['x']
+    	                    #y = galaxy_sample['y']
+    	                    #z = galaxy_sample['z']
+    	                    #vz = galaxy_sample['vz']
+    	                    #rsd_pos = three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z', velocity = vz , velocity_distortion_dimension="z")
+    		            #b_para, b_perp = 0.75, 0.14
+    	 	            #groups = FoFGroups(rsd_pos, b_perp, b_para, period = None, Lbox = 200 , num_threads=1)
+                            #gids = groups.group_ids
+                            #group_richness = richness(gids)
+                            #obvs.append(gmf(group_richness))                 # calculate GMF
                         elif obv == 'xi':
                     	    xi = tpcf(
                                      pos, rbins, pos, 

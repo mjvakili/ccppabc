@@ -1,17 +1,12 @@
 '''
-
-
 module for building and loading all the possible data and covariance
 combinations that can come up in the generalised inference
-
-
-
 '''
 #general python modules
 import numpy as np
 from multiprocessing import cpu_count
 from numpy.linalg import solve
-
+import pyfof
 #haltools functions
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
@@ -201,12 +196,12 @@ def build_nbar_xi_gmf(Mr=21):
     '''
     
     thr = -1. * np.float(Mr)
-    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                    halocat='multidark', redshift=0.)
+    model = PrebuiltHodModelFactory('zheng07', threshold=thr)
+    halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
     datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(simname='multidark',
+    model.populate_mock(halocat,
                         masking_function=datsubvol,
                         enforce_PBC=False)
     
@@ -223,19 +218,18 @@ def build_nbar_xi_gmf(Mr=21):
     #compute number density    
 
     nbar = len(pos) / 200**3.
-
     #load randoms and RRs
     
     randoms = data_random()
     RR = data_RR()
     NR = len(randoms)
-    
+ 
     #compue tpcf with Landy-Szalay estimator
 
     data_xir = tpcf(
             pos, rbins, pos, 
-            randoms=randoms, period = period, 
-            max_sample_size=int(1e5), estimator='Landy-Szalay', 
+            randoms=randoms, period = None, 
+            max_sample_size=int(2e5), estimator='Landy-Szalay', 
             approx_cell1_size=approx_cell1_size, 
             approx_cellran_size=approx_cellran_size, 
             RR_precomputed = RR, 
@@ -243,23 +237,32 @@ def build_nbar_xi_gmf(Mr=21):
 
 
     fullvec = np.append(nbar, data_xir)
+    
+    #compute gmf
+
+    b_normal = 0.75
+    b = b_normal * (nbar)**(-1./3) 
+    groups = pyfof.friends_of_friends(pos , b)
+    w = np.array([len(x) for x in groups])
+    gbins = gmf_bins()
+    gmf = np.histogram(w , gbins)[0] / (200.**3.)
+    
 
     #compute group richness    
 
-    galaxy_sample = model.mock.galaxy_table
-    x = galaxy_sample['x']
-    y = galaxy_sample['y']
-    z = galaxy_sample['z']
-    vz = galaxy_sample['vz']
-    pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
-                               , velocity = vz , velocity_distortion_dimension="z")
-    b_para, b_perp = 0.5, 0.2
-    groups = FoFGroups(pos, b_perp, b_para, period = None, 
-                      Lbox = 200 , num_threads='max')
-    gids = groups.group_ids
-    rich = richness(gids)
-
-    gmf = GMF(rich)  # GMF
+    #galaxy_sample = model.mock.galaxy_table
+    #x = galaxy_sample['x']
+    #y = galaxy_sample['y']
+    #z = galaxy_sample['z']
+    #vz = galaxy_sample['vz']
+    #pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
+    #                           , velocity = vz , velocity_distortion_dimension="z")
+    #b_para, b_perp = 0.5, 0.2
+    #groups = FoFGroups(pos, b_perp, b_para, period = None, 
+    #                  Lbox = 200 , num_threads='max')
+    #gids = groups.group_ids
+    #rich = richness(gids)
+    #gmf = GMF(rich)  # GMF
 
     fullvec = np.append(fullvec, gmf)
 
@@ -285,8 +288,8 @@ def build_nbar_xi_gmf_cov(Mr=21):
     gmf_counts = []
 
     thr = -1. * np.float(Mr)
-    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                    halocat='multidark', redshift=0.)
+    model = PrebuiltHodModelFactory('zheng07', threshold=thr)
+    halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
     
     #some settings for tpcf calculations
@@ -307,12 +310,13 @@ def build_nbar_xi_gmf_cov(Mr=21):
 
         # populate the mock subvolume
         mocksubvol = lambda x: util.mask_func(x, i)
-        model.populate_mock(simname='multidark',
+        model.populate_mock(halocat,
                             masking_function=mocksubvol,
                             enforce_PBC=False)
         # returning the positions of galaxies
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
         # calculate nbar
+        
         nbars.append(len(pos) / 200**3.)
         # translate the positions of randoms to the new subbox
         xi , yi , zi = util.random_shifter(i)
@@ -324,34 +328,45 @@ def build_nbar_xi_gmf_cov(Mr=21):
         xi = tpcf(
             pos, rbins, pos, 
             randoms=temp_randoms, period = period, 
-            max_sample_size=int(1e5), estimator='Landy-Szalay', 
+            max_sample_size=int(3e5), estimator='Landy-Szalay', 
             approx_cell1_size=approx_cell1_size, 
             approx_cellran_size=approx_cellran_size,
             RR_precomputed = RR,
 	    NR_precomputed = NR)
         xir.append(xi)
         # calculate gmf
-        galaxy_sample = model.mock.galaxy_table
-        x = galaxy_sample['x']
-        y = galaxy_sample['y']
-        z = galaxy_sample['z']
-        vz = galaxy_sample['vz']
-        pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
-                               , velocity = vz , velocity_distortion_dimension="z")
-        b_para, b_perp = 0.5, 0.2
-        groups = FoFGroups(pos, b_perp, b_para, period = None, 
-                      Lbox = 200 , num_threads='max')
-        gids = groups.group_ids
-        rich = richness(gids)
-        gmfs.append(GMF(rich))  # GMF
-        gmf_counts.append(GMF(rich, counts=True))   # Group counts
+
+
+        b_normal = 0.75
+        nbar = len(pos) / 200**3.
+        b = b_normal * (nbar)**(-1./3) 
+        groups = pyfof.friends_of_friends(pos , b)
+    	w = np.array([len(x) for x in groups])
+    	gbins = gmf_bins()
+    	gmf = np.histogram(w , gbins)[0] / 200.**3.
+        gmfs.append(gmf)
+
+        #galaxy_sample = model.mock.galaxy_table
+        #x = galaxy_sample['x']
+        #y = galaxy_sample['y']
+        #z = galaxy_sample['z']
+        #vz = galaxy_sample['vz']
+        #pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
+        #                               , velocity = vz , velocity_distortion_dimension="z")
+        #b_para, b_perp = 0.5, 0.2
+        #groups = FoFGroups(pos, b_perp, b_para, period = None, 
+        #              Lbox = 200 , num_threads='max')
+        #gids = groups.group_ids
+        #rich = richness(gids)
+        #gmfs.append(GMF(rich))  # GMF
+        #gmf_counts.append(GMF(rich, counts=True))   # Group counts
     # save nbar variance
     nbar_var = np.var(nbars, axis=0, ddof=1)
     nbar_file = ''.join([util.multidat_dir(), 'nbar_var.Mr', str(Mr), '.dat'])
     np.savetxt(nbar_file, [nbar_var])
 
     # determine extra poisson noise on gmf
-    gmf_counts_mean = np.mean(gmf_counts, axis=0)
+    #gmf_counts_mean = np.mean(gmf_counts, axis=0)
 
     # write full covariance matrix of various combinations of the data
     # and invert for the likelihood evaluations
@@ -368,16 +383,16 @@ def build_nbar_xi_gmf_cov(Mr=21):
     np.savetxt(nopoisson_file, fullcov)
 
     # add in poisson noise for gmf
-    for i in range(len(gmf_counts_mean)):
-        fullcov[1+len(xi) + i, 1+len(xi)+ i] += gmf_counts_mean[i] / 200**6.
+    #for i in range(len(gmf_counts_mean)):
+    #    fullcov[1+len(xi) + i, 1+len(xi)+ i] += gmf_counts_mean[i] / 200**6.
     # save poisson noise for GMF
-    gmf_poisson_file = ''.join([util.multidat_dir(),
-                    'gmf_poisson.Mr', str(Mr), '.dat'])
-    np.savetxt(gmf_poisson_file, gmf_counts_mean)
+    #gmf_poisson_file = ''.join([util.multidat_dir(),
+    #                'gmf_poisson.Mr', str(Mr), '.dat'])
+    #np.savetxt(gmf_poisson_file, gmf_counts_mean)
 
     # and save the covariance matrix
-    full_cov_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_cov.Mr', str(Mr), '.dat'])
-    np.savetxt(full_cov_file, fullcov)
+    #full_cov_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_cov.Mr', str(Mr), '.dat'])
+    #np.savetxt(full_cov_file, fullcov)
     # and a correlation matrix
     full_corr_file = ''.join([util.multidat_dir(), 'nbar_xi_gmf_corr.Mr', str(Mr), '.dat'])
     np.savetxt(full_corr_file, fullcorr)
