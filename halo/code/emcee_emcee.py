@@ -66,7 +66,7 @@ def lnPost(theta, **kwargs):
             f = (124. - 2. - nbin)/(124. - 1.)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
         neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
-        #print neg_chi_tot
+        print neg_chi_tot
     	return neg_chi_tot
 
     lp = lnprior(theta , **kwargs)
@@ -155,7 +155,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                          5.e-2 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
-
+        print pos0.shape
     # Initializing MPIPool
     pool = MPIPool()
     if not pool.is_master():
@@ -171,10 +171,12 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
             'Mr': data_dict['Mr']
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=hod_kwargs)
-    #pos0 = np.loadtxt("../datnbar_xi_Mr21.mcmc_chain.dat")[:-100,:]
+    #pos0 = np.loadtxt("../datnbar_xi_Mr21.mcmc_chain.dat")[-100:,:]
+    #print pos0.shape
     # Initializing Walkers 
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
+        #print position
         f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
             output_str = '\t'.join(position[k].astype('str')) + '\n'
@@ -269,7 +271,7 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
         random_guess = np.array([11. , np.log(.4) , 11.5 , 1.0 , 13.5])
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                 1e-1 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
-
+        print pos0.shape
     # Initializing the emcee sampler
     hod_kwargs = {
             'prior_range': prior_range, 
@@ -282,6 +284,7 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
     
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
         position = result[0]
+        print "position=" , position
         f = open(chain_file, 'a')
         for k in range(position.shape[0]): 
             output_str = '\t'.join(position[k].astype('str')) + '\n'
