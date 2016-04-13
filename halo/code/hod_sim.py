@@ -2,7 +2,7 @@
 HaloTools HOD Simulation
 '''
 import numpy as np
-
+import pyfof
 #haltools functions
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
