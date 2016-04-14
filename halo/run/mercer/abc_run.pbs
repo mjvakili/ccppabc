@@ -1,21 +1,21 @@
 #!/bin/bash
 
-#PBS -l nodes=3:ppn=20,mem=550GB
-#PBS -l walltime=48:00:00
-#PBS -N openmpi_abc_run
-#PBS -M chh327@nyu.edu,sw77@nyu.edu
+#PBS -l nodes=1:ppn=5,mem=300GB
+#PBS -l walltime=2:00:00
+#PBS -N abcgmf
+#PBS -M mv1003@nyu.edu
 #PBS -m abe
 #PBS -j oe
  
 module purge
 module load mpi4py/openmpi/intel/1.3.1
 module load numpy/intel/1.10.1
-
-cd /scratch/chh327/shenglong-test/abc_run_openmpi
+module load pyfof/intel/0.1.2
+cd /scratch/mv1003/
 
 mpiexec \
-    python /home/chh327/project/ccppabc/halo/code/abc_pemcee.py \
-    20 1000 "nbarxigmf" $(pwd)
+    python /work/mv1003/abc2/ccppabc/halo/code/abcpmc_restart.py \
+    30 1000 "nbargmf" $(pwd)
 
 # leave a blank line at the end
  
