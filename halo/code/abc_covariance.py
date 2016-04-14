@@ -21,7 +21,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
     '''
     nbars = []
     xir = []
-    #gmfs = []
+    gmfs = []
 
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr)
