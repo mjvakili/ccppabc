@@ -1,4 +1,5 @@
 import numpy as np
+import pyfof
 from halotools.sim_manager import CachedHaloCatalog
 from halotools.empirical_models import PrebuiltHodModelFactory
 from halotools.mock_observables import tpcf
@@ -20,11 +21,11 @@ def build_nbar_xi_gmf_cov(Mr=21):
     '''
     nbars = []
     xir = []
-    gmfs = []
+    #gmfs = []
 
     thr = -1. * np.float(Mr)
-    model = PrebuiltHodModelFactory('zheng07', threshold=thr,
-                                    halocat='multidark', redshift=0.)
+    model = PrebuiltHodModelFactory('zheng07', threshold=thr)
+    halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
     #some settings for tpcf calculations
     rbins = hardcoded_xi_bins()
 
@@ -32,7 +33,7 @@ def build_nbar_xi_gmf_cov(Mr=21):
         print 'mock#', i
 
         # populate the mock subvolume
-        model.populate_mock(simname='multidark')
+        model.populate_mock(halocat)
         # returning the positions of galaxies
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
         # calculate nbar
@@ -43,18 +44,14 @@ def build_nbar_xi_gmf_cov(Mr=21):
                   max_sample_size=int(2e5), estimator='Landy-Szalay')
         xir.append(xi)
         # calculate gmf
-        galaxy_sample = model.mock.galaxy_table
-        x = galaxy_sample['x']
-        y = galaxy_sample['y']
-        z = galaxy_sample['z']
-        vz = galaxy_sample['vz']
-        pos_rsd = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z'
-                               , velocity = vz , velocity_distortion_dimension="z")
-        b_para, b_perp = 0.5, 0.2
-        groups = FoFGroups(pos_rsd, b_perp, b_para, Lbox = model.mock.Lbox, num_threads=1)
-        gids = groups.group_ids
-        rich = richness(gids)
-        gmfs.append(GMF(rich)*(200**3.)/(1000.**3.))  # GMF
+        nbar = len(pos) / 1000**3.
+        b_normal = 0.75
+        b = b_normal * (nbar)**(-1./3) 
+        groups = pyfof.friends_of_friends(pos , b)
+        w = np.array([len(x) for x in groups])
+        gbins = gmf_bins()
+        gmf = np.histogram(w , gbins)[0] / (1000.**3.)
+        gmfs.append(gmf)  # GMF
     # save nbar variance
     nbar_var = np.var(nbars, axis=0, ddof=1)
     nbar_file = ''.join([util.multidat_dir(), 'abc_nbar_var.Mr', str(Mr), '.dat'])
@@ -70,7 +67,6 @@ def build_nbar_xi_gmf_cov(Mr=21):
                             np.array(gmfs)))
     fullcov = np.cov(fulldatarr.T)
     fullcorr = np.corrcoef(fulldatarr.T)
-
     # and save the covariance matrix
     nopoisson_file = ''.join([util.multidat_dir(), 'abc_nbar_xi_gmf_cov.no_poisson.Mr', str(Mr), '.dat'])
     np.savetxt(nopoisson_file, fullcov)
