@@ -61,12 +61,14 @@ def lnPost(theta, **kwargs):
             nbin = len(res)
             f = (124. - 2. - nbin)/(124. - 1.)
     	if observables == ['nbar','gmf']:
-            res = fake_obs - np.hstack([model_obvs[0],model_obvs[1]])
+            #print "m" , model_obvs[1][1:]
+            #print "d" , fake_obs[1:]
+            res = fake_obs - np.hstack([model_obvs[0],model_obvs[1][1:]])
 	    nbin = len(res)
             f = (124. - 2. - nbin)/(124. - 1.)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
         neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
-        print neg_chi_tot
+        #print neg_chi_tot
     	return neg_chi_tot
 
     lp = lnprior(theta , **kwargs)
@@ -100,13 +102,13 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
         fake_obs_icov = Data.data_cov(**data_dict)[:16 , :16]
     if observables == ['nbar','gmf']:
-        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
-        fake_obs_icov = np.zeros((11,11))
-        print Data.data_cov(**data_dict)[16: , 16:].shape
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)[1:]])
+        fake_obs_icov = np.zeros((10,10))
+        #print Data.data_cov(**data_dict)[17: , 17:].shape
 
-        fake_obs_icov[1:,1:] = Data.data_cov(**data_dict)[16: , 16:]
-        fake_obs_icov[0,1:] = Data.data_cov(**data_dict)[0 , 16:]
-        fake_obs_icov[1:,0] = Data.data_cov(**data_dict)[16: , 0]
+        fake_obs_icov[1:,1:] = Data.data_cov(**data_dict)[17: , 17:]
+        fake_obs_icov[0,1:] = Data.data_cov(**data_dict)[0 , 17:]
+        fake_obs_icov[1:,0] = Data.data_cov(**data_dict)[17: , 0]
         fake_obs_icov[0,0] = Data.data_cov(**data_dict)[0 , 0]
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
@@ -171,7 +173,8 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
             'Mr': data_dict['Mr']
             }
     sampler = emcee.EnsembleSampler(Nwalkers, Ndim, lnPost, pool=pool, kwargs=hod_kwargs)
-    #pos0 = np.loadtxt("../datnbar_xi_Mr21.mcmc_chain.dat")[-100:,:]
+    #pos0 = np.loadtxt("../dat/nbar_gmf_Mr21.mcmc_chain.dat")[-10:,:]
+    #sampler.reset()
     #print pos0.shape
     # Initializing Walkers 
     for result in sampler.sample(pos0, iterations=Nchain, storechain=False):
