@@ -131,7 +131,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             gmf_Cii = Cii_list[1]
             dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
             # omitting the first GMF bin in the model ([1:])
-            dist_gmf = np.sum((datum[1:] - model[1:][1:])**2. / gmf_Cii)
+            dist_gmf = np.sum((datum[1:] - model[1][1:])**2. / gmf_Cii)
             dists = [dist_nbar , dist_gmf]
         elif observables == ['xi']: 
             xi_Cii = Cii_list[0]
