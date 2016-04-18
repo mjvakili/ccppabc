@@ -9,7 +9,7 @@ import scipy.optimize as op
 # --- Local ---
 import util
 import data as Data
-from hod_sim import HODsim 
+from hod_sim import MCMC_HODsim 
 from group_richness import richness
 from prior import PriorRange
 import corner
@@ -60,10 +60,9 @@ def lnPost(theta, **kwargs):
             res = fake_obs - np.hstack([model_obvs[0], model_obvs[1]])
             nbin = len(res)
             f = (124. - 2. - nbin)/(124. - 1.)
-    	if observables == ['nbar','gmf']:
-            #print "m" , model_obvs[1][1:]
-            #print "d" , fake_obs[1:]
-            res = fake_obs - np.hstack([model_obvs[0],model_obvs[1][1:]])
+    	if observables == ['nbar', 'gmf']:
+            # omitting the first gmf bin!!!!
+            res = fake_obs - np.hstack([model_obvs[0], model_obvs[1][1:]])
 	    nbin = len(res)
             f = (124. - 2. - nbin)/(124. - 1.)
         #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
@@ -102,10 +101,13 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_xi(**data_dict)])
         fake_obs_icov = Data.data_cov(inference='mcmc', **data_dict)[:16 , :16]
     if observables == ['nbar','gmf']:
+        ##### FIRST BIN OF GMF DROPPED ###############
+        # CAUTION: hardcoded 
         fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)[1:]])
         fake_obs_icov = np.zeros((10,10))
         #print Data.data_cov(**data_dict)[17: , 17:].shape
-
+        
+        # Covariance matrix being adjusted accordingly 
         fake_obs_icov[1:,1:] = Data.data_cov(inference='mcmc', **data_dict)[17: , 17:]
         fake_obs_icov[0,1:] = Data.data_cov(inference='mcmc', **data_dict)[0 , 17:]
         fake_obs_icov[1:,0] = Data.data_cov(inference='mcmc', **data_dict)[17: , 0]
@@ -189,7 +191,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
 
 
 if __name__=="__main__": 
-    generator = HODsim(Mr = 21, b_normal=0.25, inference='mcmc')
+    generator = MCMC_HODsim(Mr = 21, b_normal=0.25)
     continue_chain = False
     Nwalkers = int(sys.argv[1])
     print 'N walkers = ', Nwalkers

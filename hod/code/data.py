@@ -53,21 +53,21 @@ def data_file(Mr=21, b_normal=0.25):
 def data_nbar(Mr=21, b_normal=0.25):
     ''' Load the observed nbar from the data vector file
     '''
-    dat = np.looadtxt(data_file(Mr=Mr, b_normal=b_normal))
+    dat = np.loadtxt(data_file(Mr=Mr, b_normal=b_normal))
     nbar = dat[0]
     return nbar
 
 def data_xi(Mr=21, b_normal=0.25):
     ''' Load the observed xi (2PCF) from data vector file
     '''
-    dat = np.looadtxt(data_file(Mr=Mr, b_normal=b_normal))
+    dat = np.loadtxt(data_file(Mr=Mr, b_normal=b_normal))
     xi = dat[1:16]
     return xi
 
 def data_gmf(Mr=21, b_normal=0.25):
     ''' Load the observed GMF from data vector file 
     '''
-    dat = np.looadtxt(data_file(Mr=Mr, b_normal=b_normal))
+    dat = np.loadtxt(data_file(Mr=Mr, b_normal=b_normal))
     gmf = dat[16:]
     return gmf
 
@@ -410,7 +410,7 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     np.savetxt(nopoisson_file, fullcov)
     return None
 
-def build_observations(Mr=21, b_normal=0.25):
+def build_observations(Mr=21, b_normal=0.25, make=['data', 'covariance']):
     ''' Wrapper to build all the required fake observations and their
     corresponding covariance matrices. 
     '''
@@ -423,14 +423,17 @@ def build_observations(Mr=21, b_normal=0.25):
         from halotools.sim_manager import DownloadManager
         dman = DownloadManager()
         dman.download_processed_halo_table('multidark', 'rockstar', 0.0)
-
-    # xi, nbar, gmf
-    print 'Building nbar, xi(r), GMF data vector... '
-    build_xi_bins(Mr=Mr)
-    build_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
-    print 'Computing covariance matrix of data...'
-    build_MCMC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
-    build_ABC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
+    
+    if 'data' in make: 
+        # xi, nbar, gmf
+        print 'Building nbar, xi(r), GMF data vector... '
+        build_xi_bins(Mr=Mr)
+        build_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
+    
+    if 'covariance' in make:
+        print 'Computing covariance matrix of data...'
+        build_MCMC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
+        build_ABC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
 
     return None
 

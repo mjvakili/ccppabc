@@ -14,9 +14,8 @@ from matplotlib.ticker import MaxNLocator
 
 # --- local ---
 import util
-import data_multislice as Data
+import data as Data
 from prior import PriorRange
-from hod_sim import HODsim
 plt.switch_backend("Agg")
 
 def plot_data(Mr = 21 , output_dir = None):
@@ -198,7 +197,7 @@ def plot_mcmc(Nwalkers, Niter=1000, Nchains_burn=200, Mr=21, truths=None,
     plt.savefig(fig_file)
     plt.close()
 
-def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'Nmock':500},
+def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'b_normal': 0.25, 'Nmock':500},
         clobber=False):
     '''
     Plot 1\sigma and 2\sigma model predictions from ABC-PMC posterior likelihood

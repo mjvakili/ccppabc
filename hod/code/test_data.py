@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 
 import util 
 import data as Data
-from plotting import prettyplot
-from plotting import prettycolors
 # --- Halotools ---
 from halotools.empirical_models import PrebuiltHodModelFactory
 
@@ -154,6 +152,12 @@ def xi_binning_tests(Mr=20):
         r_bin, xi_r = model.mock.compute_galaxy_clustering(rbins=rbins)
         print xi_r
 
+
+def test_nbar(Mr=21, b_normal=0.25): 
+    print Data.data_nbar(Mr=Mr, b_normal=b_normal)
+
+
 if __name__=='__main__': 
+    test_nbar()
     #xi_cov(Mr=20, Nmock=500)
-    xi_binning_tests(Mr=20)
+    #xi_binning_tests(Mr=20)

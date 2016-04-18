@@ -7,7 +7,6 @@ import os
 import numpy as np
 
 def random_shifter(index):
-
     zi = (index / 25) * 200.
     i2 = index % 25
     yi = (i2 / 5) * 200.

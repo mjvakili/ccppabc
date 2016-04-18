@@ -32,7 +32,7 @@ from abcpmc import mpi_util
 # --- Local --- 
 import util
 import data as Data
-from hod_sim import HODsim
+from hod_sim import ABC_HODsim
 from prior import PriorRange
 from group_richness import richness
 
@@ -58,10 +58,14 @@ def getObvs(observables, **data_dict):
         Cii_list = [nbar_Cii, xi_Cii]
 
     elif observables == ['nbar','gmf']:
-        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)])
+        ##### FIRST BIN OF GMF DROPPED ###############
+        # CAUTION: hardcoded 
+        fake_obs = np.hstack([Data.data_nbar(**data_dict), Data.data_gmf(**data_dict)[1:]])
+
+        # CAUTION: Covariance matrix starts at 17 instead  
         fake_obs_cov = Data.data_cov(inference='abc', **data_dict)
         Cii = np.diag(fake_obs_cov)
-        gmf_Cii = Cii[16:]
+        gmf_Cii = Cii[17:]
         nbar_Cii = Cii[0]
         Cii_list = [nbar_Cii, gmf_Cii]
 
@@ -85,6 +89,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
 
     #Initializing the vector of observables and inverse covariance matrix
     fake_obs, Cii_list = getObvs(observables, **data_dict)
+
     # True HOD parameters
     data_hod_dict = Data.data_hod_param(Mr=data_dict['Mr'])
     data_hod = np.array([
@@ -103,7 +108,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     prior_range[:,1] = prior_max
 
     # Simulator
-    our_model = HODsim(Mr=data_dict['Mr'], b_normal=data_dict['b_normal'], inference='abc')    # initialize model
+    our_model = ABC_HODsim(Mr=data_dict['Mr'], b_normal=data_dict['b_normal'])    # initialize model
     kwargs = {'prior_range': prior_range, 'observables': observables}
     def simz(tt): 
         sim = our_model(tt, **kwargs)
@@ -113,7 +118,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             raise ValueError('Simulator is giving NonetType')
         return sim
 
-    def multivariate_rho(datum, model): 
+    def multivariate_rho(model, datum): 
         dists = [] 
         if observables == ['nbar','xi']: 
             nbar_Cii = Cii_list[0] 
@@ -125,7 +130,8 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             nbar_Cii = Cii_list[0] 
             gmf_Cii = Cii_list[1]
             dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
-            dist_gmf = np.sum((datum[1:] - model[1:])**2. / gmf_Cii)
+            # omitting the first GMF bin in the model ([1:])
+            dist_gmf = np.sum((datum[1:] - model[1:][1:])**2. / gmf_Cii)
             dists = [dist_nbar , dist_gmf]
         elif observables == ['xi']: 
             xi_Cii = Cii_list[0]
@@ -205,7 +211,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
 
 
 if __name__=="__main__": 
-
     Niter = int(sys.argv[1])
     print 'N iterations = ', Niter
     Npart = int(sys.argv[2])
