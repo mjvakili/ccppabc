@@ -21,7 +21,7 @@ from group_richness import gmf
 from group_richness import richness
 
 
-class HODsim(object):
+class ABC_HODsim(object):
 
     def __init__(self, Mr=21):
         '''
@@ -200,7 +200,7 @@ class HODsim(object):
                         obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
                 return obvs
 
-class HODsim2(object):
+class MCMC_HODsim(object):
 
     def __init__(self, Mr=21):
         '''

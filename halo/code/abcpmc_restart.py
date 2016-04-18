@@ -29,7 +29,7 @@ from abcpmc import mpi_util
 # --- Local --- 
 import util
 import data_multislice as Data
-from hod_sim import HODsim
+from hod_sim import ABC_HODsim
 from prior import PriorRange
 from group_richness import richness
 # --- Plotting ---
@@ -85,7 +85,7 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
     prior_range[:,0] = prior_min
     prior_range[:,1] = prior_max
     # simulator
-    our_model = HODsim(Mr=data_dict['Mr'])    # initialize model
+    our_model = ABC_HODsim(Mr=data_dict['Mr'])    # initialize model
     kwargs = {'prior_range': prior_range, 'observables': observables}
     def simz(tt): 
         sim = our_model.sum_stat(tt, **kwargs)
@@ -96,7 +96,6 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
         return sim
 
     def multivariate_rho(datum, model): 
-        #print datum , model
         dists = [] 
         if observables == ['nbar','xi']: 
             dist_nbar = (datum[0] - model[0])**2. / nbar_Cii 
@@ -138,9 +137,9 @@ def ABCpmc_HOD(T, eps_val, N_part=1000, prior_name='first_try', observables=['nb
             print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
             print pool.eps
             # plot theta
-            plot_thetas(pool.thetas, pool.ws , pool.t, 
-                    Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, 
-                    observables=observables, output_dir=output_dir)
+            #plot_thetas(pool.thetas, pool.ws , pool.t, 
+            #        Mr=data_dict["Mr"], truths=data_hod, plot_range=prior_range, 
+            #        observables=observables, output_dir=output_dir)
 
             # write theta and w to file 
             theta_file = ''.join([output_dir, util.observable_id_flag(observables), 
