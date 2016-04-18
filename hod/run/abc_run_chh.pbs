@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=5,mem=300GB
+#PBS -l walltime=2:00:00
+#PBS -N abcgmf
+#PBS -M mv1003@nyu.edu
+#PBS -m abe
+#PBS -j oe
+ 
+module purge
+module load mpi4py/openmpi/intel/1.3.1
+module load numpy/intel/1.10.1
+module load pyfof/intel/0.1.2
+cd /scratch/chh327/ccppabc/
+
+mpiexec \
+    python /home/chh327/project/ccppabc/hod/code/ccpp_abcpmc.py \
+    30 1000 "nbargmf" 
+
+# leave a blank line at the end
+ 
