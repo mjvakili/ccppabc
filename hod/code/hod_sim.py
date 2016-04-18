@@ -21,6 +21,7 @@ from group_richness import gmf
 from group_richness import richness
 
 
+<<<<<<< HEAD:hod/code/hod_sim.py
 class HODsim(object):
     def __init__(self, Mr=21, b_normal=0.25, inference='abc'):
         ''' Class object that describes our forward model used in AMC-PMC inference.

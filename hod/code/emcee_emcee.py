@@ -8,7 +8,7 @@ import scipy.optimize as op
 # --- Local ---
 import util
 import data_multislice as Data
-from hod_sim import HODsim2
+from hod_sim import MCMC_HODsim
 from group_richness import richness
 from prior import PriorRange
 import corner
@@ -295,7 +295,7 @@ def mcmc_multi(Nwalkers, Niter, observables=['nbar', 'xi'],
 
 if __name__=="__main__": 
 
-    generator = HODsim2(Mr = 21)
+    generator = MCMC_HODsim(Mr = 21)
     continue_chain = False
     Nwalkers = int(sys.argv[1])
     print 'N walkers = ', Nwalkers
@@ -315,14 +315,3 @@ if __name__=="__main__":
     out_dir = sys.argv[4]
     print 'Output to ', out_dir
     mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)# , continue_chain = False)
-    """
-    if len(sys.argv) == 4:
-        out_dir = sys.argv[4]
-        if out_dir[-1] != '/':
-            out_dir += '/'
-        print 'Output to ', out_dir
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
-    else:
-        mcmc_mpi(Nwalkers, Niter, observables=obv_list, output_dir=out_dir)
-    """
-
