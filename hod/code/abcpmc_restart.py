@@ -45,7 +45,7 @@ def getObvs(observables, **data_dict):
     '''
     if observables == ['xi']:
         fake_obs = Data.data_xi(**data_dict)
-        fake_obs_cov = Data.data_abc_cov(**data_dict)[1:16 , 1:16]
+        fake_obs_cov = Data.data_cov(inference='abc', **data_dict)[1:16 , 1:16]
         xi_Cii = np.diag(fake_obs_cov)
         Cii_list = [xi_Cii]
 

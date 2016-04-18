@@ -72,5 +72,5 @@ def abc_dir():
 def mcmc_dir():
     return dat_dir()+'mcmc/'
 
-def crash_dir() 
+def crash_dir():
     return dat_dir()+'crash/'

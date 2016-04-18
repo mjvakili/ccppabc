@@ -85,7 +85,7 @@ def data_cov(Mr=21, b_normal=0.25, inference='abc'):
         '.nbar_xi_gmf_cov', 
         '.no_poisson', 
         '.Mr', str(Mr),
-        '.bnorm', str(round(b_normal)), 
+        '.bnorm', str(round(b_normal, 2)), 
         '.dat'])
     cov = np.loadtxt(cov_fn)
     return cov
@@ -345,7 +345,7 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
 
     # and save the covariance matrix
     nopoisson_file = ''.join([util.obvs_dir(),
-        'MCMC.nbar_xi_gmf_cov', '.no_poisson', '.Mr', str(Mr), '.bnorm', str(round(b_normal)), '.dat'])
+        'MCMC.nbar_xi_gmf_cov', '.no_poisson', '.Mr', str(Mr), '.bnorm', str(round(b_normal,2)), '.dat'])
     np.savetxt(nopoisson_file, fullcov)
     return None
 
@@ -406,7 +406,7 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     fullcorr = np.corrcoef(fulldatarr.T)
     # and save the covariance matrix
     nopoisson_file = ''.join([util.obvs_dir(),
-        'ABC.nbar_xi_gmf_cov', '.no_poisson', '.Mr', str(Mr), '.bnorm', str(round(b_normal)), '.dat'])
+        'ABC.nbar_xi_gmf_cov', '.no_poisson', '.Mr', str(Mr), '.bnorm', str(round(b_normal, 2)), '.dat'])
     np.savetxt(nopoisson_file, fullcov)
     return None
 
