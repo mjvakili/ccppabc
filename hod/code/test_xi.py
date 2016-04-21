@@ -51,9 +51,9 @@ def Subvolume_Analytic(N_sub, ratio=False):
     # while the estimator claims to be Landy-Szalay, I highly suspect it
     # actually uses Landy-Szalay since DR pairs cannot be calculated from 
     # analytic randoms
-    xi = tpcf(pos, xi_bin, period=model.mock.Lbox, max_sample_size=int(2e5), estimator='Landy-Szalay', num_threads=1)
+    full_xi = tpcf(pos, xi_bin, period=model.mock.Lbox, max_sample_size=int(2e5), estimator='Landy-Szalay', num_threads=1)
     if not ratio:  
-        sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), xi, lw=2, ls='-', c='k', label=r'Analytic $\xi$ Entire Volume') 
+        sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), full_xi, lw=2, ls='-', c='k', label=r'Analytic $\xi$ Entire Volume') 
         
     # MultiDark SubVolume (precomputed RR pairs) 
     sub_model = PrebuiltHodModelFactory('zheng07', threshold=-21)
@@ -70,7 +70,7 @@ def Subvolume_Analytic(N_sub, ratio=False):
         elif method == 'Natural': 
             iii = 5
         
-        sub_xis = [] 
+        sub_xis = np.zeros(len(full_xi)) 
         for ii in range(N_sub): 
             # randomly sample one of the subvolumes
             rint = np.random.randint(1, 125)
@@ -103,16 +103,17 @@ def Subvolume_Analytic(N_sub, ratio=False):
             if ii == N_sub - 1: 
                 label = 'Subvolumes'
             
-            if not ratio: 
-                sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), sub_xi, lw=0.5, ls='--', c=pretty_colors[iii])
-            sub_xis.append(sub_xi)
+            #if not ratio: 
+            #    sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), sub_xi, lw=0.5, ls='--', c=pretty_colors[iii])
+            sub_xis += sub_xi
 
-        sub_xi_avg = np.sum(sub_xis, axis=0)/np.float(N_sub)
+        sub_xi_avg = sub_xis/np.float(N_sub)
+
         if not ratio: 
             sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), sub_xi_avg, 
                     lw=2, ls='--', c=pretty_colors[iii], label='Subvolume '+method)
         else: 
-            sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), sub_xi_avg/xi, 
+            sub.plot(0.5*(xi_bin[:-1]+xi_bin[1:]), sub_xi_avg/full_xi, 
                     lw=2, ls='--', c=pretty_colors[iii], label='Subvolume '+method)
     
     sub.set_xlim([0.1, 50.])
@@ -128,14 +129,16 @@ def Subvolume_Analytic(N_sub, ratio=False):
     sub.legend(loc='lower left')
     
     if ratio: 
-        fig_file = ''.join([util.fig_dir(), 'test_xi_subvolume_analytic.ratio.png'])
+        fig_file = ''.join([util.fig_dir(), 'test_xi_subvolume_analytic.Nsub', str(N_sub), '.ratio.png'])
     else:
-        fig_file = ''.join([util.fig_dir(), 'test_xi_subvolume_analytic.png'])
+        fig_file = ''.join([util.fig_dir(), 'test_xi_subvolume_analytic.Nsub', str(N_sub), '.png'])
     fig.savefig(fig_file, bbox_inches='tight', dpi=100)
     plt.close()
     return None 
 
 
 if __name__=="__main__": 
-    Subvolume_Analytic(5, ratio=False)
-    Subvolume_Analytic(5, ratio=True)
+    Subvolume_Analytic(10, ratio=False)
+    Subvolume_Analytic(10, ratio=True)
+    Subvolume_Analytic(100, ratio=False)
+    Subvolume_Analytic(100, ratio=True)
