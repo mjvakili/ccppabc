@@ -15,7 +15,7 @@ import util
 from data import data_random
 from data import data_RR
 from data import data_gmf_bins
-from data import hardcoded_xi_bins
+from data import xi_binedges 
 from group_richness import gmf
 from group_richness import richness
 
@@ -30,6 +30,10 @@ class MCMC_HODsim(object):
 
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
         self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
+
+        self.RR = data_RR(box='md_all')
+        self.randoms = data_random('md_all')
+        self.NR = len(self.randoms)
     
     def __call__(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         return self._sum_stat(theta, prior_range=prior_range, observables=observables)
@@ -49,12 +53,14 @@ class MCMC_HODsim(object):
         self.model.param_dict['alpha'] = theta[3]
         self.model.param_dict['logM1'] = theta[4]
 
-        rbins = hardcoded_xi_bins()
+        rbins = xi_binedges()
         rmax = rbins.max()
+        approx_cell1_size = [rmax , rmax , rmax]
+        approx_cellran_size = [rmax , rmax , rmax]
 
         if prior_range is None:
             
-            self.model.populate_mock(self.halocat)
+            self.model.populate_mock(self.halocat, enforce_PBC=False)
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
             obvs = []
 
@@ -70,8 +76,15 @@ class MCMC_HODsim(object):
     		    gmf = np.histogram(w , gbins)[0] / (1000.**3.)
                     obvs.append(gmf)   
                 elif obv == 'xi':
-                    xi = tpcf(pos, rbins, period = self.model.mock.Lbox, max_sample_size=int(2e5), estimator='Landy-Szalay', num_threads = 1)
-                    obvs.append(xi)
+                    greek_xi = tpcf(
+                            pos, rbins, pos, 
+                            randoms=randoms, period=None, 
+                            max_sample_size=int(3e5), estimator='Natural', 
+                            approx_cell1_size=approx_cell1_size, 
+                            approx_cellran_size=approx_cellran_size,
+                            RR_precomputed = self.RR,
+                            NR_precomputed = self.NR)
+                    obvs.append(greek_xi)
                 else:
                     raise NotImplementedError('Only nbar 2pcf, gmf implemented so far')
 
@@ -98,8 +111,15 @@ class MCMC_HODsim(object):
     		    	    gmf = np.histogram(w , gbins)[0] / (1000.**3.)
                     	    obvs.append(gmf)   
                         elif obv == 'xi':
-                            xi = tpcf(pos, rbins, period = self.model.mock.Lbox, max_sample_size=int(1e5), estimator='Landy-Szalay', num_threads = 1)
-                    	    obvs.append(xi)
+                            greek_xi = tpcf(
+                                    pos, rbins, pos, 
+                                    randoms=randoms, period=None, 
+                                    max_sample_size=int(3e5), estimator='Natural', 
+                                    approx_cell1_size=approx_cell1_size, 
+                                    approx_cellran_size=approx_cellran_size,
+                                    RR_precomputed = self.RR,
+                                    NR_precomputed = self.NR)
+                            obvs.append(greek_xi)
                         else:
                             raise NotImplementedError('Only nbar, tpcf, and gmf are implemented so far')
 
@@ -115,7 +135,7 @@ class MCMC_HODsim(object):
                             bins = data_gmf_bins()
                             obvs.append(np.ones_like(bins)[:-1]*1000.)
                         elif obv == 'xi':
-                            obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                            obvs.append(np.zeros(len(xi_binedges()[:-1])))
                     return obvs
             else:
                 obvs = []
@@ -126,7 +146,7 @@ class MCMC_HODsim(object):
                         bins = data_gmf_bins()
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi':
-                        obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                        obvs.append(np.zeros(len(xi_binedges()[:-1])))
                 return obvs
 
 
@@ -142,8 +162,8 @@ class ABC_HODsim(object):
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
         self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
         self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
-        self.RR = data_RR()
-        self.randoms = data_random()
+        self.RR = data_RR(box='md_sub')
+        self.randoms = data_random(box='md_sub')
         self.NR = len(self.randoms)
 
     def __call__(self, theta, prior_range=None, observables=['nbar', 'gmf']):
@@ -164,7 +184,7 @@ class ABC_HODsim(object):
         self.model.param_dict['alpha'] = theta[3]
         self.model.param_dict['logM1'] = theta[4]
 
-        rbins = hardcoded_xi_bins()
+        rbins = xi_binedges()
         rmax = rbins.max()
         period = None
         approx_cell1_size = [rmax , rmax , rmax]
@@ -199,16 +219,16 @@ class ABC_HODsim(object):
     		    gmf = np.histogram(w , gbins)[0] / (200.**3.)
                     obvs.append(gmf)   
                 elif obv == 'xi':
-                    xi = tpcf(
+                    greek_xi = tpcf(
                         pos, rbins, pos, 
                         randoms=temp_randoms, period = period, 
-                        max_sample_size=int(1e5), estimator='Landy-Szalay', 
+                        max_sample_size=int(1e5), estimator='Natural', 
                         approx_cell1_size=approx_cell1_size, 
                         approx_cellran_size=approx_cellran_size,
                         RR_precomputed = self.RR,
 	                NR_precomputed = self.NR)
 
-                    obvs.append(xi)
+                    obvs.append(greek_xi)
                 else:
                     raise NotImplementedError('Only nbar 2pcf, gmf implemented so far')
 
@@ -245,16 +265,16 @@ class ABC_HODsim(object):
     		            gmf = np.histogram(w , gbins)[0] / (200.**3.)
                     	    obvs.append(gmf)   
                         elif obv == 'xi':
-                    	    xi = tpcf(
+                    	    greek_xi = tpcf(
                                      pos, rbins, pos, 
                         	     randoms=temp_randoms, period = period, 
-                                     max_sample_size=int(2e5), estimator='Landy-Szalay', 
+                                     max_sample_size=int(2e5), estimator='Natural', 
                                      approx_cell1_size=approx_cell1_size, 
                                      approx_cellran_size=approx_cellran_size,
                                      RR_precomputed = self.RR,
 	                             NR_precomputed = self.NR)
 
-                    	    obvs.append(xi)
+                    	    obvs.append(greek_xi)
                         else:
                             raise NotImplementedError('Only nbar, tpcf, and gmf are implemented so far')
 
@@ -270,7 +290,7 @@ class ABC_HODsim(object):
                             bins = data_gmf_bins()
                             obvs.append(np.ones_like(bins)[:-1]*1000.)
                         elif obv == 'xi':
-                            obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                            obvs.append(np.zeros(len(xi_binedges()[:-1])))
                     return obvs
             else:
                 obvs = []
@@ -281,6 +301,6 @@ class ABC_HODsim(object):
                         bins = data_gmf_bins()
                         obvs.append(np.ones_like(bins)[:-1]*1000.)
                     elif obv == 'xi':
-                        obvs.append(np.zeros(len(hardcoded_xi_bins()[:-1])))
+                        obvs.append(np.zeros(len(xi_binedges()[:-1])))
                 return obvs
 

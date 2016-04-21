@@ -22,8 +22,7 @@ from group_richness import gmf_bins
 # ---Need this for some smoothing stuff, will most-likely get rid of them
 from data import data_xi_bins
 from data import data_gmf_bins
-from data import hardcoded_xi_bins
-
+from data import xi_binedges 
 
 def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'], 
                   Mr=20 , data_dict={'Mr':20, 'Nmock':500} , smooth = "False"):
@@ -50,7 +49,7 @@ def plot_xi_model(file_name="infered_hod_file_name", observables=['xi'],
         
         #mod.populate_mock()
         """ if we want to make a smooth plot, we do this:"""
-        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = hardcoded_xi_bins , num_iterations = 6 )
+        #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = xi_binedges() , num_iterations = 6 )
         """else"""
         HODsimulator(theta[i], prior_range=None, observables=['xi'], Mr=20)
         xi_gg.append(xi)

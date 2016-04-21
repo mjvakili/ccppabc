@@ -34,7 +34,7 @@ def plot_data(Mr = 21 , output_dir = None):
     fig , axes = plt.subplots(1, 2, figsize=(10, 5))
     fig.subplots_adjust(wspace=0.4, hspace=0.4)
     ax = axes[0]
-    x = Data.hardcoded_xi_bins()
+    x = Data.xi_binedges()
     y = Data.data_xi() 
     ax.errorbar(0.5*(x[:-1]+x[1:]), y, yerr=xi_err, fmt=".k", capsize=0)
     ax.set_yscale('log')
@@ -222,7 +222,6 @@ def plot_posterior_model(observable, abc_theta_file=None, data_dict={'Mr':20, 'b
     print obvs_file
     if not os.path.isfile(obvs_file) or clobber:
         for i in xrange(len(theta)):
-            #rr , xi = mod.compute_average_compute_average_galaxy_clustering(rbins = hardcoded_xi_bins , num_iterations = 6 )
             obv_i  = HODsimulator(
                     theta[i], prior_range=None,
                     observables=[obvs_str], Mr=data_dict['Mr'])

@@ -64,6 +64,13 @@ def data_xi(Mr=21, b_normal=0.25):
     xi = dat[1:16]
     return xi
 
+def data_xi_bin(Mr=21): 
+    ''' Load the r bins of the xi measurements. These are _not_ the bin edges, but 
+    the center of the bins. 
+    '''
+    xi_bin_file = ''.join([util.obvs_dir(),'xir_rbin.Mr', str(Mr),'.dat'])
+    return np.loadtxt(xi_bin_file) 
+
 def data_gmf(Mr=21, b_normal=0.25):
     ''' Load the observed GMF from data vector file 
     '''
@@ -109,7 +116,7 @@ def data_gmf_bins():
     '''
     return gmf_bins()
 
-def hardcoded_xi_bins():
+def xi_binedges():
     ''' Load hardcoded xi r-bin edges. They are spaced out unevenly due to sparseness
     at inner r bins. So the first bin ranges from 0.15 to 0.5
     '''
@@ -122,7 +129,7 @@ def hardcoded_xi_bins():
 def build_xi_bins(Mr=21):
     ''' Build hardcoded r_bin centers for xi and then save to file.
     '''
-    rbins = hardcoded_xi_bins()
+    rbins = xi_binedges() 
     rbin = .5 * (rbins[1:] + rbins[:-1])
     output_file = ''.join([util.obvs_dir(),'xir_rbin.Mr', str(Mr),'.dat'])
     np.savetxt(output_file, rbin)
@@ -167,7 +174,7 @@ def build_randoms_RR(Nr=1e6, box='md_sub'):
     verbose = False
     period = None
     num_threads = cpu_count()
-    rbins = hardcoded_xi_bins()
+    rbins = xi_binedges()
     rmax = rbins.max()
     approx_cellran_size = [rmax, rmax, rmax]
     
@@ -212,7 +219,7 @@ def build_nbar_xi_gmf(Mr=21, b_normal=0.25):
     
     #all the things necessary for tpcf calculation
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
-    rbins = hardcoded_xi_bins()
+    rbins = xi_binedges()
     rmax = rbins.max()
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cellran_size = [rmax , rmax , rmax]
@@ -270,7 +277,7 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
     
     #some settings for tpcf calculations
-    rbins = hardcoded_xi_bins()
+    rbins = xi_binedges()
     rmax = rbins.max()
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cellran_size = [rmax , rmax , rmax]
@@ -358,7 +365,7 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr)
     halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
-    rbins = hardcoded_xi_bins()  # some setting for tpcf calculations
+    rbins = xi_binedges()  # some setting for tpcf calculations
 
     rmax = rbins.max()
     approx_cell1_size = [rmax , rmax , rmax]

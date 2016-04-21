@@ -10,7 +10,7 @@ import numpy as np
 import util
 from data import data_RR
 from data import data_random
-from data import hardcoded_xi_bins
+from data import xi_binedges 
 
 # --- halotools ---
 from halotools.sim_manager import CachedHaloCatalog
@@ -47,7 +47,7 @@ def Subvolume_Analytic(N_sub, ratio=False):
     fig = plt.figure(1)
     sub = fig.add_subplot(111)
 
-    xi_bin = hardcoded_xi_bins() 
+    xi_bin = xi_binedges() 
     
     if os.path.isfile(pickle_file):
         data_dump = pickle.load(open(pickle_file, 'rb'))
