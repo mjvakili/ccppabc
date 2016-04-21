@@ -11,7 +11,6 @@ from halotools.mock_observables.pair_counters import npairs
 from halotools.sim_manager import CachedHaloCatalog
 
 def test_precomputed_rr(Nr, Mr = 21):
-   
     '''
     Mr = Luminositty threshold
     Nr = Number of randoms
