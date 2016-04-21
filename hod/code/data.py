@@ -90,34 +90,17 @@ def data_cov(Mr=21, b_normal=0.25, inference='abc'):
     cov = np.loadtxt(cov_fn)
     return cov
 
-# DEFUNCT IN LATEST VERSION 
-#def data_inv_cov(datcombo, Mr=21):
-#    ''' Load the inverse covariance matrix for given 'datcombo'
-#    
-#    Parameters
-#    ----------
-#    datcombo : (string)
-#        One of the following strings to specify the observables: 
-#        'gmf', 'nbar_gmf', 'nbar_xi', 'nbar_xi_gmf', 'xi' 
-#    '''
-#    inv_cov_fn = ''.join([util.obvs_dir(),
-#                         '{0}_inv_cov.Mr'.format(datcombo), str(Mr),
-#                         '.dat'])
-#    inv_cov = np.loadtxt(inv_cov_fn)
-#
-#    return inv_cov
-
-def data_random():
+def data_random(box='md_sub'):
     ''' Load pregenerated random points
     '''
-    random_file = ''.join([util.obvs_dir(), 'randoms', '.dat'])
+    random_file = ''.join([util.obvs_dir(), 'randoms', '.', box, '.dat'])
     randoms = np.loadtxt(random_file)
     return randoms
 
-def data_RR():
+def data_RR(box='md_sub'):
     ''' Load precomputed RR pairs
     '''
-    RR_file = ''.join([util.obvs_dir(), 'RR', '.dat'])
+    RR_file = ''.join([util.obvs_dir(), 'RR', '.', box, '.dat'])
     RR = np.loadtxt(RR_file)
     return RR
 
@@ -147,20 +130,34 @@ def build_xi_bins(Mr=21):
 
 #Build Randoms and precomputed RRs
 
-def build_randoms_RR(Nr=5e5):
+def build_randoms_RR(Nr=1e6, box='md_sub'):
     '''
     builds Nr number of random points using numpy.random.uniform 
     in a subvolume and precomputes the RR.
 
     The set of randoms and  precomputed RR will be used to compute tpcf
     with Landay-Szalay estimator in each subvolume. 
-    '''
 
-    L = 200 #this is L_md / 5   
+    Parameters
+    ----------
+    Nr : (int) 
+        Number of random points
+
+    box : (string) 
+        'md_sub' specifies multidark subvolume box (L_box = 200). 
+        'md_all' specifies multidark entire box (L_box = 1000). 
+    '''
+    if box == 'md_sub':  
+        L = 200 #this is L_md / 5   
+        if Nr < 5e5: 
+            raise ValueError('Too few number of randoms') 
+    elif box == 'md_all': 
+        L = 1000
+        if Nr < 2.5e6: 
+            raise ValueError('Too few number of randoms') 
  
     xmin , ymin , zmin = 0., 0., 0.
     xmax , ymax , zmax = L, L, L
-   
     
     num_randoms = Nr
     xran = np.random.uniform(xmin, xmax, num_randoms)
@@ -174,23 +171,22 @@ def build_randoms_RR(Nr=5e5):
     rmax = rbins.max()
     approx_cellran_size = [rmax, rmax, rmax]
     
-   
-    
     RR = npairs(
             randoms, randoms, rbins, period,
             verbose, num_threads,
             approx_cellran_size, approx_cellran_size)
     RR = np.diff(RR)
   
-
-    output_file_random = ''.join([util.obvs_dir(),'randoms','.dat'])
-    np.savetxt(output_file_random, randoms)
+    output_file_random = ''.join([util.obvs_dir(),
+        'randoms', '.', box, '.dat'])
+    np.savetxt(output_file_random, 
+            randoms)
     
-
-    output_file_RR = ''.join([util.obvs_dir(),'RR','.dat'])
+    output_file_RR = ''.join([util.obvs_dir(),
+        'RR', '.', box, '.dat'])
     np.savetxt(output_file_RR, RR)
-
     return None
+
 
 # Build observables ---------------
 def build_nbar_xi_gmf(Mr=21, b_normal=0.25):
@@ -212,35 +208,32 @@ def build_nbar_xi_gmf(Mr=21, b_normal=0.25):
     model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
     datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(halocat,
-                        masking_function=datsubvol,
-                        enforce_PBC=False)
+    model.populate_mock(halocat, masking_function=datsubvol, enforce_PBC=False)
     
     #all the things necessary for tpcf calculation
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
     rbins = hardcoded_xi_bins()
     rmax = rbins.max()
-    period = None
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cellran_size = [rmax , rmax , rmax]
 
     #compute number density    
     nbar = len(pos) / 200**3.
     
-    #load randoms and RRs
-    randoms = data_random()
-    RR = data_RR()
+    # load MD subvolume randoms and RRs
+    randoms = data_random(box='md_sub')
+    RR = data_RR(box='md_sub')
     NR = len(randoms)
  
-    #compue tpcf with Landy-Szalay estimator
+    #compue tpcf with Natural estimator
     data_xir = tpcf(
             pos, rbins, pos, 
-            randoms=randoms, period = None, 
-            max_sample_size=int(2e5), estimator='Landy-Szalay', 
+            randoms=randoms, period=None, 
+            max_sample_size=int(2e5), estimator='Natural', 
             approx_cell1_size=approx_cell1_size, 
             approx_cellran_size=approx_cellran_size, 
-            RR_precomputed = RR, 
-            NR_precomputed = NR)
+            RR_precomputed=RR, 
+            NR_precomputed=NR)
 
     fullvec = np.append(nbar, data_xir)
     
@@ -279,14 +272,13 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     #some settings for tpcf calculations
     rbins = hardcoded_xi_bins()
     rmax = rbins.max()
-    period = None
     approx_cell1_size = [rmax , rmax , rmax]
     approx_cellran_size = [rmax , rmax , rmax]
     
     #load randoms and RRs
     
-    randoms = data_random()
-    RR = data_RR()
+    randoms = data_random(box='md_sub')
+    RR = data_RR(box='md_sub')
     NR = len(randoms)
 
     for i in xrange(1,125):
@@ -311,8 +303,8 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         #calculate xi(r)        
         xi = tpcf(
             pos, rbins, pos, 
-            randoms=temp_randoms, period = period, 
-            max_sample_size=int(3e5), estimator='Landy-Szalay', 
+            randoms=temp_randoms, period=None, 
+            max_sample_size=int(3e5), estimator='Natural', 
             approx_cell1_size=approx_cell1_size, 
             approx_cellran_size=approx_cellran_size,
             RR_precomputed = RR,
@@ -368,19 +360,37 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
     rbins = hardcoded_xi_bins()  # some setting for tpcf calculations
 
+    rmax = rbins.max()
+    approx_cell1_size = [rmax , rmax , rmax]
+    approx_cellran_size = [rmax , rmax , rmax]
+    
+    # load randoms and RRs for the ENTIRE MultiDark volume 
+    randoms = data_random(box='md_all')
+    RR = data_RR(box='md_all')
+    NR = len(randoms)
+
     for i in xrange(1,125):
         print 'mock#', i
         # populate the mock subvolume
-        model.populate_mock(halocat)
+        model.populate_mock(halocat, enforce_PBC=False)
         # returning the positions of galaxies
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+
         # calculate nbar
         nbars.append(len(pos) / 1000**3.)
-        # translate the positions of randoms to the new subbox
-        #calculate xi(r)        
-        xi = tpcf(pos, rbins, period = model.mock.Lbox, 
-                  max_sample_size=int(2e5), estimator='Landy-Szalay')
+
+        # calculate xi(r) for the ENTIRE MultiDark volume 
+        # using the natural estimator DD/RR - 1
+        xi = tpcf(
+                pos, rbins, pos, 
+                randoms=randoms, period=None, 
+                max_sample_size=int(3e5), estimator='Natural', 
+                approx_cell1_size=approx_cell1_size, 
+                approx_cellran_size=approx_cellran_size,
+                RR_precomputed = RR,
+                NR_precomputed = NR)
         xir.append(xi)
+
         # calculate gmf
         nbar = len(pos) / 1000**3.
         b = b_normal * (nbar)**(-1./3) 
@@ -439,5 +449,4 @@ def build_observations(Mr=21, b_normal=0.25, make=['data', 'covariance']):
 
 
 if __name__ == "__main__":
-    #build_randoms_RR(Nr=5e5)
     build_observations(Mr = 21, b_normal=0.25)
