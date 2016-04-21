@@ -16,7 +16,7 @@ from halotools.empirical_models import PrebuiltHodModelFactory
 from halotools.mock_observables import tpcf
 from halotools.mock_observables import FoFGroups
 from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
-from halotools.mock_observables.pair_counters import npairs
+from halotools.mock_observables.pair_counters.pairs import npairs
 
 #our ccppabc functions
 import util
