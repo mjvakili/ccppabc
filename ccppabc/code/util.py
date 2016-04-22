@@ -48,9 +48,6 @@ def mask_galaxy_table(pos , subvol_index):
     return masked_positions
       
     
-
-    
-
 def mk_id_column(table=None):
 
     # set up ids from 0 to 124 for the box split into 5 along each edge
@@ -99,8 +96,16 @@ def dat_dir():
     '''
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
 
+def obvs_dir(): 
+    return dat_dir()+'observations/'
 
-def multidat_dir():
-    ''' Dat directory
-    '''
-    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/multidark/'
+def abc_dir():
+    return dat_dir()+'pmc_abc/'
+
+def mcmc_dir():
+    return dat_dir()+'mcmc/'
+
+def crash_dir():
+    return dat_dir()+'crash/
+
+
