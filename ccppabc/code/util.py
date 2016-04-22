@@ -7,6 +7,7 @@ import os
 import numpy as np
 
 def random_shifter(index):
+
     zi = (index / 25) * 200.
     i2 = index % 25
     yi = (i2 / 5) * 200.
@@ -15,6 +16,38 @@ def random_shifter(index):
 
     return xi , yi , zi
 
+def edge(index):
+    '''
+    returns the edge of the subvolume of a given index
+    '''    
+    zi = (index / 25) * 200.
+    i2 = index % 25
+    yi = (i2 / 5) * 200.
+    i3 = i2 % 5
+    xi = (i3) * 200.
+
+    return xi , yi , zi
+
+
+def mask_galaxy_table(pos , subvol_index):
+    '''
+    maskes the positions of the galaxies in the entire subvolume
+    returns the galaxies that are in a subvolume with index subvol_index
+    '''
+    xi , yi , zi  = edge(subvol_index)
+    mask = np.where()
+        
+    submask = np.where((xi <pos[:, 0]) * \
+                       (pos[:, 0] < xi + 200) * \
+                       (yi < pos[:, 1]) * \ 
+                       (pos[:, 1] < yi + 200) * \
+                       (zi <pos[:, 2]) * \ 
+                       (pos[:, 2] < zi + 200))
+    masked_positions = pos[submask]
+
+    return masked_positions
+      
+    
 def mk_id_column(table=None):
 
     # set up ids from 0 to 124 for the box split into 5 along each edge
@@ -58,7 +91,8 @@ def fig_dir():
     return fig_dir
 
 def dat_dir():
-    ''' Dat directory
+    '''
+    Dat directory
     '''
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
 
@@ -72,4 +106,6 @@ def mcmc_dir():
     return dat_dir()+'mcmc/'
 
 def crash_dir():
-    return dat_dir()+'crash/'
+    return dat_dir()+'crash/
+
+
