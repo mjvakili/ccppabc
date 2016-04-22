@@ -39,10 +39,10 @@ def mask_galaxy_table(pos , subvol_index):
         
     submask = np.where((xi <pos[:, 0]) * \
                        (pos[:, 0] < xi + 200) * \
-                       (yi < pos[:, 1]) * \ 
+                       (yi < pos[:, 1]) *  \
                        (pos[:, 1] < yi + 200) * \
-                       (zi <pos[:, 2]) * \ 
-                       (pos[:, 2] < zi + 200))
+                       (zi < pos[:, 1]) *  \
+                       (pos[:, 1] < zi + 200))
     masked_positions = pos[submask]
 
     return masked_positions
