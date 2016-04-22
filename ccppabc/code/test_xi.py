@@ -205,7 +205,7 @@ def Subvolume_Fullvolume(N_sub, ratio=False):
         full_approx_cell1_size = [rmax , rmax , rmax]
         full_approx_cellran_size = [rmax , rmax , rmax]
 
-        model.populate_mock(halocat)
+        model.populate_mock(halocat, enforce_PBC=False)
         full_pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
         
         full_xi = tpcf(

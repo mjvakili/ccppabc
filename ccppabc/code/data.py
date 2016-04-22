@@ -16,7 +16,7 @@ from halotools.empirical_models import PrebuiltHodModelFactory
 from halotools.mock_observables import tpcf
 from halotools.mock_observables import FoFGroups
 from halotools.empirical_models.factories.mock_helpers import three_dim_pos_bundle
-from halotools.mock_observables.pair_counters.pairs import npairs
+from halotools.mock_observables.pair_counters import npairs_3d
 
 #our ccppabc functions
 import util
@@ -178,7 +178,7 @@ def build_randoms_RR(Nr=1e6, box='md_sub'):
     rmax = rbins.max()
     approx_cellran_size = [rmax, rmax, rmax]
     
-    RR = npairs(
+    RR = npairs_3d(
             randoms, randoms, rbins, period,
             verbose, num_threads,
             approx_cellran_size, approx_cellran_size)
