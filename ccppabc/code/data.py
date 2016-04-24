@@ -385,7 +385,7 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     for i in xrange(1,125):
         print 'mock#', i
         # populate the mock subvolume
-        model.populate_mock(halocat, enforce_PBC=False)
+        model.populate_mock(halocat)
         # returning the positions of galaxies
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
 
