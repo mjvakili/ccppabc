@@ -20,7 +20,7 @@ from group_richness import richness
 
 class MCMC_HODsim(object):
     def __init__(self, Mr=21, b_normal=0.25):
-        ''' Class object that describes our forward model used in AMC-PMC inference.
+        ''' Class object that describes our forward model used in MCMC inference.
         Our model forward models the galaxy catalog using HOD parameters using HaloTools.
         '''
         self.Mr = Mr
@@ -30,9 +30,9 @@ class MCMC_HODsim(object):
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
         self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
 
-        self.RR = data_RR(box='md_all')
-        self.randoms = data_random('md_all')
-        self.NR = len(self.randoms)
+        ##self.RR = data_RR(box='md_all')
+        ##self.randoms = data_random('md_all')
+        ##self.NR = len(self.randoms)
     
     def __call__(self, theta, prior_range=None, observables=['nbar', 'gmf']):
         return self._sum_stat(theta, prior_range=prior_range, observables=observables)
@@ -59,7 +59,7 @@ class MCMC_HODsim(object):
 
         if prior_range is None:
             
-            self.model.populate_mock(self.halocat, enforce_PBC=False)
+            self.model.populate_mock(self.halocat)
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
             obvs = []
 
@@ -76,13 +76,10 @@ class MCMC_HODsim(object):
                     obvs.append(gmf)   
                 elif obv == 'xi':
                     greek_xi = tpcf(
-                            pos, rbins, pos, 
-                            randoms=randoms, period=None, 
+                            pos, rbins,  
+                            period=self.model.mock.Lbox, 
                             max_sample_size=int(3e5), estimator='Natural', 
-                            approx_cell1_size=approx_cell1_size, 
-                            approx_cellran_size=approx_cellran_size,
-                            RR_precomputed = self.RR,
-                            NR_precomputed = self.NR)
+                            approx_cell1_size=approx_cell1_size)
                     obvs.append(greek_xi)
                 else:
                     raise NotImplementedError('Only nbar 2pcf, gmf implemented so far')
@@ -111,13 +108,9 @@ class MCMC_HODsim(object):
                     	    obvs.append(gmf)   
                         elif obv == 'xi':
                             greek_xi = tpcf(
-                                    pos, rbins, pos, 
-                                    randoms=randoms, period=None, 
+                                    pos, rbins, period=self.model.mock.Lbox, 
                                     max_sample_size=int(3e5), estimator='Natural', 
-                                    approx_cell1_size=approx_cell1_size, 
-                                    approx_cellran_size=approx_cellran_size,
-                                    RR_precomputed = self.RR,
-                                    NR_precomputed = self.NR)
+                                    approx_cell1_size=approx_cell1_size)
                             obvs.append(greek_xi)
                         else:
                             raise NotImplementedError('Only nbar, tpcf, and gmf are implemented so far')
@@ -159,7 +152,7 @@ class ABC_HODsim(object):
         thr = -1. * np.float(Mr)
 
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
-        self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+        #self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
         self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
         self.RR = data_RR(box='md_sub')
         self.randoms = data_random(box='md_sub')
@@ -191,12 +184,14 @@ class ABC_HODsim(object):
 
         if prior_range is None:
             rint = np.random.randint(1, 125)
-            simsubvol = lambda x: util.mask_func(x, rint)
-            self.model.populate_mock(self.halocat,
-                            masking_function=simsubvol,
-                            enforce_PBC=False)
-           
+            ####simsubvol = lambda x: util.mask_func(x, rint)
+            ####self.model.populate_mock(self.halocat,
+            ####                masking_function=simsubvol,
+            ####                enforce_PBC=False)
+            self.model.populate_mock(self.halocat)
+                        
             pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
+            pos = util.mask_galaxy_table(pos , rint) 
 
             xi , yi , zi = util.random_shifter(rint)
             temp_randoms = self.randoms.copy()

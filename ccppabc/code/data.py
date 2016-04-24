@@ -212,13 +212,16 @@ def build_nbar_xi_gmf(Mr=21, b_normal=0.25):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr)
     halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
-    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+    ####model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
 
-    datsubvol = lambda x: util.mask_func(x, 0)
-    model.populate_mock(halocat, masking_function=datsubvol, enforce_PBC=False)
+    ####datsubvol = lambda x: util.mask_func(x, 0)
+    ####model.populate_mock(halocat, masking_function=datsubvol, enforce_PBC=False)
+    model.populate_mock(halocat)
     
     #all the things necessary for tpcf calculation
     pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+    #masking the galaxies outside the subvolume 0
+    pos = util.mask_galaxy_table(pos , 0)
     rbins = xi_binedges()
     rmax = rbins.max()
     approx_cell1_size = [rmax , rmax , rmax]
@@ -274,7 +277,7 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr)
     halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
-    model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+    ###model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
     
     #some settings for tpcf calculations
     rbins = xi_binedges()
@@ -292,12 +295,15 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         print 'mock#', i
 
         # populate the mock subvolume
-        mocksubvol = lambda x: util.mask_func(x, i)
-        model.populate_mock(halocat,
-                            masking_function=mocksubvol,
-                            enforce_PBC=False)
-        # returning the positions of galaxies
+        ###mocksubvol = lambda x: util.mask_func(x, i)
+        ###model.populate_mock(halocat,
+        ###                    masking_function=mocksubvol,
+        ###                    enforce_PBC=False)
+        model.populate_mock(halocat)
+        # returning the positions of galaxies in the entire volume
         pos = three_dim_pos_bundle(model.mock.galaxy_table, 'x', 'y', 'z')
+        # masking out the galaxies outside the subvolume i
+        pos = util.mask_galaxy_table(pos , i)
         # calculate nbar
         
         nbars.append(len(pos) / 200**3.)
@@ -308,7 +314,7 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         temp_randoms[:,1] += yi
         temp_randoms[:,2] += zi
         #calculate xi(r)        
-        xi = tpcf(
+        xi = (
             pos, rbins, pos, 
             randoms=temp_randoms, period=None, 
             max_sample_size=int(3e5), estimator='Natural', 
