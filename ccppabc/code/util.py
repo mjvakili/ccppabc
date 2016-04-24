@@ -35,7 +35,6 @@ def mask_galaxy_table(pos , subvol_index):
     returns the galaxies that are in a subvolume with index subvol_index
     '''
     xi , yi , zi  = edge(subvol_index)
-    mask = np.where()
         
     submask = np.where((xi <pos[:, 0]) * \
                        (pos[:, 0] < xi + 200) * \
@@ -106,6 +105,6 @@ def mcmc_dir():
     return dat_dir()+'mcmc/'
 
 def crash_dir():
-    return dat_dir()+'crash/
+    return dat_dir()+'crash/'
 
 

@@ -237,13 +237,13 @@ def build_nbar_xi_gmf(Mr=21, b_normal=0.25):
  
     #compue tpcf with Natural estimator
     data_xir = tpcf(
-            pos, rbins, pos, 
-            randoms=randoms, period=None, 
-            max_sample_size=int(2e5), estimator='Natural', 
-            approx_cell1_size=approx_cell1_size, 
-            approx_cellran_size=approx_cellran_size, 
-            RR_precomputed=RR, 
-            NR_precomputed=NR)
+                 pos, rbins, pos, 
+                 randoms=randoms, period=None, 
+                 max_sample_size=int(2e5), estimator='Natural', 
+                 approx_cell1_size=approx_cell1_size, 
+                 approx_cellran_size=approx_cellran_size, 
+                 RR_precomputed=RR, 
+                 NR_precomputed=NR)
 
     fullvec = np.append(nbar, data_xir)
     
@@ -314,14 +314,14 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         temp_randoms[:,1] += yi
         temp_randoms[:,2] += zi
         #calculate xi(r)        
-        xi = (
-            pos, rbins, pos, 
-            randoms=temp_randoms, period=None, 
-            max_sample_size=int(3e5), estimator='Natural', 
-            approx_cell1_size=approx_cell1_size, 
-            approx_cellran_size=approx_cellran_size,
-            RR_precomputed = RR,
-	    NR_precomputed = NR)
+        xi=tpcf(
+             pos, rbins, pos, 
+             randoms=temp_randoms, period=None, 
+             max_sample_size=int(3e5), estimator='Natural', 
+             approx_cell1_size=approx_cell1_size, 
+             approx_cellran_size=approx_cellran_size,
+             RR_precomputed = RR,
+	     NR_precomputed = NR)
         xir.append(xi)
         # calculate gmf
 
@@ -451,6 +451,9 @@ def build_observations(Mr=21, b_normal=0.25, make=['data', 'covariance']):
         # xi, nbar, gmf
         print 'Building nbar, xi(r), GMF data vector... '
         build_xi_bins(Mr=Mr)
+        print 'Building randoms and RRs for the subvolumes'
+        build_randoms_RR(Nr=5e5, box='md_sub')
+        
         build_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
     
     if 'covariance' in make:
