@@ -17,9 +17,8 @@ def random_shifter(index):
     return xi , yi , zi
 
 def edge(index):
-    '''
-    returns the edge of the subvolume of a given index
-    '''    
+
+    
     zi = (index / 25) * 200.
     i2 = index % 25
     yi = (i2 / 5) * 200.
@@ -28,24 +27,19 @@ def edge(index):
 
     return xi , yi , zi
 
-
 def mask_galaxy_table(pos , subvol_index):
-    '''
-    maskes the positions of the galaxies in the entire subvolume
-    returns the galaxies that are in a subvolume with index subvol_index
-    '''
+
+
     xi , yi , zi  = edge(subvol_index)
-        
     submask = np.where((xi <pos[:, 0]) * \
                        (pos[:, 0] < xi + 200) * \
-                       (yi < pos[:, 1]) *  \
+                       (yi <pos[:, 1]) * \
                        (pos[:, 1] < yi + 200) * \
-                       (zi < pos[:, 1]) *  \
-                       (pos[:, 1] < zi + 200))
+                       (zi <pos[:, 2]) *  \
+                       (pos[:, 2] < zi + 200))
     masked_positions = pos[submask]
 
     return masked_positions
-      
     
 def mk_id_column(table=None):
 
@@ -65,7 +59,6 @@ def mk_id_column(table=None):
 
     return subvol_ids
 
-
 def mask_func(halo_table, subvol_index):
     '''
     Function passed to the `populate mock` method of a halotools model
@@ -74,7 +67,6 @@ def mask_func(halo_table, subvol_index):
     '''
     ids = halo_table["sim_subvol"]
     return np.where(ids == subvol_index)[0]
-
 
 def observable_id_flag(observables):
     '''
@@ -106,5 +98,4 @@ def mcmc_dir():
 
 def crash_dir():
     return dat_dir()+'crash/'
-
 
