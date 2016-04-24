@@ -152,7 +152,7 @@ class ABC_HODsim(object):
         thr = -1. * np.float(Mr)
 
         self.model = PrebuiltHodModelFactory('zheng07', threshold=thr)
-        #self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
+        ####self.model.new_haloprop_func_dict = {'sim_subvol': util.mk_id_column}
         self.halocat = CachedHaloCatalog(simname = 'multidark', redshift = 0, halo_finder = 'rockstar')
         self.RR = data_RR(box='md_sub')
         self.randoms = data_random(box='md_sub')
@@ -239,7 +239,8 @@ class ABC_HODsim(object):
                                 enforce_PBC=False)
            
                     pos =three_dim_pos_bundle(self.model.mock.galaxy_table, 'x', 'y', 'z')
-
+                    #imposing mask on the galaxy table
+                    pos = util.mask_galaxy_table(pos , rint) 
             	    xi , yi , zi = util.random_shifter(rint)
             	    temp_randoms = self.randoms.copy()
             	    temp_randoms[:,0] += xi
@@ -262,7 +263,7 @@ class ABC_HODsim(object):
                     	    greek_xi = tpcf(
                                      pos, rbins, pos, 
                         	     randoms=temp_randoms, period = period, 
-                                     max_sample_size=int(2e5), estimator='Natural', 
+                                     max_sample_size=int(1e5), estimator='Natural', 
                                      approx_cell1_size=approx_cell1_size, 
                                      approx_cellran_size=approx_cellran_size,
                                      RR_precomputed = self.RR,

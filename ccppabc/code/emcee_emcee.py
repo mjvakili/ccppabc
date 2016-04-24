@@ -65,7 +65,6 @@ def lnPost(theta, **kwargs):
             res = fake_obs - np.hstack([model_obvs[0], model_obvs[1][1:]])
 	    nbin = len(res)
             f = (124. - 2. - nbin)/(124. - 1.)
-        #neg_chi_tot = - 0.5 * np.sum(np.dot(res , np.dot(fake_obs_icov , res)))
         neg_chi_tot = - 0.5 * f * np.sum(np.dot(res , solve(fake_obs_icov , res)))
         #print neg_chi_tot
     	return neg_chi_tot
@@ -160,7 +159,7 @@ def mcmc_mpi(Nwalkers, Nchains, observables=['nbar', 'xi'],
         random_guess = data_hod
         pos0 = np.repeat(random_guess, Nwalkers).reshape(Ndim, Nwalkers).T + \
                          5.e-2 * np.random.randn(Ndim * Nwalkers).reshape(Nwalkers, Ndim)
-        print pos0.shape
+        #print pos0.shape
     # Initializing MPIPool
     pool = MPIPool()
     if not pool.is_master():
@@ -209,7 +208,7 @@ if __name__=="__main__":
     print 'Observables: ', ', '.join(obv_list)
     mcmc_name = sys.argv[4]
     print 'MCMC name ', mcmc_name 
-    mcmc_mpi(Nwalkers, Niter, observables=obv_list, mcmcrun=mcmc_name)# , continue_chain = False)
+    mcmc_mpi(Nwalkers, Niter, observables=obv_list, mcmcrun=mcmc_name)
 
 
 

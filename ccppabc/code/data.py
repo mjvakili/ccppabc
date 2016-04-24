@@ -7,7 +7,6 @@ combinations that can come up in the generalised inference
 #general python modules
 import numpy as np
 from multiprocessing import cpu_count
-from numpy.linalg import solve
 import pyfof
 
 #haltools functions
@@ -272,7 +271,6 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     nbars = []
     xir = []
     gmfs = []
-    gmf_counts = []
 
     thr = -1. * np.float(Mr)
     model = PrebuiltHodModelFactory('zheng07', threshold=thr)
@@ -305,14 +303,14 @@ def build_MCMC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         # masking out the galaxies outside the subvolume i
         pos = util.mask_galaxy_table(pos , i)
         # calculate nbar
-        
+        print "shape of pos" , pos.shape 
         nbars.append(len(pos) / 200**3.)
         # translate the positions of randoms to the new subbox
-        xi , yi , zi = util.random_shifter(i)
+        xi0 , yi0 , zi0 = util.random_shifter(i)
         temp_randoms = randoms.copy()
-        temp_randoms[:,0] += xi
-        temp_randoms[:,1] += yi
-        temp_randoms[:,2] += zi
+        temp_randoms[:,0] += xi0
+        temp_randoms[:,1] += yi0
+        temp_randoms[:,2] += zi0
         #calculate xi(r)        
         xi=tpcf(
              pos, rbins, pos, 
@@ -378,9 +376,9 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
     approx_cellran_size = [rmax , rmax , rmax]
     
     # load randoms and RRs for the ENTIRE MultiDark volume 
-    randoms = data_random(box='md_all')
-    RR = data_RR(box='md_all')
-    NR = len(randoms)
+    ###randoms = data_random(box='md_all')
+    ###RR = data_RR(box='md_all')
+    ###NR = len(randoms)
 
     for i in xrange(1,125):
         print 'mock#', i
@@ -395,13 +393,9 @@ def build_ABC_cov_nbar_xi_gmf(Mr=21, b_normal=0.25):
         # calculate xi(r) for the ENTIRE MultiDark volume 
         # using the natural estimator DD/RR - 1
         xi = tpcf(
-                pos, rbins, pos, 
-                randoms=randoms, period=None, 
+                pos, rbins, period=model.mock.Lbox, 
                 max_sample_size=int(3e5), estimator='Natural', 
-                approx_cell1_size=approx_cell1_size, 
-                approx_cellran_size=approx_cellran_size,
-                RR_precomputed = RR,
-                NR_precomputed = NR)
+                approx_cell1_size=approx_cell1_size)
         xir.append(xi)
 
         # calculate gmf
@@ -449,20 +443,21 @@ def build_observations(Mr=21, b_normal=0.25, make=['data', 'covariance']):
     
     if 'data' in make: 
         # xi, nbar, gmf
-        print 'Building nbar, xi(r), GMF data vector... '
         build_xi_bins(Mr=Mr)
         print 'Building randoms and RRs for the subvolumes'
         build_randoms_RR(Nr=5e5, box='md_sub')
-        
+        print 'Building nbar, xi(r), GMF data vector... '
         build_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
     
     if 'covariance' in make:
         print 'Computing covariance matrix of data...'
+        print 'building the sample covariance'
         build_MCMC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
+        print 'building the poisson covariance'
         build_ABC_cov_nbar_xi_gmf(Mr=Mr, b_normal=b_normal)
 
     return None
 
 
 if __name__ == "__main__":
-    build_observations(Mr = 21, b_normal=0.25)
+    build_observations(Mr = 21, b_normal=0.25 , make = ['data' , 'covariance'])
