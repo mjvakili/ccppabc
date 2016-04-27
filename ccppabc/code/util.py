@@ -88,7 +88,7 @@ def dat_dir():
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
 
 def obvs_dir(): 
-    return dat_dir()+'observations/'
+    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'repo_dat/observations/'
 
 def abc_dir():
     return dat_dir()+'pmc_abc/'
