@@ -298,4 +298,3 @@ class ABC_HODsim(object):
                     elif obv == 'xi':
                         obvs.append(np.zeros(len(xi_binedges()[:-1])))
                 return obvs
-
