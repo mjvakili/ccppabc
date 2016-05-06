@@ -2,7 +2,6 @@
 Plotting modules
 '''
 import os
-from astroML.plotting import plot_mcmc
 #----------------------------------------------------------------------
 # This function adjusts matplotlib settings for a uniform feel in the textbook.
 # Note that with usetex=True, fonts are rendered with LaTeX.  This may
@@ -17,26 +16,27 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MaxNLocator
-from ChangTools.plotting import prettyplot
-from ChangTools.plotting import prettycolors
-prettycolors()
+# from ChangTools.plotting import prettyplot
+# from ChangTools.plotting import prettycolors
+# prettycolors()
 # --- local ---
 import util
 import data as Data
 from prior import PriorRange
 plt.switch_backend("Agg")
 from matplotlib import lines as mlines
+from matplotlib import gridspec
 
 def overlay_pdfs_contours(abc_filename , mcmc_filename , nwalkers , nburns , Mr):
     import matplotlib as mpl
     label_size = 35
-    mpl.rcParams['xtick.labelsize'] = label_size 
-    mpl.rcParams['ytick.labelsize'] = label_size 
+    mpl.rcParams['xtick.labelsize'] = label_size
+    mpl.rcParams['ytick.labelsize'] = label_size
     MP_LINEWIDTH = 2.4
     MP_TICKSIZE = 10.
-    thick_line1 = mlines.Line2D([], [], ls = '-', c = 'blue', linewidth=4, 
+    thick_line1 = mlines.Line2D([], [], ls = '-', c = 'blue', linewidth=4,
                            label='ABC-PMC')
-    thick_line2 = mlines.Line2D([], [], ls = '-', c = 'red', linewidth=4, 
+    thick_line2 = mlines.Line2D([], [], ls = '-', c = 'red', linewidth=4,
                            label=r'Gaussian $\mathcal{L}$ +MCMC')
     mpl.rc('axes', linewidth=MP_LINEWIDTH)
     data_hod_dict = Data.data_hod_param(Mr=Mr)
@@ -52,31 +52,31 @@ def overlay_pdfs_contours(abc_filename , mcmc_filename , nwalkers , nburns , Mr)
     plot_range = np.zeros((len(prior_min),2))
     plot_range[:,0] = prior_min
     plot_range[:,1] = prior_max
-    
+
     mcmc_sample = np.loadtxt(mcmc_filename)[nburns*nwalkers:,:]
     abc_sample = np.loadtxt(abc_filename)
-    
+
     ##################### scatter plots ##########################
-    fig, axes = plt.subplots(1, 3, figsize=(48, 13))
-    fig.subplots_adjust(wspace=0.4, hspace=0.2)    
-   
+    fig, axes = plt.subplots(2, 3, figsize=(48, 13))
+    fig.subplots_adjust(wspace=0.4, hspace=0.2)
+
     ax = axes[0]
-    ax_list = corner.hist2d(mcmc_sample[:,3],mcmc_sample[:,2],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                            fill_contours = True, alpha = 10. , color = 'r', smooth = 1. , linewidth=4)
-    ax_list = corner.hist2d(abc_sample[:,3],abc_sample[:,2],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                            fill_contours = True,alpha = 0.1, color = 'b', smooth = 1. , linewidth=4)
+    ax_list = corner.hist2d(mcmc_sample[:,3],mcmc_sample[:,2],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                            fill_contours = True, alpha = 10. , color = 'r', smooth = 1. , linewidth=4, range = [plot_range[3,:],plot_range[2,:]])
+    ax_list = corner.hist2d(abc_sample[:,3],abc_sample[:,2],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                            fill_contours = True,alpha = 0.1, color = 'b', smooth = 1. , linewidth=4, range = [plot_range[3,:],plot_range[2,:]])
     ax.plot(truths[3] , truths[2] , marker="*", markersize=25 , color = "yellow")
     ax.set_ylabel(r'$\log M_{\rm min}$', fontsize = 50)
     ax.set_xlabel(r'$\alpha$', fontsize = 50)
     ax.set_xlim([plot_range[3,0] , plot_range[3,1]])
     ax.set_ylim([plot_range[2,0] , plot_range[2,1]])
-    
+
 
     ax = axes[1]
-    ax_list = corner.hist2d(mcmc_sample[:,2],mcmc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                            fill_contours = True, color = 'r', smooth = 1. , linewidth=4)
-    ax_list = corner.hist2d(abc_sample[:,2],abc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                           fill_contours = True, color = 'b', smooth = 1. , linewidth=4)
+    ax_list = corner.hist2d(mcmc_sample[:,2],mcmc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                            fill_contours = True, color = 'r', smooth = 1. , linewidth=4, range = [plot_range[2,:],plot_range[4,:]])
+    ax_list = corner.hist2d(abc_sample[:,2],abc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                           fill_contours = True, color = 'b', smooth = 1. , linewidth=4, range = [plot_range[2,:],plot_range[4,:]])
     ax.plot(truths[2] , truths[4] , marker="*", markersize=25 , color = "yellow")
     ax.set_xlabel(r'$\log M_{\rm min}$', fontsize = 50)
     ax.set_ylabel(r'$\log M_{1}$', fontsize = 50)
@@ -86,10 +86,10 @@ def overlay_pdfs_contours(abc_filename , mcmc_filename , nwalkers , nburns , Mr)
 
 
     ax = axes[2]
-    ax_list = corner.hist2d(mcmc_sample[:,3],mcmc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                            fill_contours = True, color = 'r', smooth = 1. , linewidth=4)
-    ax_list = corner.hist2d(abc_sample[:,3], abc_sample[:,4], bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False , 
-                            fill_contours = True, color = 'b', smooth = 1. , linewidth=4)
+    ax_list = corner.hist2d(mcmc_sample[:,3],mcmc_sample[:,4],bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                            fill_contours = True, color = 'r', smooth = 1. , linewidth=4, range = [plot_range[3,:],plot_range[4,:]])
+    ax_list = corner.hist2d(abc_sample[:,3], abc_sample[:,4], bins =20,levels=[0.68,0.95], ax = ax, plot_datapoints = False ,
+                            fill_contours = True, color = 'b', smooth = 1. , linewidth=4, range = [plot_range[3,:],plot_range[4,:]])
     ax.plot(truths[3] , truths[4] , marker="*", markersize=25 , color = "yellow")
     ax.set_ylabel(r'$\log M_{1}$', fontsize = 50)
     ax.set_xlabel(r'$\alpha$', fontsize = 50)
@@ -99,45 +99,178 @@ def overlay_pdfs_contours(abc_filename , mcmc_filename , nwalkers , nburns , Mr)
 
     plt.legend(handles=[thick_line2, thick_line1], frameon=False, loc='best', fontsize=50)
 
-    plt.savefig("contours_nbargmf2.pdf") 
-   
+    plt.savefig("contours_nbarxi2.pdf")
+
     ################## HISTOGRAMS#########################################
- 
-    fig, axes = plt.subplots(1, 3, figsize=(48, 13))
-    fig.subplots_adjust(wspace=0.4, hspace=0.2)    
-   
-    ax = axes[0]
-    q = ax.hist(mcmc_sample[:,2], bins =20, normed = True , alpha = 1. , color = 'r', linewidth=4 , histtype='step')
-    qq = ax.hist(abc_sample[:,2], bins =20, normed = True , alpha = 1. , color = 'b', linewidth=4 , histtype='step')
-    ax.vlines(truths[2], 0, max(q[0].max(),qq[0].max()), color = "k", linewidth = 5)
-    ax.set_xlabel(r'$\log M_{\rm min}$', fontsize = 50)
+
+#     fig, axes = plt.subplots(1, 3, figsize=(48, 13))
+#     fig.subplots_adjust(wspace=0.4, hspace=0.2)
+#
+#     ax = axes[0]
+#     q = ax.hist(mcmc_sample[:,2], bins =20, range = [plot_range[2,:].min(),plot_range[2,:].max()] , normed = True , alpha = 1. , color = 'r', linewidth=4 , histtype='step')
+#     qq = ax.hist(abc_sample[:,2], bins =20, range = [plot_range[2,:].min(),plot_range[2,:].max()] ,normed = True , alpha = 1. , color = 'b', linewidth=4 , histtype='step')
+#     ax.vlines(truths[2], 0, max(q[0].max(),qq[0].max()), color = "k", linewidth = 5)
+#     ax.set_xlabel(r'$\log M_{\rm min}$', fontsize = 50)
+#     ax.set_xlim([plot_range[2,0] , plot_range[2,1]])
+#
+#
+#     ax = axes[1]
+#     q = ax.hist(mcmc_sample[:,3], bins =20, range = [plot_range[3,:].min(),plot_range[3,:].max()] ,normed = True , alpha = 1. , color = 'r', linewidth=4, histtype='step')
+#     qq = ax.hist(abc_sample[:,3], bins =20, range = [plot_range[3,:].min(),plot_range[3,:].max()] ,normed = True , alpha = 1. , color = 'b', linewidth=4, histtype='step')
+#     ax.vlines(truths[3], 0, max(q[0].max(),qq[0].max()), color = "k" , linewidth = 5)
+#     ax.set_xlabel(r'$\alpha$', fontsize = 50)
+#     ax.set_xlim([plot_range[3,0] , plot_range[3,1]])
+#
+#
+#     ax = axes[2]
+#     q = ax.hist(mcmc_sample[:,4], bins =20, range = [plot_range[4,:].min(),plot_range[4,:].max()] ,normed = True , alpha = 1. , color = 'r', linewidth=4, histtype='step')
+#     qq = ax.hist(abc_sample[:,4], bins =20, range = [plot_range[4,:].min(),plot_range[4,:].max()] ,normed = True , alpha = 1. , color = 'b', linewidth=4 , histtype='step')
+#     ax.vlines(truths[4] , 0, max(q[0].max(),qq[0].max()), colors='k' , linewidth = 5)
+#     ax.set_xlabel(r'$\log M_{1}$', fontsize = 50)
+#     ax.set_xlim([plot_range[4,0] , plot_range[4,1]])
+#
+#
+#     plt.legend(handles=[thick_line2, thick_line1], frameon=False, loc='best', fontsize=30)
+#
+#     plt.savefig("histograms_nbarxi2.pdf")
+#     return None
+
+
+    abclr = 'blue'
+    mcmclr = 'red'
+
+    fig = plt.figure(1, figsize=(50, 25))
+    gs = gridspec.GridSpec(3, 2, height_ratios=[3, 1],
+                           width_ratios=[1,1,1])
+
+    ax = plt.subplot(gs[0])
+    q = ax.hist(mcmc_sample[:,2], bins=20,
+                range=[plot_range[2,:].min(),
+                       plot_range[2,:].max()],
+                normed=True, alpha=1., color=mcmclr,
+                linewidth=4, histtype='step')
+    qq = ax.hist(abc_sample[:,2], bins=20,
+                 range=[plot_range[2,:].min(),
+                        plot_range[2,:].max()],
+                 normed=True, alpha=1., color=abclr,
+                 linewidth=4, histtype='step')
+    ax.vlines(truths[2], 0, max(q[0].max(),qq[0].max()),
+              color = "k", linewidth = 5)
+    ax.set_xticklabels([])
     ax.set_xlim([plot_range[2,0] , plot_range[2,1]])
-    
 
-    ax = axes[1]
-    q = ax.hist(mcmc_sample[:,3], bins =20, normed = True , alpha = 1. , color = 'r', linewidth=4, histtype='step')
-    qq = ax.hist(abc_sample[:,3], bins =20, normed = True , alpha = 1. , color = 'b', linewidth=4, histtype='step')
-    ax.vlines(truths[3], 0, max(q[0].max(),qq[0].max()), color = "k" , linewidth = 5)
+    ax = plt.subplot(gs[1])
+    q = ax.hist(mcmc_sample[:,3], bins=20,
+                range=[plot_range[3,:].min(),
+                       plot_range[3,:].max()],
+                normed=True, alpha=1., color=mcmclr,
+                linewidth=4, histtype='step')
+    qq = ax.hist(abc_sample[:,3], bins=20,
+                 range=[plot_range[3,:].min(),
+                        plot_range[3,:].max()],
+                 normed=True, alpha=1., color=abclr,
+                 linewidth=4, histtype='step')
+    ax.vlines(truths[3], 0, max(q[0].max(),qq[0].max()),
+              color="k", linewidth=5)
+    ax.set_xticklabels([])
+    ax.set_xlim([plot_range[3,0], plot_range[3,1]])
+
+    ax = plt.subplot(gs[2])
+    q = ax.hist(mcmc_sample[:,4], bins=20,
+                range=[plot_range[4,:].min(),
+                       plot_range[4,:].max()],
+                normed=True, alpha=1., color=mcmclr,
+                linewidth=4, histtype='step')
+    qq = ax.hist(abc_sample[:,4], bins=20,
+                 range=[plot_range[4,:].min(),
+                        plot_range[4,:].max()],
+                 normed=True, alpha=1., color=abclr,
+                 linewidth=4, histtype='step')
+    ax.vlines(truths[4], 0, max(q[0].max(),qq[0].max()),
+              colors='k', linewidth=5)
+    ax.set_xticklabels([])
+    ax.set_xlim([plot_range[4,0], plot_range[4,1]])
+
+    # and now the box plots below
+    bplots = []
+    ax = plt.subplot(gs[3])
+    bplots.append(ax.boxplot(mcmc_sample[:,2],
+                             vert=False, patch_artist=True))
+    bplots.append(ax.boxplot(abc_sample[:,2],
+                             vert=False, patch_artist=True))
+    for i, bplot in enumerate(bplots):
+        if i == 0:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(mcmclr)
+                patch.set_alpha(0.5)
+        elif i == 1:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(abclr)
+                patch.set_alpha(0.5)
+
+    ax.vlines(truths[2], 0, max(q[0].max(),qq[0].max()),
+              color = "k", linewidth = 5)
+    ax.set_xlim([plot_range[2,0] , plot_range[2,1]])
+    ax.set_xlabel(r'$\log M_{\rm min}$', fontsize = 50)
+
+    ax.set_yticks([1,2])
+    ax.set_yticklabels(["MCMC", "ABC"])
+
+
+
+    ax = plt.subplot(gs[4])
+    bplots.append(ax.boxplot(mcmc_sample[:,3],
+                             vert=False, patch_artist=True))
+    bplots.append(ax.boxplot(abc_sample[:,3],
+                             vert=False, patch_artist=True))
+    for i, bplot in enumerate(bplots):
+        if i == 0:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(mcmclr)
+                patch.set_alpha(0.5)
+        elif i == 1:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(abclr)
+                patch.set_alpha(0.5)
+    ax.vlines(truths[3], 0, max(q[0].max(),qq[0].max()),
+              color = "k" , linewidth = 5)
+    ax.set_xlim([plot_range[3,0], plot_range[3,1]])
     ax.set_xlabel(r'$\alpha$', fontsize = 50)
-    ax.set_xlim([plot_range[3,0] , plot_range[3,1]])
+    ax.set_yticks([])
 
-
-    ax = axes[2]
-    q = ax.hist(mcmc_sample[:,4], bins =20, normed = True , alpha = 1. , color = 'r', linewidth=4, histtype='step')
-    qq = ax.hist(abc_sample[:,4], bins =20, normed = True , alpha = 1. , color = 'b', linewidth=4 , histtype='step')
-    ax.vlines(truths[4] , 0, max(q[0].max(),qq[0].max()), colors='k' , linewidth = 5)
+    ax = plt.subplot(gs[5])
+    bplots.append(ax.boxplot(mcmc_sample[:,4],
+                             vert=False, patch_artist=True))
+    bplots.append(ax.boxplot(abc_sample[:,4],
+                             vert=False, patch_artist=True))
+    for i, bplot in enumerate(bplots):
+        if i == 0:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(mcmclr)
+                patch.set_alpha(0.5)
+        elif i == 1:
+            for patch in bplot['boxes']:
+                patch.set_facecolor(abclr)
+                patch.set_alpha(0.5)
+    ax.vlines(truths[4] , 0, max(q[0].max(),qq[0].max()),
+              colors='k' , linewidth = 5)
+    ax.set_xlim([plot_range[4,0], plot_range[4,1]])
     ax.set_xlabel(r'$\log M_{1}$', fontsize = 50)
-    ax.set_xlim([plot_range[4,0] , plot_range[4,1]])
+    ax.set_yticks([])
 
+    fig.subplots_adjust(wspace=0.05, hspace=0.0)
 
-    plt.legend(handles=[thick_line2, thick_line1], frameon=False, loc='best', fontsize=30)
+    plt.legend(handles=[thick_line2, thick_line1],
+               frameon=False, loc='best', fontsize=30)
 
-    plt.savefig("histograms_nbargmf2.pdf") 
+    plt.savefig("histograms_nbarxi2_boxplot.pdf")
     return None
+
+
 
 if __name__ == "__main__":
 
-    mcmc_filename = "results/nbar_gmf.mcmc.mcmc_chain.dat"
-    #abc_filename  = "results/nbar_gmf_theta_t9.abc.dat"
-    abc_filename = "results/nbar_gmf_theta_t8.ABCnbargmf.dat"
-    overlay_pdfs_contours(abc_filename , mcmc_filename , 100 , 9000 , 21) 
+    mcmc_filename = "results/nbar_xi.mcmc.mcmc_chain.dat"
+    abc_filename  = "results/nbar_xi_theta_t8.abc.dat"
+    #abc_filename = "results/nbar_gmf_theta_t8.ABCnbargmf.dat"
+    overlay_pdfs_contours(abc_filename , mcmc_filename , 100 , 6000 , 21)
