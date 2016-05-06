@@ -97,7 +97,7 @@ def PoolEvolution(obvs):
             r'$\mathtt{log}\;\mathcal{M}_\mathtt{min}$', 
             fontsize=30, labelpad=25)
 
-    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(hspace=0.0)
     fig_name = ''.join([ut.fig_dir(), 
         'paper_ABC_poolevolution', 
         '.', obvs, 
@@ -162,7 +162,7 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
         if obvs == 'nbarxi': 
             ax = plt.subplot(gs[0])
         elif obvs == 'nbargmf': 
-            ax = plt.subplot(gs[2])
+            ax = plt.subplot(gs[1])
 
         if 'xi' in obvs:  # 2PCF
             xi_data = Data.data_xi(Mr=Mr, b_normal=b_normal)
@@ -174,13 +174,14 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
             ax.errorbar(r_bin, xi_data, yerr = np.sqrt(np.diag(data_xi_cov)), fmt="o", color='k', 
                     markersize=0, lw=0, capsize=3, elinewidth=1.5)
             ax.scatter(r_bin, xi_data, c='k', s=10, lw=0)
-            ax.set_ylabel(r'$\xi_\mathtt{gg}$', fontsize=25)
+            ax.set_ylabel(r'$\xi_\mathtt{gg}(\mathtt{r})$', fontsize=27)
             ax.set_yscale('log') 
             ax.set_xscale('log')
             ax.set_xticklabels([])
             ax.set_xlim([0.1, 20.])
+            ax.set_ylim([0.09, 1000.])
 
-            ax = plt.subplot(gs[1])
+            ax = plt.subplot(gs[2])
             ax.fill_between(r_bin, a/xi_data, e/xi_data, color=pretty_colors[3], alpha=0.3, edgecolor="none")
             ax.fill_between(r_bin, b/xi_data, d/xi_data, color=pretty_colors[3], alpha=0.5, edgecolor="none")
             ax.errorbar(r_bin, np.repeat(1., len(xi_data)), yerr=np.sqrt(np.diag(data_xi_cov))/xi_data, 
@@ -189,7 +190,7 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
             ax.set_xlim([0.1, 20.])
             ax.set_xscale('log') 
             ax.set_ylim([0.5, 1.5]) 
-            ax.set_xlabel(r'$\mathtt{r}\;[\mathtt{Mpc}/h]$', fontsize=20)
+            ax.set_xlabel(r'$\mathtt{r}\;[\mathtt{Mpc}/h]$', fontsize=25)
             ax.set_ylabel(r'$\xi_\mathtt{gg}/\xi_\mathtt{gg}^\mathtt{obvs}$', fontsize=25)
 
         elif 'gmf' in obvs:   # GMF
@@ -198,10 +199,15 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
             data_gmf_cov = cov_data[16:, 16:]
 
             ax.fill_between(r_bin, a, e, color=pretty_colors[3], alpha=0.3, edgecolor="none")
-            ax.fill_between(r_bin, b, d, color=pretty_colors[3], alpha=0.5, edgecolor="none")
+            ax.fill_between(r_bin, b, d, color=pretty_colors[3], alpha=0.5, edgecolor="none", label='ABC Posterior')
             ax.errorbar(r_bin, data_gmf, yerr=np.sqrt(np.diag(data_gmf_cov)), fmt="o", color='k', 
-                    markersize=0, lw=0, capsize=3, elinewidth=1.5)
-            ax.scatter(r_bin, data_gmf, s=10, lw=0, c='k')
+                    markersize=0, lw=0, capsize=4, elinewidth=2)
+            ax.scatter(r_bin, data_gmf, s=15, lw=0, c='k', label='Mock Observation')
+            ax.legend(loc='upper right', scatterpoints=1, prop={'size': 25}, borderpad=1.0)
+
+            ax.yaxis.tick_right()
+            ax.yaxis.set_ticks_position('both')
+            ax.yaxis.set_label_position('right') 
             ax.set_ylabel(r'$\zeta$ $[(\mathrm{h}/\mathtt{Mpc})^{3}]$', fontsize=25)
 
             ax.set_yscale('log')
@@ -215,13 +221,16 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
 
             ax.errorbar(r_bin, np.repeat(1., len(data_gmf)), yerr=np.sqrt(np.diag(data_gmf_cov))/data_gmf, 
                     fmt="o", color='k', markersize=0, lw=0, capsize=3, elinewidth=1.5)
-            ax.plot(np.arange(1., 20., 1), np.repeat(1., len(np.arange(1., 20, 1))), c='k', ls='--', lw=2)
-            ax.set_ylim([0., 2.])
+            ax.plot(np.arange(1., 20., 1), np.repeat(1., len(np.arange(1., 20, 1))), c='k', ls='--', lw=1.75)
+
+            ax.yaxis.tick_right()
+            ax.yaxis.set_label_position('right') 
+            ax.set_ylim([-0.1, 2.1])
             ax.set_ylabel(r'$\zeta/\zeta^\mathtt{obvs}$', fontsize=25)
             ax.set_xlim([1., 20.])
-            ax.set_xlabel(r'Group Richness', fontsize=25)
+            ax.set_xlabel(r'$\mathtt{N}$ [Group Richness]', fontsize=25)
 
-    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(wspace=0.05, hspace=0.0)
     fig_name = ''.join([ut.fig_dir(), 
         'paper', 
         '.ABCposterior', 
@@ -232,6 +241,6 @@ def PosteriorObservable(Mr=21, b_normal=0.25, clobber=False):
 
 
 if __name__=="__main__": 
-    PosteriorObservable(Mr=21, b_normal=0.25)
-    #PoolEvolution('nbargmf')
-    #PoolEvolution('nbarxi')
+    #PosteriorObservable(Mr=21, b_normal=0.25)
+    PoolEvolution('nbargmf')
+    PoolEvolution('nbarxi')
