@@ -16,7 +16,9 @@ from prior import PriorRange
 from hod_sim import ABC_HODsim
 
 import matplotlib.pyplot as plt
+from matplotlib import lines as mlines
 from matplotlib import gridspec
+from scipy.stats import norm
 from matplotlib.colors import colorConverter
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
@@ -485,49 +487,180 @@ def ABC_Convergence(weighted=False):
     plt.close() 
     return None
 
+
+
 def ABCvsMCMC(obvs, nwalkers=100, nburns=9000):  
+    ''' Plots that compare the ABC posteriors to the MCMC posteriors 
+    '''
     if obvs == 'nbargmf':
         abc_dir = ''.join([ut.dat_dir(), 'paper/ABC', obvs, '/run1/',])
         abc_theta_file = lambda tt: ''.join([abc_dir, 'nbar_gmf_theta_t', str(tt), '.ABCnbargmf.dat']) 
+        tf = 8
         mcmc_dir = ''.join([ut.dat_dir(), 'paper/']) 
-        mcmc_filename = ''.join([mcmc_dir, 'nbar_gmf.mcmc.mcmc_chain.dat'])
+        mcmc_filename = ''.join([mcmc_dir, 'nbar_gmf.mcmc.mcmc_chain.p'])
+    elif obvs == 'nbarxi': 
+        abc_dir = ''.join([ut.dat_dir(), 'paper/ABC', obvs, '/',])
+        abc_theta_file = lambda tt: ''.join([abc_dir, 'nbar_xi_theta_t', str(tt), '.abc.dat'])
+        tf = 9
+        mcmc_dir = ''.join([ut.dat_dir(), 'paper/']) 
+        mcmc_filename = ''.join([mcmc_dir, 'nbar_xi.mcmc.mcmc_chain.p'])
     else: 
         raise ValueError
 
     prior_min, prior_max = PriorRange('first_try')
-    prior_range = np.zeros((2,2))
-    prior_range[:,0] = np.array([prior_min[2], prior_min[4]])
-    prior_range[:,1] = np.array([prior_max[2], prior_max[4]])
+    prior_range = np.zeros((len(prior_min),2))
+    prior_range[:,0] = prior_min 
+    prior_range[:,1] = prior_max 
 
     # true HOD parameter
     true_dict = Data.data_hod_param(Mr=21)
-    true_pair = [true_dict['logMmin'], true_dict['logM1']]
+    truths = [
+            true_dict['logM0'],                 # log M0
+            np.log(true_dict['sigma_logM']),    # log(sigma)
+            true_dict['logMmin'],               # log Mmin
+            true_dict['alpha'],                 # alpha
+            true_dict['logM1']                  # log M1
+            ]
     
-    mcmc_sample = np.loadtxt(mcmc_filename)[nburns*nwalkers:,:]
-    abc_sample = np.loadtxt(abc_theta_file(8))
+    mcmc_sample = pickle.load(open(mcmc_filename, 'rb'))[nburns*nwalkers:,:]
+    abc_sample = np.loadtxt(abc_theta_file(tf))
+
+    normie = norm()
+    sig1lo = normie.cdf(-1)
+    sig1hi = normie.cdf(1)
+    sig2lo = normie.cdf(-2)
+    sig2hi = normie.cdf(2)
+
+    nsamples_mcmc = len(mcmc_sample[:, 2])
+    nsamples_abc = len(abc_sample[:, 2])
+
+    sig1lo_mcmc = int(sig1lo * nsamples_mcmc)
+    sig2lo_mcmc = int(sig2lo * nsamples_mcmc)
+    sig1hi_mcmc = int(sig1hi * nsamples_mcmc)
+    sig2hi_mcmc = int(sig2hi * nsamples_mcmc)
+
+    sig1lo_abc = int(sig1lo * nsamples_abc)
+    sig2lo_abc = int(sig2lo * nsamples_abc)
+    sig1hi_abc = int(sig1hi * nsamples_abc)
+    sig2hi_abc = int(sig2hi * nsamples_abc)
+
+    par_labels = [
+                r'$\mathtt{log}\;\mathcal{M}_{0}$',
+                r'$\mathtt{log}\;\sigma_\mathtt{log\;M}$',
+                r'$\mathtt{log}\;\mathcal{M}_\mathtt{min}$',
+                r'$\alpha$',
+                r'$\mathtt{log}\;\mathcal{M}_{1}$'
+                ]
 
     prettyplot()
     pretty_colors = prettycolors()
-    fig = plt.figure() 
-    sub = fig.add_subplot(111)
-   
-    corner.hist2d(
-            mcmc_sample[:,2], mcmc_sample[:,4], bins=20, levels=[0.68,0.95], 
-            plot_datapoints=False, fill_contours=True, color='r', smooth=1., 
-            range=prior_range, linewidth=4)
-    corner.hist2d(
-            abc_sample[:,2], abc_sample[:,4], bins=20, levels=[0.68,0.95], 
-            plot_datapoints=False, fill_contours=True, color='b', smooth=1., 
-            range=prior_range, linewidth=4)
-    sub.plot(true_pair[0], true_pair[1] , marker="*", markersize=25, color="yellow")
-    sub.set_xlabel(r'$\log M_{\rm min}$', fontsize = 50)
-    sub.set_ylabel(r'$\log M_{1}$', fontsize = 50)
-    plt.show() 
+    fig = plt.figure(1, figsize=(20,8))
+    gs = gridspec.GridSpec(2, 3, height_ratios=[2.75, 1])
+    
+    # first panel 
+    for i in [0, 1, 2]:
+        if i == 0: 
+            i_col = 2
+            prior_range[i_col,0] = 12.5
+            prior_range[i_col,1] = 13.
+            plot_range = prior_range[i_col, :]
+        elif i == 1: 
+            i_col = 3 
+            plot_range = prior_range[i_col, :]
+        elif i == 2:
+            i_col = 4
+            prior_range[i_col,0] = 13.5
+            prior_range[i_col,1] = 14.25
+            plot_range = np.array([13.5, 14.5])
+
+        ax = plt.subplot(gs[i])
+        q = ax.hist(mcmc_sample[:,i_col], bins=20,
+                    range=[prior_range[i_col,0], prior_range[i_col,1]], 
+                    normed=True, 
+                    alpha=0.75, 
+                    color=pretty_colors[1],
+                    linewidth=2, 
+                    histtype='stepfilled',
+                    edgecolor=None
+                    )
+        qq = ax.hist(abc_sample[:,i_col], bins=20,
+                     range=[prior_range[i_col,0], prior_range[i_col,1]],
+                     normed=True, 
+                     alpha=0.75, 
+                     color=pretty_colors[3],
+                     linewidth=2, 
+                     histtype='stepfilled', 
+                     edgecolor=None
+                     )
+        ax.axvline(truths[i_col], color='k', ls='--', linewidth=3)
+        ax.set_xticklabels([])
+        ax.set_xlim([plot_range[0] , plot_range[1]])
+        
+        if i == 2: 
+            thick_line2 = mlines.Line2D([], [], ls='-', c=pretty_colors[1], linewidth=4,
+                                        label='$\mathcal{L}^\mathtt{Gauss}$ \nMCMC')
+            thick_line1 = mlines.Line2D([], [], ls='-', c=pretty_colors[3], linewidth=4,
+                                        label='ABC-PMC')
+
+            ax.legend(loc='upper right', handles=[thick_line2, thick_line1],
+                      frameon=False, fontsize=25, handletextpad=-0.0)
+
+        # general box properties
+        boxprops = {'color': 'k'}
+        medianprops = {'alpha': 0.}
+        bplots1 = []
+        ax = plt.subplot(gs[i+3])
+        # stats dict for each box
+        bplots1.append({'med': np.median(mcmc_sample[:, i_col]),
+                       'q1': np.sort(mcmc_sample[:, i_col])[sig1lo_mcmc],
+                       'q3': np.sort(mcmc_sample[:, i_col])[sig1hi_mcmc],
+                       'whislo': np.sort(mcmc_sample[:, i_col])[sig2lo_mcmc],
+                       'whishi': np.sort(mcmc_sample[:, i_col])[sig2hi_mcmc],
+                       'fliers': []})
+        bplots1.append({'med': np.median(abc_sample[:, i_col]),
+                       'q1': np.sort(abc_sample[:, i_col])[sig1lo_abc],
+                       'q3': np.sort(abc_sample[:, i_col])[sig1hi_abc],
+                       'whislo': np.sort(abc_sample[:, i_col])[sig2lo_abc],
+                       'whishi': np.sort(abc_sample[:, i_col])[sig2hi_abc],
+                       'fliers': []})
+        whiskprop = dict(linestyle='-', linewidth=2, color='k') 
+        boxprops = dict(linestyle='-', linewidth=2, color='k')
+        bxp1 = ax.bxp(bplots1, positions=[1,2], vert=False, patch_artist=True, 
+                      showfliers=False, boxprops=boxprops, medianprops=medianprops, whiskerprops=whiskprop)
+
+        for ibox, box in enumerate(bxp1['boxes']):
+            if ibox == 0:
+                box.set(facecolor=pretty_colors[1], alpha=0.75)
+            elif ibox == 1:
+                box.set(facecolor=pretty_colors[3], alpha=0.75)
+        ax.axvline(truths[i_col], color='k', ls='--', linewidth=3)
+
+        ax.set_xlim([plot_range[0] , plot_range[1]])
+        ax.set_xlabel(par_labels[i_col], fontsize=25, labelpad=15)
+        
+        if i == 0: 
+            ax.set_yticks([1,2])
+            ax.set_yticklabels([r"$\mathtt{MCMC}$", r"$\mathtt{ABC}$"])
+        else: 
+            ax.set_yticks([])
+
+    fig.subplots_adjust(wspace=0.2, hspace=0.0)
+    fig_name = ''.join([ut.fig_dir(), 
+        'paper.ABCvsMCMC', 
+        '.', obvs, 
+        '.pdf'])
+    print fig_name 
+    fig.savefig(fig_name, bbox_inches='tight', dpi=150) 
+    return None 
+    #plt.show()
+
 
 
 
 if __name__=="__main__": 
-    TrueObservables()
+    #TrueObservables()
+    ABCvsMCMC('nbargmf', nwalkers=100, nburns=9000)
+    ABCvsMCMC('nbarxi', nwalkers=100, nburns=9000)
     #ABC_Coner('nbargmf')
     #ABC_Coner('nbarxi')
     #ABC_Convergence(weighted=True)
