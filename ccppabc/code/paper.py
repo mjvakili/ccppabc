@@ -655,7 +655,7 @@ def ABCvsMCMC_histogram(obvs, nwalkers=100, nburns=9000):
     #plt.show()
 
 
-def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000):  
+def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000, sigma=False):  
     ''' Plots that compare the ABC posteriors to the MCMC posteriors 
     '''
     if obvs == 'nbargmf':
@@ -741,11 +741,16 @@ def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000):
 
         ax = plt.subplot(gs[i])
 
+        if sigma: 
+            lvls = [1-np.exp(-0.5), 1-np.exp(-0.125)]
+        else: 
+            lvls = [0.68, 0.95]
+
         corner.hist2d(mcmc_par1, mcmc_par2, bins=20, range=plot_range, ax = ax, plot_datapoints=False,
-                levels=[0.68, 0.95], color='#1F77B4', fill_contours=True, smooth=1.0, label=mcmc_label)
+                levels=lvls, color='#1F77B4', fill_contours=True, smooth=1.0, label=mcmc_label)
         
         corner.hist2d(abc_par1, abc_par2, bins=20, range=plot_range, ax = ax, 
-                levels=[0.68, 0.95], color='#FF7F0E', fill_contours=True, smooth=1.0, label=abc_label)
+                levels=lvls, color='#FF7F0E', fill_contours=True, smooth=1.0, label=abc_label)
 
         ax.scatter(np.repeat(truths[col_pair[0]],2), np.repeat(truths[col_pair[1]],2), 
                 s=100, marker='*', c='k', lw=0, label=None) 
@@ -767,11 +772,17 @@ def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000):
 
         ax.set_xlabel(par_labels[col_pair[0]], fontsize=25, labelpad=15)
         ax.set_ylabel(par_labels[col_pair[1]], fontsize=25)
+    
+    if sigma: 
+        sigma_str = '.true1sigma'
+    else: 
+        sigma_str = ''
 
     fig.subplots_adjust(wspace=0.3)
     fig_name = ''.join([ut.fig_dir(), 
         'paper.ABCvsMCMC.contour', 
         '.', obvs, 
+        sigma_str, 
         '.pdf'])
     fig.savefig(fig_name, bbox_inches='tight', dpi=150) 
     return None 
@@ -781,8 +792,8 @@ def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000):
 
 if __name__=="__main__": 
     #TrueObservables()
-    ABCvsMCMC_contour('nbargmf', nwalkers=100, nburns=9000)
-    ABCvsMCMC_contour('nbarxi', nwalkers=100, nburns=9000)
+    ABCvsMCMC_contour('nbargmf', nwalkers=100, nburns=9000, sigma=True)
+    ABCvsMCMC_contour('nbarxi', nwalkers=100, nburns=9000, sigma=True)
     #ABC_Coner('nbargmf')
     #ABC_Coner('nbarxi')
     #ABC_Convergence(weighted=True)
