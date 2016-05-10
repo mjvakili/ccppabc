@@ -489,7 +489,7 @@ def ABC_Convergence(weighted=False):
 
 
 
-def ABCvsMCMC(obvs, nwalkers=100, nburns=9000):  
+def ABCvsMCMC_histogram(obvs, nwalkers=100, nburns=9000):  
     ''' Plots that compare the ABC posteriors to the MCMC posteriors 
     '''
     if obvs == 'nbargmf':
@@ -655,12 +655,134 @@ def ABCvsMCMC(obvs, nwalkers=100, nburns=9000):
     #plt.show()
 
 
+def ABCvsMCMC_contour(obvs, nwalkers=100, nburns=9000):  
+    ''' Plots that compare the ABC posteriors to the MCMC posteriors 
+    '''
+    if obvs == 'nbargmf':
+        abc_dir = ''.join([ut.dat_dir(), 'paper/ABC', obvs, '/run1/',])
+        abc_theta_file = lambda tt: ''.join([abc_dir, 'nbar_gmf_theta_t', str(tt), '.ABCnbargmf.dat']) 
+        tf = 8
+        mcmc_dir = ''.join([ut.dat_dir(), 'paper/']) 
+        mcmc_filename = ''.join([mcmc_dir, 'nbar_gmf.mcmc.mcmc_chain.p'])
+    elif obvs == 'nbarxi': 
+        abc_dir = ''.join([ut.dat_dir(), 'paper/ABC', obvs, '/',])
+        abc_theta_file = lambda tt: ''.join([abc_dir, 'nbar_xi_theta_t', str(tt), '.abc.dat'])
+        tf = 9
+        mcmc_dir = ''.join([ut.dat_dir(), 'paper/']) 
+        mcmc_filename = ''.join([mcmc_dir, 'nbar_xi.mcmc.mcmc_chain.p'])
+    else: 
+        raise ValueError
+
+    prior_min, prior_max = PriorRange('first_try')
+    prior_range = np.zeros((len(prior_min),2))
+    prior_range[:,0] = prior_min 
+    prior_range[:,1] = prior_max 
+
+    # true HOD parameter
+    true_dict = Data.data_hod_param(Mr=21)
+    truths = [
+            true_dict['logM0'],                 # log M0
+            np.log(true_dict['sigma_logM']),    # log(sigma)
+            true_dict['logMmin'],               # log Mmin
+            true_dict['alpha'],                 # alpha
+            true_dict['logM1']                  # log M1
+            ]
+    
+    mcmc_sample = pickle.load(open(mcmc_filename, 'rb'))[nburns*nwalkers:,:]
+    abc_sample = np.loadtxt(abc_theta_file(tf))
+
+    par_labels = [
+                r'$\mathtt{log}\;\mathcal{M}_{0}$',
+                r'$\mathtt{log}\;\sigma_\mathtt{log\;M}$',
+                r'$\mathtt{log}\;\mathcal{M}_\mathtt{min}$',
+                r'$\alpha$',
+                r'$\mathtt{log}\;\mathcal{M}_{1}$'
+                ]
+
+    prettyplot()
+    pretty_colors = prettycolors()
+    fig = plt.figure(1, figsize=(20,6))
+    gs = gridspec.GridSpec(1, 3)
+    
+    # first panel 
+    for i in [0, 1, 2]:
+        plot_range = np.zeros((2,2))
+        if i == 0: 
+            col_pair = [2, 3] 
+            plot_range[0, 0] = 12.5
+            plot_range[0, 1] = 13.0
+            plot_range[1, 0] = prior_range[3, 0] 
+            plot_range[1, 1] = prior_range[3, 1] 
+        elif i == 2: 
+            col_pair = [4, 2] 
+            plot_range[0, 0] = 13.6
+            plot_range[0, 1] = 14.2
+            plot_range[1, 0] = 12.5
+            plot_range[1, 1] = 13.0
+        elif i == 1:
+            col_pair = [3, 4] 
+            plot_range[0, 0] = prior_range[3, 0]
+            plot_range[0, 1] = prior_range[3, 1] 
+            plot_range[1, 0] = 13.6
+            plot_range[1, 1] = 14.2
+
+        if i == 2: 
+            mcmc_label = r'$\mathcal{L}^\mathtt{Gauss}$ MCMC' 
+            abc_label = 'ABC-PMC'
+        else: 
+            mcmc_label = None
+            abc_label = None
+        
+        mcmc_par1 = mcmc_sample[:,col_pair[0]]
+        mcmc_par2 = mcmc_sample[:,col_pair[1]]
+
+        abc_par1 = abc_sample[:, col_pair[0]] 
+        abc_par2 = abc_sample[:, col_pair[1]] 
+
+        ax = plt.subplot(gs[i])
+
+        corner.hist2d(mcmc_par1, mcmc_par2, bins=20, range=plot_range, ax = ax, plot_datapoints=False,
+                levels=[0.68, 0.95], color='#1F77B4', fill_contours=True, smooth=1.0, label=mcmc_label)
+        
+        corner.hist2d(abc_par1, abc_par2, bins=20, range=plot_range, ax = ax, 
+                levels=[0.68, 0.95], color='#FF7F0E', fill_contours=True, smooth=1.0, label=abc_label)
+
+        ax.scatter(np.repeat(truths[col_pair[0]],2), np.repeat(truths[col_pair[1]],2), 
+                s=100, marker='*', c='k', lw=0, label=None) 
+        #ax.axvline(truths[i_col], color='k', ls='--', linewidth=3)
+        #ax.set_xticklabels([])
+        ax.set_xlim([plot_range[0, 0] , plot_range[0, 1]])
+        ax.set_ylim([plot_range[1, 0] , plot_range[1, 1]])
+        
+        if i == 2: 
+            thick_line1 = mlines.Line2D([], [], ls='-', c='#FF7F0E', linewidth=12, alpha=0.5,
+                                        label='ABC-PMC')
+            ax.legend(loc='upper right', handles=[thick_line1],
+                      frameon=False, fontsize=25, handletextpad=0.1, scatteryoffsets=[0.5])
+        elif i == 1: 
+            thick_line2 = mlines.Line2D([], [], ls='-', c='#1F77B4', linewidth=12, alpha=0.5, 
+                                        label='$\mathcal{L}^\mathtt{Gauss}$ \nMCMC')
+            ax.legend(loc='upper right', handles=[thick_line2],
+                      frameon=False, fontsize=25, handletextpad=0.1, scatteryoffsets=[0.5])
+
+        ax.set_xlabel(par_labels[col_pair[0]], fontsize=25, labelpad=15)
+        ax.set_ylabel(par_labels[col_pair[1]], fontsize=25)
+
+    fig.subplots_adjust(wspace=0.3)
+    fig_name = ''.join([ut.fig_dir(), 
+        'paper.ABCvsMCMC.contour', 
+        '.', obvs, 
+        '.pdf'])
+    fig.savefig(fig_name, bbox_inches='tight', dpi=150) 
+    return None 
+
+
 
 
 if __name__=="__main__": 
     #TrueObservables()
-    ABCvsMCMC('nbargmf', nwalkers=100, nburns=9000)
-    ABCvsMCMC('nbarxi', nwalkers=100, nburns=9000)
+    ABCvsMCMC_contour('nbargmf', nwalkers=100, nburns=9000)
+    ABCvsMCMC_contour('nbarxi', nwalkers=100, nburns=9000)
     #ABC_Coner('nbargmf')
     #ABC_Coner('nbarxi')
     #ABC_Convergence(weighted=True)
