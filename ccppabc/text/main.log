@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  24 FEB 2017 12:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  24 FEB 2017 14:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -513,7 +513,7 @@ l.677
 File: paper_data_observables.pdf Graphic file (type pdf)
 
 <use paper_data_observables.pdf>
-Package pdftex.def Info: paper_data_observables.pdf used on input line 909.
+Package pdftex.def Info: paper_data_observables.pdf used on input line 916.
 (pdftex.def)             Requested size: 469.75499pt x 237.685pt.
 
 <paper_ABC_poolevolution_nbargmf.pdf, id=528, 775.96417pt x 549.28743pt>
@@ -521,49 +521,49 @@ File: paper_ABC_poolevolution_nbargmf.pdf Graphic file (type pdf)
 
 <use paper_ABC_poolevolution_nbargmf.pdf>
 Package pdftex.def Info: paper_ABC_poolevolution_nbargmf.pdf used on input line
- 925.
+ 932.
 (pdftex.def)             Requested size: 446.2658pt x 315.90486pt.
 
 <paper_ABCconvergence.pdf, id=530, 1209.22137pt x 654.51111pt>
 File: paper_ABCconvergence.pdf Graphic file (type pdf)
 
 <use paper_ABCconvergence.pdf>
-Package pdftex.def Info: paper_ABCconvergence.pdf used on input line 948.
+Package pdftex.def Info: paper_ABCconvergence.pdf used on input line 955.
 (pdftex.def)             Requested size: 469.75499pt x 254.2596pt.
 
 <paper_ABCcorner_nbarxi.pdf, id=531, 850.1382pt x 854.59277pt>
 File: paper_ABCcorner_nbarxi.pdf Graphic file (type pdf)
 
 <use paper_ABCcorner_nbarxi.pdf>
-Package pdftex.def Info: paper_ABCcorner_nbarxi.pdf used on input line 966.
+Package pdftex.def Info: paper_ABCcorner_nbarxi.pdf used on input line 973.
 (pdftex.def)             Requested size: 399.2946pt x 401.38481pt.
 
 <paper_ABCcorner_nbargmf.pdf, id=535, 850.1382pt x 854.59277pt>
 File: paper_ABCcorner_nbargmf.pdf Graphic file (type pdf)
 
 <use paper_ABCcorner_nbargmf.pdf>
-Package pdftex.def Info: paper_ABCcorner_nbargmf.pdf used on input line 987.
+Package pdftex.def Info: paper_ABCcorner_nbargmf.pdf used on input line 994.
 (pdftex.def)             Requested size: 399.2946pt x 401.38481pt.
 
 <paper_ABCposterior.pdf, id=537, 1073.38773pt x 773.61531pt>
 File: paper_ABCposterior.pdf Graphic file (type pdf)
 
 <use paper_ABCposterior.pdf>
-Package pdftex.def Info: paper_ABCposterior.pdf used on input line 1000.
+Package pdftex.def Info: paper_ABCposterior.pdf used on input line 1007.
 (pdftex.def)             Requested size: 469.75499pt x 338.5621pt.
 
 <paper_ABCvsMCMC_nbarxi.pdf, id=540, 1187.0036pt x 550.72217pt>
 File: paper_ABCvsMCMC_nbarxi.pdf Graphic file (type pdf)
 
 <use paper_ABCvsMCMC_nbarxi.pdf>
-Package pdftex.def Info: paper_ABCvsMCMC_nbarxi.pdf used on input line 1021.
+Package pdftex.def Info: paper_ABCvsMCMC_nbarxi.pdf used on input line 1028.
 (pdftex.def)             Requested size: 469.75499pt x 217.94043pt.
 
 <paper_ABCvsMCMC_nbargmf.pdf, id=541, 1187.0036pt x 550.72217pt>
 File: paper_ABCvsMCMC_nbargmf.pdf Graphic file (type pdf)
 
 <use paper_ABCvsMCMC_nbargmf.pdf>
-Package pdftex.def Info: paper_ABCvsMCMC_nbargmf.pdf used on input line 1038.
+Package pdftex.def Info: paper_ABCvsMCMC_nbargmf.pdf used on input line 1045.
 (pdftex.def)             Requested size: 469.75499pt x 217.94043pt.
 
 <paper_ABCvsMCMC_contour_nbarxi.pdf, id=543, 1215.09586pt x 435.09015pt>
@@ -571,7 +571,7 @@ File: paper_ABCvsMCMC_contour_nbarxi.pdf Graphic file (type pdf)
 
 <use paper_ABCvsMCMC_contour_nbarxi.pdf>
 Package pdftex.def Info: paper_ABCvsMCMC_contour_nbarxi.pdf used on input line 
-1054.
+1061.
 (pdftex.def)             Requested size: 469.75499pt x 168.20398pt.
 
 <paper_ABCvsMCMC_contour_nbargmf.pdf, id=544, 1215.09586pt x 435.09015pt>
@@ -579,7 +579,7 @@ File: paper_ABCvsMCMC_contour_nbargmf.pdf Graphic file (type pdf)
 
 <use paper_ABCvsMCMC_contour_nbargmf.pdf>
 Package pdftex.def Info: paper_ABCvsMCMC_contour_nbargmf.pdf used on input line
- 1066.
+ 1073.
 (pdftex.def)             Requested size: 469.75499pt x 168.20398pt.
  (./main.bbl [21] [22pdfTeX warning (ext4): destination with the same identifie
 r (name{figure.1}) has been already used, duplicate ignored
@@ -667,16 +667,16 @@ Underfull \hbox (badness 1769) in paragraph at lines 317--320
                    \relax 
 l.409 \end{thebibliography}
                            )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1091.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1098.
  [34]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1091.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1098.
  (./main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1091.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1091.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1098.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1098.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 0DC689C1C2CB81269CB82E7FA686CDDD;778.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1091.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1098.
  ) 
 Here is how much of TeX's memory you used:
  8403 strings out of 493089
@@ -708,7 +708,7 @@ st/fonts/type1/public/hfbright/hfbrmi10.pfb></usr/local/texlive/2015/texmf-dist
 /fonts/type1/public/hfbright/hfbrsy10.pfb></usr/local/texlive/2015/texmf-dist/f
 onts/type1/public/hfbright/hftl10.pfb></usr/local/texlive/2015/texmf-dist/fonts
 /type1/public/cm-super/sfbtl10.pfb>
-Output written on main.pdf (34 pages, 1494646 bytes).
+Output written on main.pdf (34 pages, 1495282 bytes).
 PDF statistics:
  1220 PDF objects out of 1440 (max. 8388607)
  975 compressed objects within 10 object streams
