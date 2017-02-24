@@ -30,11 +30,7 @@ urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 
 \begin{document}
 \title{Approximate Bayesian Computation in Large Scale Structure: constraining the galaxy-halo connection}
-\author{ChangHoon~Hahn\altaffilmark{\dagger1}, Mohammadjavad~Vakili\altaffilmark{\dagger1},
-        Kilian~Walsh\altaffilmark{1},
-        Andrew~P.~Hearin\altaffilmark{2},
-        David~W.~Hogg\altaffilmark{1,3,4,5},
-    and~Duncan~Campbell\altaffilmark{6}}
+\author{ChangHoon~Hahn\altaffilmark{\dagger1}, Mohammadjavad~Vakili\altaffilmark{\dagger1}, Kilian~Walsh\altaffilmark{1}, Andrew~P.~Hearin\altaffilmark{2}, David~W.~Hogg\altaffilmark{1,3,4,5}, and~Duncan~Campbell\altaffilmark{6}}
 \altaffiltext{$\dagger$}{These authors have contributed equally to the paper: \url{mjvakili@nyu.edu}, \url{chh327@nyu.edu}}
 \altaffiltext{1}{Center for Cosmology and Particle Physics, 
                  Department of Physics, New York University, 4 Washington Pl., New York, NY}    
@@ -825,6 +821,9 @@ observational data.}
 %accounts for sample variance. In principle, they also have the advantage that they can account for 
 %sources of systematic uncertainties in the observational data. 
 
+{\bf \color{red} CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
+matrix depends on the accuracy of the mock catalogs (a.k.a. the forward model). While it's definitely 
+true that on small scales they break down, forward models in ABC suffers from the same issues.} 
 Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix
 estimate that captures the sample variance of the data. While we are able to do this accurately 
 within the scope of the HOD framework, for more general LSS parameter inference situations, it 
