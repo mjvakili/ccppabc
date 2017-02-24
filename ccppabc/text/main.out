@@ -1,12 +1,12 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{Methods}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Approximate\040Bayesian\040Computation}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Forward\040model}{section.2}% 4
-\BOOKMARK [3][-]{subsubsection.2.2.1}{Halo\040Occupation\040Modeling}{subsection.2.2}% 5
-\BOOKMARK [2][-]{subsection.2.3}{Summary\040Statistics}{section.2}% 6
-\BOOKMARK [1][-]{section.3}{ABC\040at\040work}{}% 7
-\BOOKMARK [2][-]{subsection.3.1}{Mock\040Observations}{section.3}% 8
-\BOOKMARK [2][-]{subsection.3.2}{ABC-PMC\040Design}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.3}{Results:\040ABC}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.4}{Comparison\040to\040the\040Gaussian\040Likelihood\040MCMC\040Analysis}{section.3}% 11
-\BOOKMARK [1][-]{section.4}{Summary\040and\040Conclusion}{}% 12
+\BOOKMARK [2][-]{subsection.2.1}{Approximate Bayesian Computation}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Forward model}{section.2}% 4
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Halo Occupation Modeling}{subsection.2.2}% 5
+\BOOKMARK [2][-]{subsection.2.3}{Summary Statistics}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{ABC at work}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Mock Observations}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{ABC-PMC Design}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Results: ABC}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.4}{Comparison to the Gaussian Likelihood MCMC Analysis}{section.3}% 11
+\BOOKMARK [1][-]{section.4}{Summary and Conclusion}{}% 12

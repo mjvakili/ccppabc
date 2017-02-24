@@ -1,9 +1,8 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.5.24)  24 FEB 2017 12:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  24 FEB 2017 12:24
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
-**main.tex
+**main
 (./main.tex
 LaTeX2e <2015/01/01>
 Babel <3.9l> and hyphenation patterns for 79 languages loaded.
@@ -50,11 +49,18 @@ Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 (/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/graphics.cfg
 File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
 )
-Package graphics Info: Driver file: xetex.def on input line 94.
+Package graphics Info: Driver file: pdftex.def on input line 94.
 
-(/usr/local/texlive/2015/texmf-dist/tex/xelatex/xetex-def/xetex.def
-File: xetex.def 2015/03/25 v4.04 LaTeX color/graphics driver for XeTeX (TeX Liv
-e/RRM/JK)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count87
 ))
 \Gin@req@height=\dimen103
 \Gin@req@width=\dimen104
@@ -75,7 +81,7 @@ Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip43
 \bibsep=\skip44
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count87
+\c@NAT@ctr=\count88
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/tools/verbatim.sty
 Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
@@ -85,17 +91,17 @@ Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
 )
 \@slugcmmntwidth=\dimen105
 \abstract@box=\box26
-\c@editornote=\count88
-\c@cureqno=\count89
+\c@editornote=\count89
+\c@cureqno=\count90
 \tnotemarkskip=\skip45
 \@abovenoteskip=\dimen106
 \pt@box=\box27
 \pt@width=\dimen107
-\pt@line=\count90
-\pt@column=\count91
-\pt@nlines=\count92
-\pt@ncol=\count93
-\pt@page=\count94
+\pt@line=\count91
+\pt@column=\count92
+\pt@nlines=\count93
+\pt@ncol=\count94
+\pt@page=\count95
 \tabbaseskip=\dimen108
 \pt@tmpcapwidth=\dimen109
 \spew@tblnotesbox=\box28
@@ -106,7 +112,7 @@ Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
 \captionbox=\box30
 \pt@reduceline=\dimen113
 \extra@vspace=\dimen114
-\c@plate=\count95
+\c@plate=\count96
 \my@footins=\box31
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/hyperref.sty
@@ -119,15 +125,15 @@ Package: hobsub-hyperref 2012/05/28 v1.13 Bundle oberdiek, subset hyperref (HO)
 (/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
 Package: hobsub-generic 2012/05/28 v1.13 Bundle oberdiek, subset generic (HO)
 Package: hobsub 2012/05/28 v1.13 Construct package bundles (HO)
-Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
-Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+Package hobsub Info: Skipping package `infwarerr' (already loaded).
+Package hobsub Info: Skipping package `ltxcmds' (already loaded).
 Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
 Package ifluatex Info: LuaTeX not detected.
 Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 Package: intcalc 2007/09/27 v1.1 Expandable calculations with integers (HO)
 Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
-Package ifpdf Info: pdfTeX in PDF mode is not detected.
+Package ifpdf Info: pdfTeX in PDF mode is detected.
 Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
 Package etexcmds Info: Could not find \expanded.
 (etexcmds)             That can mean that you are not using pdfTeX 1.50 or
@@ -138,10 +144,9 @@ Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
 Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
 )
 Package pdftexcmds Info: LuaTeX not detected.
-Package pdftexcmds Info: pdfTeX >= 1.30 not detected.
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
-Package pdftexcmds Info: \pdfdraftmode not found.
+Package pdftexcmds Info: \pdfdraftmode found.
 Package: pdfescape 2011/11/25 v1.13 Implements pdfTeX's escape features (HO)
 Package: bigintcalc 2012/04/08 v1.3 Expandable calculations on big integers (HO
 )
@@ -168,13 +173,13 @@ Package: auxhook 2011/03/04 v1.3 Hooks for auxiliary files (HO)
 Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
 )
 \@linkdim=\dimen115
-\Hy@linkcounter=\count96
-\Hy@pagecounter=\count97
+\Hy@linkcounter=\count97
+\Hy@pagecounter=\count98
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2012/11/06 v6.83m Hyperref: PDFDocEncoding definition (HO)
 )
-\Hy@SavedSpaceFactor=\count98
+\Hy@SavedSpaceFactor=\count99
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
@@ -188,7 +193,7 @@ Package hyperref Info: Plain pages OFF on input line 4458.
 Package hyperref Info: Backreferencing OFF on input line 4463.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4688.
-\c@Hy@tempcnt=\count99
+\c@Hy@tempcnt=\count100
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip10
@@ -196,7 +201,7 @@ Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5041.
 \XeTeXLinkMargin=\dimen116
-\Fld@menulength=\count100
+\Fld@menulength=\count101
 \Field@Width=\dimen117
 \Fld@charsize=\dimen118
 Package hyperref Info: Hyper figures OFF on input line 6295.
@@ -208,37 +213,22 @@ Package hyperref Info: Link coloring with OCG OFF on input line 6320.
 Package hyperref Info: PDF/A mode OFF on input line 6325.
 LaTeX Info: Redefining \ref on input line 6365.
 LaTeX Info: Redefining \pageref on input line 6369.
-\Hy@abspage=\count101
-\c@Item=\count102
-\c@Hfootnote=\count103
+\Hy@abspage=\count102
+\c@Item=\count103
+\c@Hfootnote=\count104
 )
 
-Package hyperref Message: Driver (autodetected): hxetex.
+Package hyperref Message: Driver (autodetected): hpdftex.
 
-(/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/hxetex.def
-File: hxetex.def 2012/11/06 v6.83m Hyperref driver for XeTeX
-
-(/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2012/11/06 v6.83m Hyperref: PDF Unicode definition (HO)
-)
-(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/stringenc.sty
-Package: stringenc 2011/12/02 v1.10 Convert strings between diff. encodings (HO
-)
-)
-\pdfm@box=\box32
-\c@Hy@AnnotLevel=\count104
-\HyField@AnnotCount=\count105
-\Fld@listcount=\count106
-\c@bookmark@seq@number=\count107
+(/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2012/11/06 v6.83m Hyperref driver for pdfTeX
+\Fld@listcount=\count105
+\c@bookmark@seq@number=\count106
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
 Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
-Package rerunfilecheck Info: Feature \pdfmdfivesum is not available
-(rerunfilecheck)             (e.g. pdfTeX or LuaTeX with package `pdftexcmds').
-
-(rerunfilecheck)             Therefore file contents cannot be checked efficien
-tly
-(rerunfilecheck)             and the loading of the package is aborted.
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
 )
 \Hy@SectionHShift=\skip46
 )
@@ -262,30 +252,30 @@ Package: amsbsy 1999/11/29 v1.2d
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 1999/12/14 v2.01 operator names
 )
-\inf@bad=\count108
+\inf@bad=\count107
 LaTeX Info: Redefining \frac on input line 210.
-\uproot@=\count109
-\leftroot@=\count110
+\uproot@=\count108
+\leftroot@=\count109
 LaTeX Info: Redefining \overline on input line 306.
-\classnum@=\count111
-\DOTSCASE@=\count112
+\classnum@=\count110
+\DOTSCASE@=\count111
 LaTeX Info: Redefining \ldots on input line 378.
 LaTeX Info: Redefining \dots on input line 381.
 LaTeX Info: Redefining \cdots on input line 466.
-\Mathstrutbox@=\box33
-\strutbox@=\box34
+\Mathstrutbox@=\box32
+\strutbox@=\box33
 \big@size=\dimen121
 LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
-\macc@depth=\count113
-\c@MaxMatrixCols=\count114
+\macc@depth=\count112
+\c@MaxMatrixCols=\count113
 \dotsspace@=\muskip11
-\c@parentequation=\count115
-\dspbrk@lvl=\count116
+\c@parentequation=\count114
+\dspbrk@lvl=\count115
 \tag@help=\toks19
-\row@=\count117
-\column@=\count118
-\maxfields@=\count119
+\row@=\count116
+\column@=\count117
+\maxfields@=\count118
 \andhelp@=\toks20
 \eqnshift@=\dimen122
 \alignsep@=\dimen123
@@ -305,15 +295,15 @@ Package: mathtools 2015/05/11 v1.16 mathematical typesetting tools
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count120
-\calc@Bcount=\count121
+\calc@Acount=\count119
+\calc@Bcount=\count120
 \calc@Adimen=\dimen128
 \calc@Bdimen=\dimen129
 \calc@Askip=\skip50
 \calc@Bskip=\skip51
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count122
+\calc@Ccount=\count121
 \calc@Cskip=\skip52
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/mathtools/mhsetup.sty
@@ -323,7 +313,7 @@ LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
-\g_MT_multlinerow_int=\count123
+\g_MT_multlinerow_int=\count122
 \l_MT_multwidth_dim=\dimen130
 \origjot=\skip53
 \l_MT_shortvdotswithinadjustabove_dim=\dimen131
@@ -343,34 +333,32 @@ LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
 LaTeX Info: Redefining \bm on input line 207.
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/algorithms/algorithmic.sty
-Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
 Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
-\c@ALC@unique=\count124
-\c@ALC@line=\count125
-\c@ALC@rem=\count126
-\c@ALC@depth=\count127
+\c@ALC@unique=\count123
+\c@ALC@line=\count124
+\c@ALC@rem=\count125
+\c@ALC@depth=\count126
 \ALC@tlm=\skip54
 \algorithmicindent=\skip55
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/algorithms/algorithm.sty
-Invalid UTF-8 byte or sequence at line 11 replaced by U+FFFD.
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count128
+\c@float@type=\count127
 \float@exts=\toks23
-\float@box=\box35
+\float@box=\box34
 \@float@everytoks=\toks24
-\@floatcapt=\box36
+\@floatcapt=\box35
 )
 \@float@every@algorithm=\toks25
-\c@algorithm=\count129
+\c@algorithm=\count128
 )
 Package hyperref Info: Option `colorlinks' set `true' on input line 12.
 
@@ -380,7 +368,7 @@ Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
 (/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
-Package color Info: Driver file: xetex.def on input line 142.
+Package color Info: Driver file: pdftex.def on input line 142.
 )
 (/usr/local/texlive/2015/texmf-dist/tex/latex/morefloats/morefloats.sty
 Package: morefloats 2012/01/28 v1.0f Raise limit of unprocessed floats (HMM; DH
@@ -427,9 +415,34 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 31.
 LaTeX Font Info:    ... okay on input line 31.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 31.
 LaTeX Font Info:    ... okay on input line 31.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 31.
-LaTeX Font Info:    ... okay on input line 31.
+ (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count129
+\scratchdimen=\dimen137
+\scratchbox=\box36
+\nofMPsegments=\count130
+\nofMParguments=\count131
+\everyMPshowfont=\toks26
+\MPscratchCnt=\count132
+\MPscratchDim=\dimen138
+\MPnumerator=\count133
+\makeMPintoPDFobject=\count134
+\everyMPtoPDFconversion=\toks27
+) (/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
 
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+)
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
 AAS preprint substyle, v5.2 <12 Dec 2003>.
 \AtBeginShipoutBox=\box37
 Package hyperref Info: Link coloring ON on input line 31.
@@ -439,7 +452,7 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count130
+\c@section@level=\count135
 )
 LaTeX Info: Redefining \ref on input line 31.
 LaTeX Info: Redefining \pageref on input line 31.
@@ -449,11 +462,8 @@ LaTeX Info: Redefining \nameref on input line 31.
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
-
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
-
 LaTeX Font Info:    Try loading font information for U+lasy on input line 66.
+
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
@@ -475,17 +485,14 @@ LaTeX Font Info:    Font shape `U/lasy/b/n' in size <7> not available
 (Font)              Font shape `U/lasy/m/n' tried instead on input line 66.
 LaTeX Font Info:    Font shape `U/lasy/b/n' in size <5> not available
 (Font)              Font shape `U/lasy/m/n' tried instead on input line 66.
+ [1
 
-(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/se-ascii-print.def
-File: se-ascii-print.def 2011/12/02 v1.10 stringenc: Printable ASCII characters
-
-)
-[1
-
-] [2] [3] [4] [5]
+{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
+ [4] [5]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 270.
- [6] [7] [8] [9] [10]
+
+[6] [7] [8] [9] [10]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 486.
 
 
@@ -495,55 +502,216 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 486.
  [11] [12]
-[13] [14] [15] [16] [17] [18] [19] [20]
-File: paper_data_observables.pdf Graphic file (type QTm)
- <use  "paper_data_observables.pdf" >
-File: paper_ABC_poolevolution_nbargmf.pdf Graphic file (type QTm)
+[13] [14] [15pdfTeX warning (ext4): destination with the same identifier (name{
+table.1}) has been already used, duplicate ignored
 
-<use  "paper_ABC_poolevolution_nbargmf.pdf" >
-File: paper_ABCconvergence.pdf Graphic file (type QTm)
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.677 
+      ] [16] [17] [18] [19] [20]
+<paper_data_observables.pdf, id=525, 843.36172pt x 426.71935pt>
+File: paper_data_observables.pdf Graphic file (type pdf)
 
-<use  "paper_ABCconvergence.pdf" >
-File: paper_ABCcorner_nbarxi.pdf Graphic file (type QTm)
- <use  "paper_ABCcorner_nbarxi.pdf" >
-File: paper_ABCcorner_nbargmf.pdf Graphic file (type QTm)
+<use paper_data_observables.pdf>
+Package pdftex.def Info: paper_data_observables.pdf used on input line 909.
+(pdftex.def)             Requested size: 469.75499pt x 237.685pt.
 
-<use  "paper_ABCcorner_nbargmf.pdf" >
-File: paper_ABCposterior.pdf Graphic file (type QTm)
- <use  "paper_ABCposterior.pdf" >
-File: paper_ABCvsMCMC_nbarxi.pdf Graphic file (type QTm)
+<paper_ABC_poolevolution_nbargmf.pdf, id=528, 775.96417pt x 549.28743pt>
+File: paper_ABC_poolevolution_nbargmf.pdf Graphic file (type pdf)
 
-<use  "paper_ABCvsMCMC_nbarxi.pdf" >
-File: paper_ABCvsMCMC_nbargmf.pdf Graphic file (type QTm)
- <use  "paper_ABCvsMCMC_nbargmf.pdf" >
-File: paper_ABCvsMCMC_contour_nbarxi.pdf Graphic file (type QTm)
+<use paper_ABC_poolevolution_nbargmf.pdf>
+Package pdftex.def Info: paper_ABC_poolevolution_nbargmf.pdf used on input line
+ 925.
+(pdftex.def)             Requested size: 446.2658pt x 315.90486pt.
 
-<use  "paper_ABCvsMCMC_contour_nbarxi.pdf" >
-File: paper_ABCvsMCMC_contour_nbargmf.pdf Graphic file (type QTm)
+<paper_ABCconvergence.pdf, id=530, 1209.22137pt x 654.51111pt>
+File: paper_ABCconvergence.pdf Graphic file (type pdf)
 
-<use  "paper_ABCvsMCMC_contour_nbargmf.pdf" > (./main.bbl [21] [22] [23]
-[24] [25] [26] [27] [28] [29] [30] [31] [32]
+<use paper_ABCconvergence.pdf>
+Package pdftex.def Info: paper_ABCconvergence.pdf used on input line 948.
+(pdftex.def)             Requested size: 469.75499pt x 254.2596pt.
+
+<paper_ABCcorner_nbarxi.pdf, id=531, 850.1382pt x 854.59277pt>
+File: paper_ABCcorner_nbarxi.pdf Graphic file (type pdf)
+
+<use paper_ABCcorner_nbarxi.pdf>
+Package pdftex.def Info: paper_ABCcorner_nbarxi.pdf used on input line 966.
+(pdftex.def)             Requested size: 399.2946pt x 401.38481pt.
+
+<paper_ABCcorner_nbargmf.pdf, id=535, 850.1382pt x 854.59277pt>
+File: paper_ABCcorner_nbargmf.pdf Graphic file (type pdf)
+
+<use paper_ABCcorner_nbargmf.pdf>
+Package pdftex.def Info: paper_ABCcorner_nbargmf.pdf used on input line 987.
+(pdftex.def)             Requested size: 399.2946pt x 401.38481pt.
+
+<paper_ABCposterior.pdf, id=537, 1073.38773pt x 773.61531pt>
+File: paper_ABCposterior.pdf Graphic file (type pdf)
+
+<use paper_ABCposterior.pdf>
+Package pdftex.def Info: paper_ABCposterior.pdf used on input line 1000.
+(pdftex.def)             Requested size: 469.75499pt x 338.5621pt.
+
+<paper_ABCvsMCMC_nbarxi.pdf, id=540, 1187.0036pt x 550.72217pt>
+File: paper_ABCvsMCMC_nbarxi.pdf Graphic file (type pdf)
+
+<use paper_ABCvsMCMC_nbarxi.pdf>
+Package pdftex.def Info: paper_ABCvsMCMC_nbarxi.pdf used on input line 1021.
+(pdftex.def)             Requested size: 469.75499pt x 217.94043pt.
+
+<paper_ABCvsMCMC_nbargmf.pdf, id=541, 1187.0036pt x 550.72217pt>
+File: paper_ABCvsMCMC_nbargmf.pdf Graphic file (type pdf)
+
+<use paper_ABCvsMCMC_nbargmf.pdf>
+Package pdftex.def Info: paper_ABCvsMCMC_nbargmf.pdf used on input line 1038.
+(pdftex.def)             Requested size: 469.75499pt x 217.94043pt.
+
+<paper_ABCvsMCMC_contour_nbarxi.pdf, id=543, 1215.09586pt x 435.09015pt>
+File: paper_ABCvsMCMC_contour_nbarxi.pdf Graphic file (type pdf)
+
+<use paper_ABCvsMCMC_contour_nbarxi.pdf>
+Package pdftex.def Info: paper_ABCvsMCMC_contour_nbarxi.pdf used on input line 
+1054.
+(pdftex.def)             Requested size: 469.75499pt x 168.20398pt.
+
+<paper_ABCvsMCMC_contour_nbargmf.pdf, id=544, 1215.09586pt x 435.09015pt>
+File: paper_ABCvsMCMC_contour_nbargmf.pdf Graphic file (type pdf)
+
+<use paper_ABCvsMCMC_contour_nbargmf.pdf>
+Package pdftex.def Info: paper_ABCvsMCMC_contour_nbargmf.pdf used on input line
+ 1066.
+(pdftex.def)             Requested size: 469.75499pt x 168.20398pt.
+ (./main.bbl [21] [22pdfTeX warning (ext4): destination with the same identifie
+r (name{figure.1}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_data_observables.pd
+f>] [23pdfTeX warning (ext4): destination with the same identifier (name{figure
+.2}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABC_poolevolution_n
+bargmf.pdf>] [24pdfTeX warning (ext4): destination with the same identifier (na
+me{figure.3}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCconvergence.pdf>
+] [25pdfTeX warning (ext4): destination with the same identifier (name{figure.4
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCcorner_nbarxi.pd
+f>] [26pdfTeX warning (ext4): destination with the same identifier (name{figure
+.5}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCcorner_nbargmf.p
+df>] [27pdfTeX warning (ext4): destination with the same identifier (name{figur
+e.6}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCposterior.pdf>]
+[28pdfTeX warning (ext4): destination with the same identifier (name{figure.7})
+ has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCvsMCMC_nbarxi.pd
+f>] [29pdfTeX warning (ext4): destination with the same identifier (name{figure
+.8}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCvsMCMC_nbargmf.p
+df>] [30pdfTeX warning (ext4): destination with the same identifier (name{figur
+e.9}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                  pdfTeX warning (ext4): destin
+ation with the same identifier (name{figure.10}) has been already used, duplica
+te ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.12 ...ta}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+                                                   <./paper_ABCvsMCMC_contour_n
+barxi.pdf> <./paper_ABCvsMCMC_contour_nbargmf.pdf
+
+pdfTeX warning: pdflatex (file ./paper_ABCvsMCMC_contour_nbargmf.pdf): PDF incl
+usion: multiple pdfs with page group included in a single page
+>] [31] [32]
 Underfull \hbox (badness 1769) in paragraph at lines 317--320
 []\OT1/cmr/m/n/12 Rodr^^S^^Pguez-Torres, S. A., Prada, F., Chuang, C.-H., et al
 . 2015, ArXiv e-prints,
  []
 
-[33])
+[33]pdfTeX warning (ext4): destination with the same identifier (name{Hfootnote
+.2}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.409 \end{thebibliography}
+                           )
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1091.
  [34]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 1091.
  (./main.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1091.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1091.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1091.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1091.
+
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 0DC689C1C2CB81269CB82E7FA686CDDD;778.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1091.
  ) 
 Here is how much of TeX's memory you used:
- 11178 strings out of 493706
- 153917 string characters out of 6145769
- 258148 words of memory out of 5000000
- 14390 multiletter control sequences out of 15000+600000
- 18986 words of font info for 77 fonts, out of 8000000 for 9000
- 1328 hyphenation exceptions out of 8191
- 32i,11n,45p,1334b,696s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 8403 strings out of 493089
+ 120206 string characters out of 6134842
+ 242087 words of memory out of 5000000
+ 11572 multiletter control sequences out of 15000+600000
+ 18626 words of font info for 76 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 34i,11n,28p,1330b,706s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></u
+sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
+/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/l
+ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/t
+exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texl
+ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/
+texmf-dist/fonts/type1/public/hfbright/hfbr10.pfb></usr/local/texlive/2015/texm
+f-dist/fonts/type1/public/hfbright/hfbr17.pfb></usr/local/texlive/2015/texmf-di
+st/fonts/type1/public/hfbright/hfbrmi10.pfb></usr/local/texlive/2015/texmf-dist
+/fonts/type1/public/hfbright/hfbrsy10.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/public/hfbright/hftl10.pfb></usr/local/texlive/2015/texmf-dist/fonts
+/type1/public/cm-super/sfbtl10.pfb>
+Output written on main.pdf (34 pages, 1494646 bytes).
+PDF statistics:
+ 1220 PDF objects out of 1440 (max. 8388607)
+ 975 compressed objects within 10 object streams
+ 175 named destinations out of 1000 (max. 500000)
+ 147 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on main.pdf (34 pages).
