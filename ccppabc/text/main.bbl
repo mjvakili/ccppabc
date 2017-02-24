@@ -1,0 +1,409 @@
+\begin{thebibliography}{}
+\providecommand\natexlab[1]{#1}
+\providecommand\JournalTitle[1]{#1}
+
+\bibitem[{{Akeret} {et~al.}(2015){Akeret}, {Refregier}, {Amara}, {Seehars}, \&
+  {Hasner}}]{abccosmology}
+{Akeret}, J., {Refregier}, A., {Amara}, A., {Seehars}, S., \& {Hasner}, C.
+  2015,
+  \href{http://dx.doi.org/10.1088/1475-7516/2015/08/043}{\JournalTitle{\jcap},
+  8, 043}
+
+\bibitem[{{Ata} {et~al.}(2015){Ata}, {Kitaura}, \& {M{\"u}ller}}]{devpois}
+{Ata}, M., {Kitaura}, F.-S., \& {M{\"u}ller}, V. 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stu2347}{\JournalTitle{\mnras}, 446,
+  4250}
+
+\bibitem[{Beaumont {et~al.}(2009)Beaumont, Cornuet, Marin, \& Robert}]{abcpmc}
+Beaumont, M.~A., Cornuet, J.-M., Marin, J.-M., \& Robert, C.~P. 2009,
+  \JournalTitle{Biometrika}, asp052
+
+\bibitem[{{Behroozi} {et~al.}(2013{\natexlab{a}}){Behroozi}, {Wechsler}, \&
+  {Conroy}}]{behroozi13}
+{Behroozi}, P.~S., {Wechsler}, R.~H., \& {Conroy}, C. 2013{\natexlab{a}},
+  \href{http://dx.doi.org/10.1088/0004-637X/770/1/57}{\JournalTitle{\apj}, 770,
+  57}
+
+\bibitem[{{Behroozi} {et~al.}(2013{\natexlab{b}}){Behroozi}, {Wechsler}, \&
+  {Wu}}]{rockstar}
+{Behroozi}, P.~S., {Wechsler}, R.~H., \& {Wu}, H.-Y. 2013{\natexlab{b}},
+  \href{http://dx.doi.org/10.1088/0004-637X/762/2/109}{\JournalTitle{\apj},
+  762, 109}
+
+\bibitem[{{Berlind} \& {Weinberg}(2002)}]{berlind_weinberg2002}
+{Berlind}, A.~A., \& {Weinberg}, D.~H. 2002,
+  \href{http://dx.doi.org/10.1086/341469}{\JournalTitle{\apj}, 575, 587}
+
+\bibitem[{{Berlind} {et~al.}(2006){Berlind}, {Frieman}, {Weinberg}, {Blanton},
+  {Warren}, {Abazajian}, {Scranton}, {Hogg}, {Scoccimarro}, {Bahcall},
+  {Brinkmann}, {Gott}, {Kleinman}, {Krzesinski}, {Lee}, {Miller}, {Nitta},
+  {Schneider}, {Tucker}, {Zehavi}, \& {SDSS Collaboration}}]{groups}
+{Berlind}, A.~A., {Frieman}, J., {Weinberg}, D.~H., {et~al.} 2006,
+  \href{http://dx.doi.org/10.1086/508170}{\JournalTitle{\apjs}, 167, 1}
+
+\bibitem[{{Bernardeau} {et~al.}(2002){Bernardeau}, {Colombi}, {Gazta{\~n}aga},
+  \& {Scoccimarro}}]{Bernardeau:2002aa}
+{Bernardeau}, F., {Colombi}, S., {Gazta{\~n}aga}, E., \& {Scoccimarro}, R.
+  2002,
+  \href{http://dx.doi.org/10.1016/S0370-1573(02)00135-7}{\JournalTitle{\physrep},
+  367, 1}
+
+\bibitem[{Bishop(2007)}]{bishop}
+Bishop, C. 2007, Pattern Recognition and Machine Learning (Information Science
+  and Statistics), 1st edn. 2006. corr. 2nd printing edn
+
+\bibitem[{{Bond} {et~al.}(1991){Bond}, {Cole}, {Efstathiou}, \&
+  {Kaiser}}]{bond91}
+{Bond}, J.~R., {Cole}, S., {Efstathiou}, G., \& {Kaiser}, N. 1991,
+  \href{http://dx.doi.org/10.1086/170520}{\JournalTitle{\apj}, 379, 440}
+
+\bibitem[{{Cacciato} {et~al.}(2013){Cacciato}, {van den Bosch}, {More}, {Mo},
+  \& {Yang}}]{cacciato13}
+{Cacciato}, M., {van den Bosch}, F.~C., {More}, S., {Mo}, H., \& {Yang}, X.
+  2013, \href{http://dx.doi.org/10.1093/mnras/sts525}{\JournalTitle{\mnras},
+  430, 767}
+
+\bibitem[{{Cameron} \& {Pettitt}(2012)}]{abcmorphology}
+{Cameron}, E., \& {Pettitt}, A.~N. 2012,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2012.21371.x}{\JournalTitle{\mnras},
+  425, 44}
+
+\bibitem[{{Casas-Miranda} {et~al.}(2002){Casas-Miranda}, {Mo}, {Sheth}, \&
+  {Boerner}}]{Casas-Miranda:2002aa}
+{Casas-Miranda}, R., {Mo}, H.~J., {Sheth}, R.~K., \& {Boerner}, G. 2002,
+  \href{http://dx.doi.org/10.1046/j.1365-8711.2002.05378.x}{\JournalTitle{\mnras},
+  333, 730}
+
+\bibitem[{{Chuang} {et~al.}(2015){Chuang}, {Zhao}, {Prada}, {Munari}, {Avila},
+  {Izard}, {Kitaura}, {Manera}, {Monaco}, {Murray}, {Knebe}, {Sc{\'o}ccola},
+  {Yepes}, {Garcia-Bellido}, {Mar{\'{\i}}n}, {M{\"u}ller}, {Skibba}, {Crocce},
+  {Fosalba}, {Gottl{\"o}ber}, {Klypin}, {Power}, {Tao}, \&
+  {Turchaninov}}]{nifty}
+{Chuang}, C.-H., {Zhao}, C., {Prada}, F., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1093/mnras/stv1289}{\JournalTitle{\mnras}, 452,
+  686}
+
+\bibitem[{{Conroy} \& {Wechsler}(2009)}]{conroy09}
+{Conroy}, C., \& {Wechsler}, R.~H. 2009,
+  \href{http://dx.doi.org/10.1088/0004-637X/696/1/620}{\JournalTitle{\apj},
+  696, 620}
+
+\bibitem[{{Cooray} \& {Sheth}(2002)}]{cooray_sheth2002}
+{Cooray}, A., \& {Sheth}, R. 2002,
+  \href{http://dx.doi.org/10.1016/S0370-1573(02)00276-4}{\JournalTitle{\physrep},
+  372, 1}
+
+\bibitem[{{Davis} {et~al.}(1985){Davis}, {Efstathiou}, {Frenk}, \&
+  {White}}]{fof}
+{Davis}, M., {Efstathiou}, G., {Frenk}, C.~S., \& {White}, S.~D.~M. 1985,
+  \href{http://dx.doi.org/10.1086/163168}{\JournalTitle{\apj}, 292, 371}
+
+\bibitem[{Del~Moral {et~al.}(2006)Del~Moral, Doucet, \& Jasra}]{smc}
+Del~Moral, P., Doucet, A., \& Jasra, A. 2006, \JournalTitle{Journal of the
+  Royal Statistical Society: Series B (Statistical Methodology)}, 68, 411
+
+\bibitem[{{Dressler}(1980)}]{Dressler:1980aa}
+{Dressler}, A. 1980,
+  \href{http://dx.doi.org/10.1086/157753}{\JournalTitle{\apj}, 236, 351}
+
+\bibitem[{{Dutton} \& {Macci{\`o}}(2014)}]{nfw_c(M)}
+{Dutton}, A.~A., \& {Macci{\`o}}, A.~V. 2014,
+  \href{http://dx.doi.org/10.1093/mnras/stu742}{\JournalTitle{\mnras}, 441,
+  3359}
+
+\bibitem[{{Eriksen} {et~al.}(2004){Eriksen}, {O'Dwyer}, {Jewell}, {Wandelt},
+  {Larson}, {G{\'o}rski}, {Levin}, {Banday}, \& {Lilje}}]{Eriksen:2004aa}
+{Eriksen}, H.~K., {O'Dwyer}, I.~J., {Jewell}, J.~B., {et~al.} 2004,
+  \href{http://dx.doi.org/10.1086/425219}{\JournalTitle{\apjs}, 155, 227}
+
+\bibitem[{Filippi {et~al.}(2011)Filippi, Barnes, \& Stumpf}]{optimalkernel}
+Filippi, S., Barnes, C., \& Stumpf, M. 2011, \JournalTitle{arXiv preprint
+  arXiv:1106.6280}
+
+\bibitem[{{Foreman-Mackey} {et~al.}(2013){Foreman-Mackey}, {Hogg}, {Lang}, \&
+  {Goodman}}]{emcee}
+{Foreman-Mackey}, D., {Hogg}, D.~W., {Lang}, D., \& {Goodman}, J. 2013,
+  \href{http://dx.doi.org/10.1086/670067}{\JournalTitle{\pasp}, 125, 306}
+
+\bibitem[{{Hartlap} {et~al.}(2007){Hartlap}, {Simon}, \&
+  {Schneider}}]{hartlap2007}
+{Hartlap}, J., {Simon}, P., \& {Schneider}, P. 2007,
+  \href{http://dx.doi.org/10.1051/0004-6361:20066170}{\JournalTitle{\aap}, 464,
+  399}
+
+\bibitem[{{Hearin} {et~al.}(2016{\natexlab{a}}){Hearin}, {Campbell},
+  {Tollerud}, {Behroozi}, {Diemer}, {Goldbaum}, {Jennings}, {Leauthaud}, {Mao},
+  {More}, {Parejko}, {Sinha}, {Sipocz}, \& {Zentner}}]{Hearin:2016aa}
+{Hearin}, A., {Campbell}, D., {Tollerud}, E., {et~al.} 2016{\natexlab{a}},
+  \JournalTitle{ArXiv e-prints},
+  \href{http://arxiv.org/abs/1606.04106}{{\sffamily arXiv:1606.04106
+  [astro-ph.IM]}}
+
+\bibitem[{{Hearin} {et~al.}(2016{\natexlab{b}}){Hearin}, {Zentner}, {van den
+  Bosch}, {Campbell}, \& {Tollerud}}]{hearin15}
+{Hearin}, A.~P., {Zentner}, A.~R., {van den Bosch}, F.~C., {Campbell}, D., \&
+  {Tollerud}, E. 2016{\natexlab{b}},
+  \href{http://dx.doi.org/10.1093/mnras/stw840}{\JournalTitle{\mnras}},
+  \href{http://arxiv.org/abs/1512.03050}{{\sffamily arXiv:1512.03050}}
+
+\bibitem[{{Heitmann} {et~al.}(2009){Heitmann}, {Higdon}, {White}, {Habib},
+  {Williams}, {Lawrence}, \& {Wagner}}]{coyote2}
+{Heitmann}, K., {Higdon}, D., {White}, M., {et~al.} 2009,
+  \href{http://dx.doi.org/10.1088/0004-637X/705/1/156}{\JournalTitle{\apj},
+  705, 156}
+
+\bibitem[{{Heitmann} {et~al.}(2010){Heitmann}, {White}, {Wagner}, {Habib}, \&
+  {Higdon}}]{coyote1}
+{Heitmann}, K., {White}, M., {Wagner}, C., {Habib}, S., \& {Higdon}, D. 2010,
+  \href{http://dx.doi.org/10.1088/0004-637X/715/1/104}{\JournalTitle{\apj},
+  715, 104}
+
+\bibitem[{{Heitmann} {et~al.}(2008){Heitmann}, {Luki{\'c}}, {Fasel}, {Habib},
+  {Warren}, {White}, {Ahrens}, {Ankeny}, {Armstrong}, {O'Shea}, {Ricker},
+  {Springel}, {Stadel}, \& {Trac}}]{cosmiccode}
+{Heitmann}, K., {Luki{\'c}}, Z., {Fasel}, P., {et~al.} 2008,
+  \href{http://dx.doi.org/10.1088/1749-4699/1/1/015003}{\JournalTitle{Computational
+  Science and Discovery}, 1, 015003}
+
+\bibitem[{{Ishida} {et~al.}(2015){Ishida}, {Vitenti}, {Penna-Lima}, {Cisewski},
+  {de Souza}, {Trindade}, {Cameron}, \& {Busti}}]{cosmoabc}
+{Ishida}, E.~E.~O., {Vitenti}, S.~D.~P., {Penna-Lima}, M., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1016/j.ascom.2015.09.001}{\JournalTitle{Astronomy
+  and Computing}, 13, 1}
+
+\bibitem[{{Kaiser}(1984)}]{Kaiser:1984aa}
+{Kaiser}, N. 1984,
+  \href{http://dx.doi.org/10.1086/184341}{\JournalTitle{\apjl}, 284, L9}
+
+\bibitem[{{Klypin} {et~al.}(2011){Klypin}, {Trujillo-Gomez}, \&
+  {Primack}}]{bolshoi}
+{Klypin}, A.~A., {Trujillo-Gomez}, S., \& {Primack}, J. 2011,
+  \href{http://dx.doi.org/10.1088/0004-637X/740/2/102}{\JournalTitle{\apj},
+  740, 102}
+
+\bibitem[{{Knox}(1995)}]{Knox:1995aa}
+{Knox}, L. 1995,
+  \href{http://dx.doi.org/10.1103/PhysRevD.52.4307}{\JournalTitle{\prd}, 52,
+  4307}
+
+\bibitem[{{Kravtsov} {et~al.}(1997){Kravtsov}, {Klypin}, \& {Khokhlov}}]{art}
+{Kravtsov}, A.~V., {Klypin}, A.~A., \& {Khokhlov}, A.~M. 1997,
+  \href{http://dx.doi.org/10.1086/313015}{\JournalTitle{\apjs}, 111, 73}
+
+\bibitem[{{Leach} {et~al.}(2008){Leach}, {Cardoso}, {Baccigalupi}, {Barreiro},
+  {Betoule}, {Bobin}, {Bonaldi}, {Delabrouille}, {de Zotti}, {Dickinson},
+  {Eriksen}, {Gonz{\'a}lez-Nuevo}, {Hansen}, {Herranz}, {Le Jeune},
+  {L{\'o}pez-Caniego}, {Mart{\'{\i}}nez-Gonz{\'a}lez}, {Massardi}, {Melin},
+  {Miville-Desch{\^e}nes}, {Patanchon}, {Prunet}, {Ricciardi}, {Salerno},
+  {Sanz}, {Starck}, {Stivoli}, {Stolyarov}, {Stompor}, \&
+  {Vielva}}]{Leach:2008aa}
+{Leach}, S.~M., {Cardoso}, J.-F., {Baccigalupi}, C., {et~al.} 2008,
+  \href{http://dx.doi.org/10.1051/0004-6361:200810116}{\JournalTitle{\aap},
+  491, 597}
+
+\bibitem[{{Leauthaud} {et~al.}(2012){Leauthaud}, {Tinker}, {Bundy}, {Behroozi},
+  {Massey}, {Rhodes}, {George}, {Kneib}, {Benson}, {Wechsler}, {Busha},
+  {Capak}, {Cort{\^e}s}, {Ilbert}, {Koekemoer}, {Le F{\`e}vre}, {Lilly},
+  {McCracken}, {Salvato}, {Schrabback}, {Scoville}, {Smith}, \&
+  {Taylor}}]{leauthaud12}
+{Leauthaud}, A., {Tinker}, J., {Bundy}, K., {et~al.} 2012,
+  \href{http://dx.doi.org/10.1088/0004-637X/744/2/159}{\JournalTitle{\apj},
+  744, 159}
+
+\bibitem[{{Lemson} \& {Kauffmann}(1999)}]{lemson99}
+{Lemson}, G., \& {Kauffmann}, G. 1999,
+  \href{http://dx.doi.org/10.1046/j.1365-8711.1999.02090.x}{\JournalTitle{\mnras},
+  302, 111}
+
+\bibitem[{{Lin} \& {Kilbinger}(2015)}]{abcwl}
+{Lin}, C.-A., \& {Kilbinger}, M. 2015,
+  \href{http://dx.doi.org/10.1051/0004-6361/201526659}{\JournalTitle{\aap},
+  583, A70}
+
+\bibitem[{{Lin} {et~al.}(2016){Lin}, {Kilbinger}, \& {Pires}}]{abcwl2}
+{Lin}, C.-A., {Kilbinger}, M., \& {Pires}, S. 2016, \JournalTitle{ArXiv
+  e-prints}, \href{http://arxiv.org/abs/1603.06773}{{\sffamily
+  arXiv:1603.06773}}
+
+\bibitem[{{Miyatake} {et~al.}(2015){Miyatake}, {More}, {Mandelbaum}, {Takada},
+  {Spergel}, {Kneib}, {Schneider}, {Brinkmann}, \& {Brownstein}}]{miyatake15}
+{Miyatake}, H., {More}, S., {Mandelbaum}, R., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1088/0004-637X/806/1/1}{\JournalTitle{\apj}, 806,
+  1}
+
+\bibitem[{{Mo} \& {White}(1996)}]{Mo:1996aa}
+{Mo}, H.~J., \& {White}, S.~D.~M. 1996,
+  \href{http://dx.doi.org/10.1093/mnras/282.2.347}{\JournalTitle{\mnras}, 282,
+  347}
+
+\bibitem[{{More} {et~al.}(2009){More}, {van den Bosch}, \&
+  {Cacciato}}]{more2010}
+{More}, S., {van den Bosch}, F.~C., \& {Cacciato}, M. 2009,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2008.14114.x}{\JournalTitle{\mnras},
+  392, 917}
+
+\bibitem[{{More} {et~al.}(2013){More}, {van den Bosch}, {Cacciato}, {More},
+  {Mo}, \& {Yang}}]{more13}
+{More}, S., {van den Bosch}, F.~C., {Cacciato}, M., {et~al.} 2013,
+  \href{http://dx.doi.org/10.1093/mnras/sts697}{\JournalTitle{\mnras}, 430,
+  747}
+
+\bibitem[{{Navarro} {et~al.}(2004){Navarro}, {Hayashi}, {Power}, {Jenkins},
+  {Frenk}, {White}, {Springel}, {Stadel}, \& {Quinn}}]{nfw}
+{Navarro}, J.~F., {Hayashi}, E., {Power}, C., {et~al.} 2004,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2004.07586.x}{\JournalTitle{\mnras},
+  349, 1039}
+
+\bibitem[{{Oh} {et~al.}(1999){Oh}, {Spergel}, \& {Hinshaw}}]{Oh:1999aa}
+{Oh}, S.~P., {Spergel}, D.~N., \& {Hinshaw}, G. 1999,
+  \href{http://dx.doi.org/10.1086/306629}{\JournalTitle{\apj}, 510, 551}
+
+\bibitem[{{Peebles}(1980)}]{peebles80}
+{Peebles}, P.~J.~E. 1980, {The large-scale structure of the universe}
+
+\bibitem[{{Planck Collaboration} {et~al.}(2014){Planck Collaboration}, {Ade},
+  {Aghanim}, {Armitage-Caplan}, {Arnaud}, {Ashdown}, {Atrio-Barandela},
+  {Aumont}, {Baccigalupi}, {Banday}, \& et~al.}]{planckI}
+{Planck Collaboration}, {Ade}, P.~A.~R., {Aghanim}, N., {et~al.} 2014,
+  \href{http://dx.doi.org/10.1051/0004-6361/201321591}{\JournalTitle{\aap},
+  571, A16}
+
+\bibitem[{{Planck Collaboration} {et~al.}(2015{\natexlab{a}}){Planck
+  Collaboration}, {Ade}, {Aghanim}, {Arnaud}, {Ashdown}, {Aumont},
+  {Baccigalupi}, {Banday}, {Barreiro}, {Bartlett}, \& et~al.}]{planckII}
+---. 2015{\natexlab{a}}, \JournalTitle{ArXiv e-prints},
+  \href{http://arxiv.org/abs/1502.01589}{{\sffamily arXiv:1502.01589}}
+
+\bibitem[{{Planck Collaboration} {et~al.}(2015{\natexlab{b}}){Planck
+  Collaboration}, {Ade}, {Aghanim}, {Arnaud}, {Arroja}, {Ashdown}, {Aumont},
+  {Baccigalupi}, {Ballardini}, {Banday}, \& et~al.}]{planck_NG}
+---. 2015{\natexlab{b}}, \JournalTitle{ArXiv e-prints},
+  \href{http://arxiv.org/abs/1502.01592}{{\sffamily arXiv:1502.01592}}
+
+\bibitem[{{Planck Collaboration} {et~al.}(2015{\natexlab{c}}){Planck
+  Collaboration}, {Ade}, {Aghanim}, {Arnaud}, {Arroja}, {Ashdown}, {Aumont},
+  {Baccigalupi}, {Ballardini}, {Banday}, \& et~al.}]{planck_inflation}
+---. 2015{\natexlab{c}}, \JournalTitle{ArXiv e-prints},
+  \href{http://arxiv.org/abs/1502.02114}{{\sffamily arXiv:1502.02114}}
+
+\bibitem[{{Press} \& {Schechter}(1974)}]{press74}
+{Press}, W.~H., \& {Schechter}, P. 1974,
+  \href{http://dx.doi.org/10.1086/152650}{\JournalTitle{\apj}, 187, 425}
+
+\bibitem[{Pritchard {et~al.}(1999)Pritchard, Seielstad, Perez-Lezaun, \&
+  Feldman}]{abcrejectionsampling}
+Pritchard, J.~K., Seielstad, M.~T., Perez-Lezaun, A., \& Feldman, M.~W. 1999,
+  \JournalTitle{Molecular biology and evolution}, 16, 1791
+
+\bibitem[{{Riebe} {et~al.}(2011){Riebe}, {Partl}, {Enke}, {Forero-Romero},
+  {Gottloeber}, {Klypin}, {Lemson}, {Prada}, {Primack}, {Steinmetz}, \&
+  {Turchaninov}}]{multidark}
+{Riebe}, K., {Partl}, A.~M., {Enke}, H., {et~al.} 2011, \JournalTitle{ArXiv
+  e-prints}, \href{http://arxiv.org/abs/1109.0003}{{\sffamily arXiv:1109.0003
+  [astro-ph.CO]}}
+
+\bibitem[{{Riess} {et~al.}(1998){Riess}, {Filippenko}, {Challis},
+  {Clocchiatti}, {Diercks}, {Garnavich}, {Gilliland}, {Hogan}, {Jha},
+  {Kirshner}, {Leibundgut}, {Phillips}, {Reiss}, {Schmidt}, {Schommer},
+  {Smith}, {Spyromilio}, {Stubbs}, {Suntzeff}, \& {Tonry}}]{Riess:1998aa}
+{Riess}, A.~G., {Filippenko}, A.~V., {Challis}, P., {et~al.} 1998,
+  \href{http://dx.doi.org/10.1086/300499}{\JournalTitle{\aj}, 116, 1009}
+
+\bibitem[{{Rodr{\'{\i}}guez-Torres} {et~al.}(2015){Rodr{\'{\i}}guez-Torres},
+  {Prada}, {Chuang}, {Guo}, {Klypin}, {Behroozi}, {Hahn}, {Comparat}, {Yepes},
+  {Montero-Dorta}, {Brownstein}, {Maraston}, {McBride}, {Tinker},
+  {Gottl{\"o}ber}, {Favole}, {Shu}, {Kitaura}, {Bolton}, {Scoccimarro},
+  {Samushia}, {Schlegel}, {Schneider}, \& {Thomas}}]{Rodriguez-Torres:2015aa}
+{Rodr{\'{\i}}guez-Torres}, S.~A., {Prada}, F., {Chuang}, C.-H., {et~al.} 2015,
+  \JournalTitle{ArXiv e-prints},
+  \href{http://arxiv.org/abs/1509.06404}{{\sffamily arXiv:1509.06404}}
+
+\bibitem[{{Santiago} \& {Strauss}(1992)}]{Santiago:1992aa}
+{Santiago}, B.~X., \& {Strauss}, M.~A. 1992,
+  \href{http://dx.doi.org/10.1086/171056}{\JournalTitle{\apj}, 387, 9}
+
+\bibitem[{{Scoccimarro} {et~al.}(2001){Scoccimarro}, {Sheth}, {Hui}, \&
+  {Jain}}]{scoccimarro2001}
+{Scoccimarro}, R., {Sheth}, R.~K., {Hui}, L., \& {Jain}, B. 2001,
+  \href{http://dx.doi.org/10.1086/318261}{\JournalTitle{\apj}, 546, 20}
+
+\bibitem[{{Seljak}(2000)}]{seljak2000}
+{Seljak}, U. 2000,
+  \href{http://dx.doi.org/10.1046/j.1365-8711.2000.03715.x}{\JournalTitle{\mnras},
+  318, 203}
+
+\bibitem[{{Silk} {et~al.}(2012){Silk}, {Filippi}, \& {Stumpf}}]{silk12}
+{Silk}, D., {Filippi}, S., \& {Stumpf}, M.~P.~H. 2012, \JournalTitle{ArXiv
+  e-prints}, \href{http://arxiv.org/abs/1210.3296}{{\sffamily arXiv:1210.3296
+  [stat.CO]}}
+
+\bibitem[{{Somerville} \& {Dav{\'e}}(2015)}]{somerville15}
+{Somerville}, R.~S., \& {Dav{\'e}}, R. 2015,
+  \href{http://dx.doi.org/10.1146/annurev-astro-082812-140951}{\JournalTitle{\araa},
+  53, 51}
+
+\bibitem[{{Somerville} {et~al.}(2001){Somerville}, {Lemson}, {Sigad}, {Dekel},
+  {Kauffmann}, \& {White}}]{Sommerville:2001aa}
+{Somerville}, R.~S., {Lemson}, G., {Sigad}, Y., {et~al.} 2001,
+  \href{http://dx.doi.org/10.1046/j.1365-8711.2001.03894.x}{\JournalTitle{\mnras},
+  320, 289}
+
+\bibitem[{{Steidel} {et~al.}(1998){Steidel}, {Adelberger}, {Dickinson},
+  {Giavalisco}, {Pettini}, \& {Kellogg}}]{Steidel:1998aa}
+{Steidel}, C.~C., {Adelberger}, K.~L., {Dickinson}, M., {et~al.} 1998,
+  \href{http://dx.doi.org/10.1086/305073}{\JournalTitle{\apj}, 492, 428}
+
+\bibitem[{{Tinker} {et~al.}(2011){Tinker}, {Wetzel}, \&
+  {Conroy}}]{Tinker:2011aa}
+{Tinker}, J., {Wetzel}, A., \& {Conroy}, C. 2011, \JournalTitle{ArXiv
+  e-prints}, \href{http://arxiv.org/abs/1107.5046}{{\sffamily arXiv:1107.5046
+  [astro-ph.CO]}}
+
+\bibitem[{{Tinker} {et~al.}(2013){Tinker}, {Leauthaud}, {Bundy}, {George},
+  {Behroozi}, {Massey}, {Rhodes}, \& {Wechsler}}]{Tinker:2013aa}
+{Tinker}, J.~L., {Leauthaud}, A., {Bundy}, K., {et~al.} 2013,
+  \href{http://dx.doi.org/10.1088/0004-637X/778/2/93}{\JournalTitle{\apj}, 778,
+  93}
+
+\bibitem[{{Tinker} {et~al.}(2005){Tinker}, {Weinberg}, {Zheng}, \&
+  {Zehavi}}]{tinker05}
+{Tinker}, J.~L., {Weinberg}, D.~H., {Zheng}, Z., \& {Zehavi}, I. 2005,
+  \href{http://dx.doi.org/10.1086/432084}{\JournalTitle{\apj}, 631, 41}
+
+\bibitem[{{van den Bosch} {et~al.}(2003){van den Bosch}, {Mo}, \&
+  {Yang}}]{vdb03}
+{van den Bosch}, F.~C., {Mo}, H.~J., \& {Yang}, X. 2003,
+  \href{http://dx.doi.org/10.1046/j.1365-8711.2003.07012.x}{\JournalTitle{\mnras},
+  345, 923}
+
+\bibitem[{{van den Bosch} {et~al.}(2013){van den Bosch}, {More}, {Cacciato},
+  {Mo}, \& {Yang}}]{vdBosch13}
+{van den Bosch}, F.~C., {More}, S., {Cacciato}, M., {Mo}, H., \& {Yang}, X.
+  2013, \href{http://dx.doi.org/10.1093/mnras/sts006}{\JournalTitle{\mnras},
+  430, 725}
+
+\bibitem[{{Wandelt} {et~al.}(2004){Wandelt}, {Larson}, \&
+  {Lakshminarayanan}}]{Wandelt:2004aa}
+{Wandelt}, B.~D., {Larson}, D.~L., \& {Lakshminarayanan}, A. 2004,
+  \href{http://dx.doi.org/10.1103/PhysRevD.70.083511}{\JournalTitle{\prd}, 70,
+  083511}
+
+\bibitem[{{Weyant} {et~al.}(2013){Weyant}, {Schafer}, \& {Wood-Vasey}}]{abcsn}
+{Weyant}, A., {Schafer}, C., \& {Wood-Vasey}, W.~M. 2013,
+  \href{http://dx.doi.org/10.1088/0004-637X/764/2/116}{\JournalTitle{\apj},
+  764, 116}
+
+\bibitem[{{White} \& {Scott}(1996)}]{White:1996aa}
+{White}, M., \& {Scott}, D. 1996, \JournalTitle{Comments on Astrophysics}, 18,
+  \href{http://arxiv.org/abs/astro-ph/9601170}{{\sffamily astro-ph/9601170}}
+
+\bibitem[{{Zheng} {et~al.}(2007){Zheng}, {Coil}, \& {Zehavi}}]{zheng07}
+{Zheng}, Z., {Coil}, A.~L., \& {Zehavi}, I. 2007,
+  \href{http://dx.doi.org/10.1086/521074}{\JournalTitle{\apj}, 667, 760}
+
+\bibitem[{{Zheng} {et~al.}(2005){Zheng}, {Berlind}, {Weinberg}, {Benson},
+  {Baugh}, {Cole}, {Dav{\'e}}, {Frenk}, {Katz}, \& {Lacey}}]{zheng2005}
+{Zheng}, Z., {Berlind}, A.~A., {Weinberg}, D.~H., {et~al.} 2005,
+  \href{http://dx.doi.org/10.1086/466510}{\JournalTitle{\apj}, 633, 791}
+
+\end{thebibliography}
