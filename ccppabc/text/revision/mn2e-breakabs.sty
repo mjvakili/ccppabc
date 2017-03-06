@@ -1,0 +1,125 @@
+%% 
+%% This is file `mn2e-breakabs.sty'.
+%% 
+%% Copyright (C) 2009 Aptara Corp.
+%% 
+%% This package will help to break the abstract, when the title 
+%% part consume most of the verticle space on opening page.
+%%
+
+\NeedsTeXFormat{LaTeX2e}
+
+\def\fileversion{v1.0}
+\def\filedate{2009/04/07}
+
+\ProvidesPackage{mn2e-breakabs}[\filedate\space\fileversion\space abstract breaking package]
+%
+\newbox\titlebox
+\newbox\@tempboxxb
+\newbox\chk@absbox
+\newbox\chk@absbox@one
+
+\newdimen\titledim
+\newdimen\pagewhite
+\newdimen\absdim
+\newdimen\thanks@ht
+
+\def\tempfootnotetext{\@ifnextchar[{\@tempfootnotetext}{\@tempfootnotetext[]}}
+\def\@tempfootnotetext[#1]#2{{\addtocounter{footnote}{\@ne}\footnotesize{\thefootnote} #2\par}}
+
+\def\maketitle{\par
+ \begingroup
+  \if@twocolumn
+   \setbox\titlebox\vbox{\hsize\textwidth\vspace*{17pt}\let\thanks\relax\@maketitle}%
+   \global\titledim\ht\titlebox%
+   \global\advance\titledim\dp\titlebox%
+   \twocolumn[\vspace*{17pt}\@maketitle]
+  \else
+   \newpage
+   \global\@topnum\z@
+   \@maketitle
+  \fi
+  \thispagestyle{titlepage}
+ \endgroup
+ \let\maketitle\relax
+ \let\@maketitle\relax
+ \gdef\@author{}
+ \gdef\@title{}
+ \let\thanks\relax
+ \global\setbox\@tempboxxb\vbox{\hsize\textwidth\let\footnotetext\tempfootnotetext\@thanks}
+ \global\thanks@ht\ht\@tempboxxb
+ \global\advance\thanks@ht\dp\@tempboxxb
+ \global\advance\thanks@ht\skip\footins
+ \global\advance\thanks@ht\baselineskip
+%%  \let\footnotetext\tempfootnotetext
+%%  \begin{figure}\setcounter{footnote}{\z@}\vskip\skip\footins\vskip\baselineskip\@thanks\end{figure}%
+%%  \gdef\@thanks{}
+}
+
+%
+\def\abstract{
+ \if@twocolumn
+   \Start@SFBbox\@abstract
+%%    \start@SFBbox\@abstract
+ \else
+   \@abstract
+ \fi
+}
+\def\endabstract{
+ \if@twocolumn
+   \endlist\Finish@SFBbox
+%%    \endlist\finish@SFBbox
+ \else
+  \endlist
+ \fi
+}
+
+\def\@abstract{\list{}{%
+    \linewidth\textwidth
+    \listparindent\realparindent
+    \itemindent\z@
+    \labelwidth\z@ \labelsep\z@
+    \leftmargin 11pc\rightmargin\z@
+    \parsep 0pt plus 1pt}\item[]%
+    \reset@font\normalsize{\bf ABSTRACT}\\\reset@font\large
+} % SFB 0.1.01
+
+\def\endkeywords{\if@twocolumn
+  \endlist\addvspace{37pt plus 0.5\baselineskip}\finish@SFBbox
+ \else
+  \endlist
+ \fi
+ \@thanks
+ \gdef\@thanks{}
+ \SFB@keywordstrue
+}
+
+\def\Start@SFBbox{%
+  \global\setbox\chk@absbox\vbox\bgroup%
+    \hsize\textwidth%
+}
+
+\def\Finish@SFBbox{\par%\vskip -\dbltextfloatsep
+  \egroup
+  \global\pagewhite\textheight%
+  \global\advance\pagewhite-\titledim
+  \global\advance\pagewhite-\thanks@ht
+  \global\absdim\ht\chk@absbox
+  \global\advance\absdim\dp\chk@absbox
+  \ifdim\absdim>\pagewhite%
+    \setbox\chk@absbox@one\vsplit\chk@absbox to \pagewhite%
+    \global\absdim\z@%
+    \global\pagewhite\z@%
+    \global\titledim\z@%
+    \start@SFBbox\copy\chk@absbox@one\finish@SFBbox
+    \@thanks
+    \gdef\@thanks{}
+    \twocolumn[\copy\chk@absbox]
+  \else%
+    \start@SFBbox\copy\chk@absbox\finish@SFBbox
+  \fi%
+ }
+
+\endinput
+%% 
+%% End of file `mn2e-breakabs.sty'.
