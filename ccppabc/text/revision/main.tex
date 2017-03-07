@@ -1,28 +1,4 @@
-% mnras_template.tex 
-%
-% LaTeX template for creating an MNRAS paper
-%
-% v3.0 released 14 May 2015
-% (version numbers match those of mnras.cls)
-%
-% Copyright (C) Royal Astronomical Society 2015
-% Authors:
-% Keith T. Smith (Royal Astronomical Society)
-
-% Change log
-%
-% v3.0 May 2015
-%    Renamed to match the new package name
-%    Version number matches mnras.cls
-%    A few minor tweaks to wording
-% v1.0 September 2013
-%    Beta testing only - never publicly released
-%    First version: a simple (ish) template for creating an MNRAS paper
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Basic setup. Most papers should leave these options alone.
 \documentclass[fleqn,usenatbib]{mnras}
-
 % MNRAS is set in Times font. If you don't have this installed (most LaTeX
 % installations will be fine) or prefer the old Computer Modern fonts, comment
 % out the following line
@@ -49,11 +25,6 @@
 
 %%%%% AUTHORS - PLACE YOUR OWN COMMANDS HERE %%%%%
 
-% Please keep new commands to a minimum, and use \newcommand not \def to avoid
-% overwriting existing commands. Example:
-%\newcommand{\pcm}{\,cm$^{-2}$}	% per cm-squared
-
-
 \newcommand{\todo}[1]{{\em \textcolor{red}{ #1}}}
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
@@ -64,6 +35,10 @@
 \newcommand{\pars}{\vec{\theta}}
 \newcommand{\dev}{\mathrm{d}}
 \newcommand{\mstar}{h^{-1}M_\odot}
+
+\definecolor{dred}{rgb}{0.75,0,0}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -882,12 +857,16 @@ In both figures, the ``true'' HOD parameters are plotted as black stars. The ove
 are generally in good agreement with each other. However, the contours for the ABC-PMC method are
 more elongated along $\alpha$. 
 
-{\bf \color{red} Overall, the constraints from ABC-PMC are consistent with those from 
+%%%
+{\bf \color{dred} 
+Overall, the constraints from ABC-PMC are consistent with those from 
 the Gaussian pseudo-likelihood MCMC method; however, using ABC-PMC has a number of 
 advantages. ABC-PMC utilizes a forward generative model. Our forward generative model, 
 for instance, accounts for sample variance. Forward generative models also have the 
 advantage that they can account for sources of systematic uncertainties that affect 
-observational data.}
+observational data.
+}
+%%%
 
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood 
 %MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using 
@@ -895,9 +874,13 @@ observational data.}
 %accounts for sample variance. In principle, they also have the advantage that they can account for 
 %sources of systematic uncertainties in the observational data. 
 
-{\bf \color{red} CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
+%%%
+{\bf \color{darkgreen} 
+CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
 matrix depends on the accuracy of the mock catalogs (a.k.a. the forward model). While it's definitely 
-true that on small scales they break down, forward models in ABC suffers from the same issues.} 
+true that on small scales they break down, forward models in ABC suffers from the same issues.
+} 
+%%%
 Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix
 estimate that captures the sample variance of the data. While we are able to do this accurately 
 within the scope of the HOD framework, for more general LSS parameter inference situations, it 
@@ -1003,7 +986,7 @@ publicly available software packages $\mathtt{emcee}$ and $\mathtt{abcpmc}$. We 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=\textwidth]{paper_data_observables.pdf}
+\includegraphics[width=\textwidth]{figs/paper_data_observables.pdf}
 \caption{\label{fig:mock} The two-point correlation function $\xigg(r)$ (left) and group multiplicity 
 function $\gmf(N)$ (right) summary statistics of the mock observations generated from 
 the ``true'' HOD parameters described in Section \ref{sec:mock_obv}. The width of the 
@@ -1018,7 +1001,7 @@ and $\gmf(N)$ above as the summary statistics of the observation.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=0.95\textwidth]{paper_ABC_poolevolution_nbargmf.pdf}
+\includegraphics[width=0.95\textwidth]{figs/paper_ABC_poolevolution_nbargmf.pdf}
 \caption{\label{fig:pool_demo} We demonstrate the evolution of the ABC particles, $\pars_t$, over iterations $t = 1$ to $9$ in the $\log \mathcal{M}_{min}$ and $\log \mathcal{M}_1$ parameter space. 
 $\bar{n}$ and $\gmf(N)$ are used as observables for the above results. For reference, 
 in each panel, we include the ``true'' HOD parameters (black star) listed in 
@@ -1038,7 +1021,7 @@ we find that $\pars_\mathrm{true}$ lies safely within the $68\%$ confidence regi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=\textwidth]{paper_ABCconvergence.pdf}
+\includegraphics[width=\textwidth]{figs/paper_ABCconvergence.pdf}
 \caption{\label{fig:abc_converge} We illustrate the convergence of the ABC algorithm through the evolution of the ABC particle distribution as a function of iteration for 
 parameters $\log \mathcal{M}_\mathrm{min}$ (left), $\alpha$ (center), and 
 $\log \mathcal{M}_1$ (right).
@@ -1054,7 +1037,7 @@ that the ABC algorithm has converged.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=0.85\textwidth]{paper_ABCcorner_nbarxi.pdf}
+\includegraphics[width=0.85\textwidth]{figs/paper_ABCcorner_nbarxi.pdf}
 \caption{\label{fig:abc_corner_nbarxi} We present the constraints on the \citet{zheng07} HOD model parameters obtained from our ABC-PMC analysis using $\bar{n}$ and $\xigg(r)$ as observables.  
 The diagonal panels plot the posterior distribution of each HOD parameter with 
 vertical dashed lines marking the $50\%$ quantile and $68\%$ confidence intervals of the 
@@ -1071,7 +1054,7 @@ interval. Ultimately, the ABC parameter constraints we obtain in our analysis ar
 
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=0.85\textwidth]{paper_ABCcorner_nbargmf.pdf}
+\includegraphics[width=0.85\textwidth]{figs/paper_ABCcorner_nbargmf.pdf}
 \caption{\label{fig:abc_corner_nbargmf}Same as Figure \ref{fig:abc_corner_nbarxi} but for our ABC analysis using $\bar{n}$ and $\gmf(N)$ as observables. The ABC parameter constraints we obtain are
 consistent with the ``true'' HOD parameters.}
 %\end{center}
@@ -1082,7 +1065,7 @@ consistent with the ``true'' HOD parameters.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=\textwidth]{paper_ABCposterior.pdf}
+\includegraphics[width=\textwidth]{figs/paper_ABCposterior.pdf}
 \caption{\label{fig:abc_moneyplot} We compare the ABC-PMC posterior prediction for the observables $\xigg(r)$ (left) and $\gmf(N)$ (right) (orange; Section \ref{sec:abc_results}) 
 to $\xigg(r)$ and $\gmf(N)$ of the mock observation (black) in the top panels.
 In the lower panels, we plot the ratio between the ABC-PMC posterior predictions for $\xigg$ and $\gmf$ 
@@ -1102,7 +1085,7 @@ predictions.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=1.\textwidth]{paper_ABCvsMCMC_nbarxi.pdf}
+\includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbarxi.pdf}
 \caption{\label{fig:hist_nbarxi} We compare the $\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$ parameter constraints from ABC-PMC (orange) to the constraints from the Gaussian Likelihood MCMC (blue) using $\ngalaxy$ and $\xigg(r)$ as observables. The \emph{top} panels show the histograms of the marginalized posterior PDFs over the parameters. In the \emph{bottom} panels, we include box plots marking the confidence intervals of the posterior distributions. The boxes represent the $68\%$ confidence interval while the ``whiskers'' represent the $95\%$ confidence interval. We also
 plot the ``true'' HOD parameters with vertical black dashed line. Marginalized posterior PDFs 
 obtained from the two methods are consistent with each other. The ABC-PMC constraints are slightly 
@@ -1113,7 +1096,7 @@ less biased for $\alpha$.}
 
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=1.\textwidth]{paper_ABCvsMCMC_nbargmf.pdf}
+\includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbargmf.pdf}
 \caption{\label{fig:hist_nbargmf} Same as Figure \ref{fig:hist_nbarxi}, but both the ABC-PMC analysis and the standard Gaussian 
 Likelihood MCMC analysis are done using the observables $\ngalaxy$ and $\gmf(N)$. The constraints are 
 consistent with the ``true'' HOD parameters and both methods infer the region of allowed values to similar 
@@ -1128,7 +1111,7 @@ spurious when modeling the group multiplicity function.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=1.\textwidth]{paper_ABCvsMCMC_contour_nbarxi.pdf}
+\includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbarxi.pdf}
 \caption{\label{fig:cont_nbarxi}
  We compare the ABC-PMC (orange) and the Gaussian likelihood MCMC (blue)
 predictions of the 68\% and 95\% posterior confidence regions over the HOD 
@@ -1140,7 +1123,7 @@ to create the mock observations are plotted by black stars in each panel. The tw
 
 \begin{figure*}
 %\begin{center}
-\includegraphics[width=1.\textwidth]{paper_ABCvsMCMC_contour_nbargmf.pdf}
+\includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbargmf.pdf}
 \caption{ \label{fig:cont_nbargmf} Same as Figure \ref{fig:cont_nbarxi}, but using $\ngalaxy$ and $\gmf(N)$ as observables. Again, both methods accurately estimate the parameter value regions of the true values for the data. The MCMC estimation of $\alpha$ by use of a Gaussian-likelihood is biased when compared with the ABC-PMC contours. This may be due to the fact that the group multiplicity function is particularly unsuited to the use of a Gaussian-likelihood analysis.}
 %\end{center}
 \end{figure*}
