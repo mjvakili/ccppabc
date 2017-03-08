@@ -1140,22 +1140,27 @@ marginalized posterior PDFs over the parameters. In the \emph{bottom} panels, we
 plots marking the confidence intervals of the posterior distributions. The boxes represent the 
 $68\%$ confidence interval while the ``whiskers'' represent the $95\%$ confidence interval. We mark 
 the ``true'' HOD parameters with vertical black dashed line. The marginalized posterior PDFs 
+obtained from the two methods are consistent with each other. The ABC-PMC and Gaussian pseudo-likelihood
+constraints are generally consistent for $\log \mathcal{M}_{\rm min}$ and $\log \mathcal{M}_{1}$. 
+The ABC-PMC constraint for $\alpha$ is slightly less biased and has slightly larger uncertainty
+then the constraint from Gaussian pseudo-likelihood analysis.} 
 }
-obtained from the two methods are consistent with each other. The ABC-PMC constraints are slightly 
-narrower for $\log \mathcal{M}_{\rm min}$, slightly wider for $\log \mathcal{M}_{1}$, and slightly 
-less biased for $\alpha$.} 
 %\end{center}
 \end{figure*}
 
 \begin{figure*}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbargmf.pdf}
-\caption{\label{fig:hist_nbargmf} Same as Figure \ref{fig:hist_nbarxi}, but both the ABC-PMC analysis and the standard Gaussian 
-Likelihood MCMC analysis are done using the observables $\ngalaxy$ and $\gmf(N)$. The constraints are 
-consistent with the ``true'' HOD parameters and both methods infer the region of allowed values to similar 
-precision. The MCMC result for $\alpha$ is slightly more biased compared to ABC-PMC estimate. 
-This may stem from the fact that the use of Gaussian-likelihood and its associated assumptions is more 
+\caption{\label{fig:hist_nbargmf} 
+{\bf \color{dred}
+Same as Figure \ref{fig:hist_nbarxi}, but both the ABC-PMC
+analysis and the Gaussian pseudo-likelihood MCMC analysis use $\ngalaxy$ and $\gmf(N)$ as 
+observables. Both methods derive constraints consistent with the ``true'' HOD parameters 
+and infer the region of allowed values to similar precision. We note that the MCMC constraint 
+on $\alpha$ is slightly more biased compared to ABC-PMC estimate. This discrepancy may stem 
+from the fact that the use of Gaussian pseudo-likelihood and its associated assumptions is more 
 spurious when modeling the group multiplicity function.}
+}
 %\end{center}
 \end{figure*}
 
@@ -1166,18 +1171,32 @@ spurious when modeling the group multiplicity function.}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbarxi.pdf}
 \caption{\label{fig:cont_nbarxi}
- We compare the ABC-PMC (orange) and the Gaussian likelihood MCMC (blue)
+{\bf \color{dred}
+We compare the ABC-PMC (orange) and the Gaussian pseudo-likelihood MCMC (blue)
 predictions of the 68\% and 95\% posterior confidence regions over the HOD 
 parameters ($\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$) 
-using $\ngalaxy$ and $\xigg(r)$ as observables. The ``true'' HOD parameters used 
-to create the mock observations are plotted by black stars in each panel. The two approaches are consistent with the true values of the parameters used to generate the data.}
+using $\ngalaxy$ and $\xigg(r)$ as observables. In each panel, the black star
+represents the ``true'' HOD parameters used to generate the mock observations. 
+Both inference methods derive confidence regions consistent with the ``true'' 
+HOD parameters.
+}
+}
 %\end{center}
 \end{figure*}
 
 \begin{figure*}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbargmf.pdf}
-\caption{ \label{fig:cont_nbargmf} Same as Figure \ref{fig:cont_nbarxi}, but using $\ngalaxy$ and $\gmf(N)$ as observables. Again, both methods accurately estimate the parameter value regions of the true values for the data. The MCMC estimation of $\alpha$ by use of a Gaussian-likelihood is biased when compared with the ABC-PMC contours. This may be due to the fact that the group multiplicity function is particularly unsuited to the use of a Gaussian-likelihood analysis.}
+\caption{ \label{fig:cont_nbargmf} 
+Same as Figure \ref{fig:cont_nbarxi}, but using $\ngalaxy$ and $\gmf(N)$ as 
+observables. Again, the confidence regions derived from both methods are 
+consistent with the ``true'' HOD parameters used to generate the mock 
+observations. The confidence region of $\alpha$ from the Gaussian 
+pseudo-likelood method is biased compared to the ABC-PMC contours. 
+This may be due to the fact that the true likelihood function that 
+describes $\gmf(N)$ deviates significantly from the assumed Gaussian 
+functional form.}
+}
 %\end{center}
 \end{figure*}
 
