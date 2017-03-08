@@ -889,6 +889,16 @@ for instance, accounts for sample variance. Forward generative models also have 
 advantage that they can account for sources of systematic uncertainties that affect 
 observational data.
 }
+
+{\bf \color{dred}
+It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC. Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects. This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a singal-to-noise ratio cut. 
+}
+
+{\bf \color{dred}
+In standard likelihood analyses, these selection effects, if not accounted for, can lead to biases in the inferred parameters of interest. Hierarchical models can modify the likelihood functions through by taking into account the selection effects. Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the data that incorporates signal-to-noise ratio cuts, incompleteness, etc.
+}{\bf \color{darkgreen}
+MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ?
+}
 %%%
 
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood 
@@ -898,6 +908,9 @@ observational data.
 %sources of systematic uncertainties in the observational data. 
 
 %%%
+{\bf \color{darkgreen}
+MJV: @CHH I think this paragraph is misleading since both ABC and Gaussian likelihood covariances suffer from inaccuracy of the simulations. I say we remove this paragraph entirely. It does not add any clarify anything. It just causes confusion!
+}
 {\bf \color{darkgreen} 
 CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
 matrix depends on the accuracy of the mock catalogs (a.k.a. the forward model). While it's definitely 
