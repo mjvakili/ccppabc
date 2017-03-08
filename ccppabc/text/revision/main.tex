@@ -20,10 +20,15 @@
 \usepackage{graphicx}	% Including figure files
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
+\usepackage{xcolor}	% Extra maths symbols
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%% AUTHORS - PLACE YOUR OWN COMMANDS HERE %%%%%
+
+\definecolor{dred}{rgb}{0.75,0.,0.}
+\definecolor{darkred}{rgb}{0.5,0.,0.}
+\definecolor{darkgreen}{rgb}{0.,0.5,0.}
 
 \newcommand{\todo}[1]{{\em \textcolor{red}{ #1}}}
 \newcommand{\beq}{\begin{equation}}
@@ -35,10 +40,6 @@
 \newcommand{\pars}{\vec{\theta}}
 \newcommand{\dev}{\mathrm{d}}
 \newcommand{\mstar}{h^{-1}M_\odot}
-
-\definecolor{dred}{rgb}{0.75,0,0}
-\definecolor{darkred}{rgb}{0.5,0,0}
-\definecolor{darkgreen}{rgb}{0,0.5,0}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -797,57 +798,79 @@ for parameter inference in large scale structure.} % boom mic drop.
 %%%%%%%%%%%%%%%%%%%%%%% SECTION: %%%%%%%%%%%%%%%%%%%%%%%
 % SECTION: Comparison to MCMC analysis  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Comparison to the Gaussian Likelihood MCMC Analysis} \label{sec:abcvsmcmc}
+\subsection{Comparison to the Gaussian {\color{dred} Pseudo - Likelihood} MCMC Analysis} \label{sec:abcvsmcmc}
 In order to assess the quality of the parameter inference described in the previous section, 
-we compare the ABC-PMC results with the HOD parameter constraints assuming a Gaussian likelihood 
+we compare the ABC-PMC results with the HOD parameter constraints 
+{\bf \color{dred} from}
+assuming a Gaussian likelihood 
 function. The model used for the Gaussian likelihood analysis is different than the forward 
 generative model adopted for the ABC-PMC algorithm, to be consistent with the standard approach.
+
 In the ABC analysis, the model accounts for sample variance by randomly sampling a subvolume to be 
-populated with galaxies. The Gaussian likelihood analysis assumes a covariance matrix that captures 
-the uncertainties from the sample variance, and therefore in the model, we populate the halos of
-the entire $\mathtt{MultiDark}$ simulation rather than a subvolume. 
+populated with galaxies. 
+{\bf \color{dred} %%%
+Instead, in the Gaussian pseudo-likelihood analysis, the covariance matrix is assumed to capture the
+uncertainties from sample variance. Hence, in the model for the Gaussian pseudo-likelihood analysis, 
+we populate halos of the {\em entire} $\mathtt{MultiDark}$ simulation rather than a subvolume.
+We describe the Gaussian pseudo-likelihood analysis below.
+}
+%The Gaussian likelihood analysis assumes a covariance matrix that captures the uncertainties from the sample variance, and therefore in the model, we populate the halos of the entire $\mathtt{MultiDark}$ simulation rather than a subvolume. 
 
-We introduce the observable $\mathbf{x}$ as a combination of the summary statistics of the 
-galaxy mock catalog used in the inference. When we use $\ngalaxy$ and $\xigg(r)$ as observables, 
-$\mathbf{x} = [\ngalaxy , \xigg]$, while $\mathbf{x} = [\ngalaxy , \gmf]$ when we use $\ngalaxy$ and $\gmf(N)$
-Based on this notation, we write likelihood function as 
+{\bf \color{dred}
+To write down the Gaussian pseudo-likelihood, we first introduce the vector $\mathbf{x}$: 
+a combination of the summary statistics (observables) for a galaxy catalog. 
+When we use $\ngalaxy$ and $\xigg(r)$ as observables in the analysis: $\mathbf{x} = [\ngalaxy , \xigg]$;
+when we use $\ngalaxy$ and $\gmf(N)$ as observables in the analysis: $\mathbf{x} = [\ngalaxy , \gmf]$.
+Based on this notation, we can write pseudo-likelihood function as 
 \begin{eqnarray}
--2 \ln \mathcal{L}(\theta | d) &=& \Delta \mathbf{x}^{T}\widehat{C^{-1}}\Delta \mathbf{x} + \ln\Big[(2\pi)^{d}\mathrm{det}(C)\Big], \label{loglike}\\
-\Delta \mathbf{x} &=& [\mathbf{x}_{obs} -\mathbf{x}_{mod}],
+-2 \ln \mathcal{L}(\theta | d) &=& \Delta \mathbf{x}^{T}\widehat{C^{-1}}\Delta \mathbf{x} + \ln\Big[(2\pi)^{d}\mathrm{det}(C)\Big], \label{loglike}
 \end{eqnarray}
-where $\Delta \mathbf{x}$ is the difference between the measured $\mathbf{x}_{obs}$ of the mock observations 
-and that of the model $\mathbf{x}_{mod}(\mathbb{\theta})$. $d$ is the dimension of the observable $\mathbf{x}$. 
-When we use $\mathbf{x} = [\ngalaxy, \xigg]$, $d = 13$. When we use $\mathbf{x} = [\ngalaxy, \gmf]$, $d = 10$.  
-$\widehat{C^{-1}}$ is the estimate of the inverse covariance matrix, which we calculate 
-following  \cite{hartlap2007}:
-\beq
-\widehat{C^{-1}} = \frac{N_{\rm mocks}-d - 1}{N_{\rm mocks} -1}\widehat{C}^{-1},
-\eeq
-where $\widehat{C}$ is the estimated covariance matrix and $N_{\rm mock}$ is the number of mocks used to 
-estimate $\widehat{C}$. $N_{\rm mock} = 124$ (Section \ref{sec:mock_obv}). Depending on $\mathbf{x}$, 
-$\widehat{C}$ is given by the appropriate block of the covariance matrix Eq. \ref{eq:cov} corresponding 
-to the observables. We note that in the covariance matrix the dependence on the HOD parameters is neglected. 
-Therefore, the second term in the expression of the log-likelihood (Eq. \ref{loglike}) can be neglected. 
-We sample from the posterior distribution of the likelihood given the prior distribution using the 
-MCMC sampler $\mathtt{EMCEE}$ (\citealt{emcee}). 
+where 
+\begin{eqnarray}
+\Delta \mathbf{x} &=& [\mathbf{x}_{obs} -\mathbf{x}_{mod}], 
+\end{eqnarray}
+the difference between $\mathbf{x}_{obs}$, measured from the mock observation, 
+and $\mathbf{x}_{mod}(\mathbb{\theta})$ measured from the mock catalog generated 
+from the model with parameters $\theta$ .
+$d$ here is the dimension of $\mathbf{x}$ (for $\mathbf{x} = [\ngalaxy, \xigg]$, $d = 13$; 
+for $\mathbf{x} = [\ngalaxy, \gmf]$, $d = 10$).  
+$\widehat{C^{-1}}$ is the inverse covariance matrix, which we estimate following \cite{hartlap2007}:
+\begin{eqnarray}
+\widehat{C^{-1}} = \frac{N_{\rm mocks}-d - 1}{N_{\rm mocks} -1} \; \widehat{C}^{-1}.
+\end{eqnarray}
+$\widehat{C}$ is the estimated covariance matrix, calculated using the corresponding 
+$\mathbf{x}$ block of the covariance matrix from Eq.~\ref{eq:cov}, and $N_{\rm mock}$ 
+is the number of mocks used for the estimation ($N_{\rm mock} = 124$; see Section \ref{sec:mock_obv}).
+We note that in $\widehat{C}$ the dependence on the HOD parameters is neglected, 
+so the second term in the expression of Eq.~\ref{loglike} can be neglected. 
+Finally, using this pseudo-likelihood, we sample from the posterior distribution 
+given the prior distribution using the MCMC sampler $\mathtt{emcee}$ (\citealt{emcee}). 
+}
 
-In Figure \ref{fig:hist_nbarxi} we compare the ABC-PMC and Gaussian likelihood MCMC 
-results for the marginalized posterior PDFs over three parameters of the HOD model $\{\log \mathcal{M}_{\rm min},
-\alpha , \log\mathcal{M}_1\}$ using $\ngalaxy$ and $\xigg$ as observables. 
-Figure \ref{fig:hist_nbargmf} makes the same comparison when $\ngalaxy$ and $\gmf$ are used in the inference. 
+{\bf \color{dred}
+In Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, we compare the results from
+ABC-PMC and Gaussian pseudo-likelihood MCMC analyses using $[\ngalaxy, \xigg]$ and 
+$[\ngalaxy, \gmf]$ as observables respectively. The top panels in each figure 
+compares the marginalized posterior PDFs for three parameters of the HOD model: 
+$\{\log \mathcal{M}_{\rm min}, \alpha , \log\mathcal{M}_1\}$. The lower panels in each 
+figure compares the $68\%$ and $95\%$ confidence intervals of the constraints 
+derived from the two inference methods as a box plot. The ``true'' HOD parameters
+are marked by vertical dashed lines in each panel. 
+}
 
-Figure \ref{fig:hist_nbarxi} demonstrates in the top panel that constraints obtained from the two 
-methods are consistent with the ``true'' HOD parameters represented by the vertical dashed lines. 
-The marginalized posteriors over the parameters follow each other very closely. The lower panel of 
-Figure \ref{fig:hist_nbarxi} plot the $68\%$ and $95\%$ confidence intervals of the constraints 
-derived from the two methods as a box plot. The uncertainty over the parameter $\log \mathcal{M}_\mathrm{min}$ 
-is slightly smaller while the uncertainties of the parameters $\alpha$ and $\log M_{1}$ 
-are slightly larger for our ABC-PMC results.
-
-In Figure \ref{fig:hist_nbargmf}, when we use $\ngalaxy$ and $\gmf$ as observables, both methods 
-produce consistent constraints with each other and ``true'' HOD parameters. The lower panel of Figure 
-\ref{fig:hist_nbargmf} shows that the uncertainties from the two methods are comparable. The 
-ABC-PMC constraints over $\alpha$ is slightly less biased and slightly less precise. 
+{\bf \color{dred}
+In Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, for each of the parameters, 
+the marginalized posteriors from both inference methods are comparable. Similarly, 
+the lower panels of the figures reveal that the constraints derived for each parameter
+from the two methods are also consistent, with minor discrepancies. Furthermore, we 
+find that both methods produce constraints consistent with the ``true'' HOD parameters.
+}
+{\bf \color{darkgreen}
+CHH: A few sentences discussing the width of the distributions for each of the panels
+have been commented out. Not sure if it's meaningful to include such slight discrepancies. 
+@MJV: Could you take a look at what's written above and see if you feel that it's sufficient?  
+}
+%The uncertainty over the parameter $\log \mathcal{M}_\mathrm{min}$ is slightly smaller while the uncertainties of the parameters $\alpha$ and $\log M_{1}$ are slightly larger for our ABC-PMC results.  In Figure \ref{fig:hist_nbargmf}, when we use $\ngalaxy$ and $\gmf$ as observables, both methods produce consistent constraints with each other and ``true'' HOD parameters. The lower panel of Figure \ref{fig:hist_nbargmf} shows that the uncertainties from the two methods are comparable. The ABC-PMC constraints over $\alpha$ is slightly less biased and slightly less precise. 
 
 In Figures \ref{fig:cont_nbarxi} and \ref{fig:cont_nbargmf}, we plot the contours enclosing the $68\%$ 
 and $95\%$ confidence regions of the posterior probabilities of the two methods. Figure \ref{fig:cont_nbarxi}
@@ -1086,8 +1109,16 @@ predictions.}
 \begin{figure*}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbarxi.pdf}
-\caption{\label{fig:hist_nbarxi} We compare the $\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$ parameter constraints from ABC-PMC (orange) to the constraints from the Gaussian Likelihood MCMC (blue) using $\ngalaxy$ and $\xigg(r)$ as observables. The \emph{top} panels show the histograms of the marginalized posterior PDFs over the parameters. In the \emph{bottom} panels, we include box plots marking the confidence intervals of the posterior distributions. The boxes represent the $68\%$ confidence interval while the ``whiskers'' represent the $95\%$ confidence interval. We also
-plot the ``true'' HOD parameters with vertical black dashed line. Marginalized posterior PDFs 
+\caption{\label{fig:hist_nbarxi} 
+{\bf \color{dred}
+We compare the $\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$ parameter 
+constraints from ABC-PMC (orange) to constraints from the Gaussian pseudo-ikelihood MCMC (blue) 
+using $\ngalaxy$ and $\xigg(r)$ as observables. The \emph{top} panels compares the two methods' 
+marginalized posterior PDFs over the parameters. In the \emph{bottom} panels, we include box 
+plots marking the confidence intervals of the posterior distributions. The boxes represent the 
+$68\%$ confidence interval while the ``whiskers'' represent the $95\%$ confidence interval. We mark 
+the ``true'' HOD parameters with vertical black dashed line. The marginalized posterior PDFs 
+}
 obtained from the two methods are consistent with each other. The ABC-PMC constraints are slightly 
 narrower for $\log \mathcal{M}_{\rm min}$, slightly wider for $\log \mathcal{M}_{1}$, and slightly 
 less biased for $\alpha$.} 

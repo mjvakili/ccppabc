@@ -1,5 +1,5 @@
-# MNRAS: MN-16-2332-MJ 
-#(ABC paper referee report)
+# MNRAS: MN-16-2332-MJ referee report
+## ABC LSS paper
 Reviewer's Comments:
 
 >The paper demonstrates how ABC can be used to constrain parameters of the HOD model.
@@ -16,7 +16,7 @@ The main reason that the referee cites is that our comparison between the standa
 
 > I list below a few points which, if included in the discussion, will certainly contribute to the development of ABC in the astronomical context, and thus make the paper suitable for MNRAS:
 
-> -  a deeper discussion on why the ABC approach should be preferred in this particular context (one or two phrases on this should be included in the abstract).
+>1) a deeper discussion on why the ABC approach should be preferred in this particular context (one or two phrases on this should be included in the abstract).
    in section 3.4 it is said:
    "Furthermore, the Gaussian-likelihood approach relies on constructing an accurate covariance
 matrix estimate that captures the sample variance of the data. While we are able to
@@ -32,19 +32,19 @@ estimate; hence it does not face these problems."
 I agree and I think it would be helpful to further motivate using ABC over MCMC, specifically in the context of cosmology. In other words, explicitly state in the abstract that the LF cannot actually be Gaussian and that an incorrect form of the LF can lead to biased parameter inference. This should also be further stressed in the intro with citations to papers such as  http://adsabs.harvard.edu/abs/2016MNRAS.456L.132S .
 
 
-> - if the Gaussian hypothesis underlying the standard approach are so unrealistic as stated in the text, why results are still consistent with the ABC ones? how likely it is that we will face a real data scenario which might lead to significantly different results?
+>2) if the Gaussian hypothesis underlying the standard approach are so unrealistic as stated in the text, why results are still consistent with the ABC ones? how likely it is that we will face a real data scenario which might lead to significantly different results?
 
 
 I think that this comment can be addressed in the discussion by emphasizing that the consistency we find in our comparison is *not* validation of the Gaussian LF assumption. Instead, it results from the fact that our comparison is apparently not the most sensitive to it. Smaller scales and larger scales (as MJ and Hogg mentioned) -- both of which are very likely in "real data scenarios" -- will likely be more discerning. 
 
 I also think this comment is important to address because readers might very well conclude from our paper, as it is now, that the Gaussian LF assumption is correct without understanding the nuanced conclusion.
 
-> - is it possible to simulate an extreme data situation where the results from the standard analysis are not consistent with the ABC ones? if so,  how realistic it is?
+>3) is it possible to simulate an extreme data situation where the results from the standard analysis are not consistent with the ABC ones? if so,  how realistic it is?
 
 As Hogg and MJ mentioned, examining galaxy clustering at large (BAO) scales would be one possible way. I'm confused by the wording of this comment ... but that would be a *very* realistic scenario. This comparison would require a different approach than the scope of our paper. 
 
 
-> - what caveats one would face in trying to  apply this kind of analysis in real data? How can they affect the final results and how can they be circumvented?
+>4) what caveats one would face in trying to  apply this kind of analysis in real data? How can they affect the final results and how can they be circumvented?
 
 
 Again, I'm a bit confused by the wording of this comment. Is the referee asking about the practical challenges of implementing ABC for parameter inference on real data? If so, I think the challenges would mainly be computational (i.e. the forward model). So the computation section should elaborate more on the caveats of scaling up our HOD forward model to a full blown cosmological one. 
