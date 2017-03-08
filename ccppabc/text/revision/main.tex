@@ -85,14 +85,12 @@ $^{6}$Department of Astronomy, Yale University, New Haven, CT
 
 % Abstract of the paper
 \begin{abstract}
-The standard approaches to Bayesian parameter inference in large scale structure (LSS) assume a Gaussian functional form (chi-squared form) for the likelihood. They are also typically restricted to measurements 
-such as the two point correlation function. 
-Likelihood free inferences such as Approximate Bayesian Computation (ABC) make inference possible without 
-assuming any functional form for the likelihood, thereby relaxing the assumptions and restrictions of 
-the standard approach. Instead it relies on a forward generative model of the data and a metric
-for measuring the distance between the model and data. In this work, we 
-demonstrate that ABC is feasible for LSS parameter inference by using it to constrain parameters of the 
-halo occupation distribution (HOD) model for populating dark matter halos with galaxies.
+{\bf\color{darkgreen} MJV: @CHH: Since the referee asked us to emphasize the advantage of ABC in the abstract with a few phrases, I slightly reworded the first paragraph! Could you take a look at this?}
+
+{\bf \color{dred}The standard approaches to Bayesian parameter inference in large scale structure (LSS) rely on a Gaussian functional form (chi-squared form) for the likelihood.They are typically restricted to measurements such as the two point correlation function. Furthermore, they may not correctly predict the effects of uncertainties on the form of the likelihood and parameter constraints.}
+
+{\bf \color{dred} Likelihood free inferences such as Approximate Bayesian Computation (ABC) make inference possible without making any likelihood assumption, thereby relaxing the assumptions and restrictions of the standard approach.} Instead it relies on a forward generative model of the data and a metric for measuring the distance between the model and data. In this work, we demonstrate that ABC is feasible for LSS parameter inference by using it to constrain parameters of the halo occupation distribution (HOD) model for populating dark matter halos with galaxies.
+
 
 Using specific implementation of ABC supplemented with Population Monte Carlo
 importance sampling, a generative forward model using HOD, and a distance metric 
@@ -1189,7 +1187,7 @@ observations. The confidence region of $\alpha$ from the Gaussian
 pseudo-likelood method is biased compared to the ABC-PMC contours. 
 This may be due to the fact that the true likelihood function that 
 describes $\gmf(N)$ deviates significantly from the assumed Gaussian 
-functional form.}
+functional form.}}
 %\end{center}
 \end{figure*}
 
