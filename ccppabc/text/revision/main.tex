@@ -558,13 +558,46 @@ In this study we set the linking length to be $0.25$ times the mean separation o
 is given by $\ngalaxy^{-1/3}$. Once the galaxy groups are identified, we bin them into bins of 
 group richness. The total number of groups in each bin is divided by the comoving volume to get 
 $\gmf(N)$ --- in units of $(\mathrm{Mpc}/h)^{-3}$. 
-
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure: Mock observation 2PCF and GMF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}
+%\begin{center}
+\includegraphics[width=\textwidth]{figs/paper_data_observables.pdf}
+\caption{\label{fig:mock} The two-point correlation function $\xigg(r)$ (left) and group multiplicity 
+function $\gmf(N)$ (right) summary statistics of the mock observations generated from 
+the ``true'' HOD parameters described in Section \ref{sec:mock_obv}. The width of the 
+shaded region corresponds to the square root of the covariance matrix diagonal 
+elements (Eq. \ref{eq:cov}). In our ABC analysis, we treat the $\xigg(r)$ 
+and $\gmf(N)$ above as the summary statistics of the observation.}
+%\end{center}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure: ABC Pool Evolution plot 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}
+%\begin{center}
+\includegraphics[width=0.8\textwidth]{figs/paper_ABC_poolevolution_nbargmf.pdf}
+\caption{\label{fig:pool_demo} We demonstrate the evolution of the ABC particles, $\pars_t$, over iterations $t = 1$ to $9$ in the $\log \mathcal{M}_{min}$ and $\log \mathcal{M}_1$ parameter space. 
+$\bar{n}$ and $\gmf(N)$ are used as observables for the above results. For reference, 
+in each panel, we include the ``true'' HOD parameters (black star) listed in 
+Section \ref{sec:mock_obv}. The initial distance threshold, $\vec\epsilon_1 = 
+[\infty, \infty]$ at $t=1$ (top left) so the $\pars_1$ spans the entire range of the prior distribution, 
+which is also the range of the panels. We see for $t < 5$, the parameter space occupied 
+by the ABC $\pars_t$ shrinks dramatically. Eventually when the algorithm converges, 
+$t > 7$, the parameter space occupied by $\pars_t$ no longer shrinks and their 
+distributions represent the posterior distribution of the 
+parameters. At $t=9$, the final iteration, the ABC algorithm has converged and 
+we find that $\pars_\mathrm{true}$ lies safely within the $68\%$ confidence region.} 
+%\end{center}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%
 %  ABC at work 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{ABC at work}\label{sec:abcatwork}
 With the methodology and the key components of ABC explained above, here we set out to 
 demonstrate how ABC can be used to constrain HOD parameters. We start, in Section \ref{sec:mock_obv} 
@@ -578,6 +611,7 @@ Lastly, in order to both assess the quality of the ABC-PMC parameter inference a
 discuss the assumptions of the standard Gaussian likelihood approach, we compare the 
 ABC-PMC results to parameter constraints using the standard approach in Section 
 \ref{sec:abcvsmcmc}.
+
 %%%%%%%%%%%%%%%%%%%%% SUBSECTION %%%%%%%%%%%%%%%%%%%%%%%
 % Mock Observations  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -635,8 +669,24 @@ However, we benefit from the fact that these observables are generated from mock
 using the true HOD parameters of our choice: we can use the true HOD parameters to assess the 
 quality of the parameter constraints we obtain from ABC-PMC. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure: ABC Pool Convergence 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}
+%\begin{center}
+\includegraphics[width=\textwidth]{figs/paper_ABCconvergence.pdf}
+\caption{\label{fig:abc_converge} We illustrate the convergence of the ABC algorithm through the evolution of the ABC particle distribution as a function of iteration for 
+parameters $\log \mathcal{M}_\mathrm{min}$ (left), $\alpha$ (center), and 
+$\log \mathcal{M}_1$ (right).
+The top panel corresponds our ABC results using the observables $(\bar{n}, \gmf(N))$, 
+while the lower panel plots  corresponds to the ABC results using $(\bar{n}, \xigg(r))$. 
+The distributions of parameters show no significant change after $t > 7$, which suggests
+that the ABC algorithm has converged.}
+%\end{center}
+\end{figure*}
+
 %%%%%%%%%%%%%%%%%%%%% SUBSECTION %%%%%%%%%%%%%%%%%%%%%%%
-% Mock Observations  
+% ABC-PMC Design 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ABC-PMC Design} \label{sec:abcpmc_spec}
 In Section \ref{sec:abc}, we describe the key components of the ABC algorithm we use in our analysis.
@@ -850,25 +900,24 @@ given the prior distribution using the MCMC sampler $\mathtt{emcee}$ (\citealt{e
 {\bf \color{dred}
 In Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, we compare the results from
 ABC-PMC and Gaussian pseudo-likelihood MCMC analyses using $[\ngalaxy, \xigg]$ and 
-$[\ngalaxy, \gmf]$ as observables respectively. The top panels in each figure 
+$[\ngalaxy, \gmf]$ as observables, respectively. The top panels in each figure 
 compares the marginalized posterior PDFs for three parameters of the HOD model: 
-$\{\log \mathcal{M}_{\rm min}, \alpha , \log\mathcal{M}_1\}$. The lower panels in each 
+$\{\log \mathcal{M}_{\rm min}, \alpha, \log\mathcal{M}_1\}$. The lower panels in each 
 figure compares the $68\%$ and $95\%$ confidence intervals of the constraints 
 derived from the two inference methods as a box plot. The ``true'' HOD parameters
 are marked by vertical dashed lines in each panel. 
 }
 
 {\bf \color{dred}
-In Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, for each of the parameters, 
-the marginalized posteriors from both inference methods are comparable. Similarly, 
-the lower panels of the figures reveal that the constraints derived for each parameter
-from the two methods are also consistent, with minor discrepancies. Furthermore, we 
-find that both methods produce constraints consistent with the ``true'' HOD parameters.
+In both Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, the marginalized 
+posteriors for each of the parameters from both inference methods are comparable 
+and consistent with the ``true'' HOD parameters. However, we note that there are 
+minor discrepancies between the maringalized posterior distributions. In particular, 
+the distribution for $\alpha$ derived from ABC-PMC is less biased than the $\alpha$ 
+constraints from the Gaussian pseudo-likelihood approach. 
 }
 {\bf \color{darkgreen}
-CHH: A few sentences discussing the width of the distributions for each of the panels
-have been commented out. Not sure if it's meaningful to include such slight discrepancies. 
-@MJV: Could you take a look at what's written above and see if you feel that it's sufficient?  
+@MJV: Could you take a look at what's written above and see if you feel that it's sufficient? 
 }
 %The uncertainty over the parameter $\log \mathcal{M}_\mathrm{min}$ is slightly smaller while the uncertainties of the parameters $\alpha$ and $\log M_{1}$ are slightly larger for our ABC-PMC results.  In Figure \ref{fig:hist_nbargmf}, when we use $\ngalaxy$ and $\gmf$ as observables, both methods produce consistent constraints with each other and ``true'' HOD parameters. The lower panel of Figure \ref{fig:hist_nbargmf} shows that the uncertainties from the two methods are comparable. The ABC-PMC constraints over $\alpha$ is slightly less biased and slightly less precise. 
 
@@ -1027,57 +1076,6 @@ publicly available software packages $\mathtt{emcee}$ and $\mathtt{abcpmc}$. We 
 %%%%%%%%%%%%%%%%%%%% FIGURES %%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Mock observation 2PCF and GMF
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure*}
-%\begin{center}
-\includegraphics[width=\textwidth]{figs/paper_data_observables.pdf}
-\caption{\label{fig:mock} The two-point correlation function $\xigg(r)$ (left) and group multiplicity 
-function $\gmf(N)$ (right) summary statistics of the mock observations generated from 
-the ``true'' HOD parameters described in Section \ref{sec:mock_obv}. The width of the 
-shaded region corresponds to the square root of the covariance matrix diagonal 
-elements (Eq. \ref{eq:cov}). In our ABC analysis, we treat the $\xigg(r)$ 
-and $\gmf(N)$ above as the summary statistics of the observation.}
-%\end{center}
-\end{figure*}
-%%%%%%%%%%%%%%%%%% End of FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ABC Pool Evolution plot 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure*}
-%\begin{center}
-\includegraphics[width=0.95\textwidth]{figs/paper_ABC_poolevolution_nbargmf.pdf}
-\caption{\label{fig:pool_demo} We demonstrate the evolution of the ABC particles, $\pars_t$, over iterations $t = 1$ to $9$ in the $\log \mathcal{M}_{min}$ and $\log \mathcal{M}_1$ parameter space. 
-$\bar{n}$ and $\gmf(N)$ are used as observables for the above results. For reference, 
-in each panel, we include the ``true'' HOD parameters (black star) listed in 
-Section \ref{sec:mock_obv}. The initial distance threshold, $\vec\epsilon_1 = 
-[\infty, \infty]$ at $t=1$ (top left) so the $\pars_1$ spans the entire range of the prior distribution, 
-which is also the range of the panels. We see for $t < 5$, the parameter space occupied 
-by the ABC $\pars_t$ shrinks dramatically. Eventually when the algorithm converges, 
-$t > 7$, the parameter space occupied by $\pars_t$ no longer shrinks and their 
-distributions represent the posterior distribution of the 
-parameters. At $t=9$, the final iteration, the ABC algorithm has converged and 
-we find that $\pars_\mathrm{true}$ lies safely within the $68\%$ confidence region.} 
-%\end{center}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ABC Pool Convergence 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure*}
-%\begin{center}
-\includegraphics[width=\textwidth]{figs/paper_ABCconvergence.pdf}
-\caption{\label{fig:abc_converge} We illustrate the convergence of the ABC algorithm through the evolution of the ABC particle distribution as a function of iteration for 
-parameters $\log \mathcal{M}_\mathrm{min}$ (left), $\alpha$ (center), and 
-$\log \mathcal{M}_1$ (right).
-The top panel corresponds our ABC results using the observables $(\bar{n}, \gmf(N))$, 
-while the lower panel plots  corresponds to the ABC results using $(\bar{n}, \xigg(r))$. 
-The distributions of parameters show no significant change after $t > 7$, which suggests
-that the ABC algorithm has converged.}
-%\end{center}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ABC Corner Plots
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure*}
@@ -1187,7 +1185,8 @@ HOD parameters.
 \begin{figure*}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbargmf.pdf}
-\caption{ \label{fig:cont_nbargmf} 
+\caption{\label{fig:cont_nbargmf} 
+{\bf \color{dred}
 Same as Figure \ref{fig:cont_nbarxi}, but using $\ngalaxy$ and $\gmf(N)$ as 
 observables. Again, the confidence regions derived from both methods are 
 consistent with the ``true'' HOD parameters used to generate the mock 
@@ -1203,42 +1202,13 @@ functional form.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%% REFERENCES %%%%%%%%%%%%%%%%%%
-
-\bibliographystyle{yahapj}
-\bibliography{ccppabc}
 %\clearpage
 % The best way to enter references is to use BibTeX:
-
-%\bibliographystyle{mnras}
-%\bibliography{example} % if your bibtex file is called example.bib
-
-
-% Alternatively you could enter them by hand, like this:
-% This method is tedious and prone to error if you have lots of references
-%\begin{thebibliography}{99}
-%\bibitem[\protect\citeauthoryear{Author}{2012}]{Author2012}
-%Author A.~N., 2013, Journal of Improbable Astronomy, 1, 1
-%\bibitem[\protect\citeauthoryear{Others}{2013}]{Others2013}
-%Others S., 2012, Journal of Interesting Stuff, 17, 198
-%\end{thebibliography}
-
+\bibliographystyle{mnras}%yahapj}
+\bibliography{ccppabc}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%% APPENDICES %%%%%%%%%%%%%%%%%%%%%
-
-%\appendix
-
-%\section{Some extra material}
-
-%If you want to present additional material which would interrupt the flow of the main paper,
-%it can be placed in an Appendix which appears after the list of references.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 % Don't change these lines
 %\bsp	% typesetting comment
 \label{lastpage}
 \end{document}
-
-% End of mnras_template.tex
