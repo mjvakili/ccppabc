@@ -940,31 +940,6 @@ MJV: @CHH Can you read the two paragraphs above and see if they address referee'
 %accounts for sample variance. In principle, they also have the advantage that they can account for 
 %sources of systematic uncertainties in the observational data. 
 
-%%%
-{\bf \color{darkgreen}
-MJV: @CHH I think this paragraph is misleading since both ABC and Gaussian likelihood covariances suffer from inaccuracy of the simulations. I say we remove this paragraph entirely. It does not add any clarify anything. It just causes confusion!
-}
-{\bf \color{darkgreen} 
-CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
-matrix depends on the accuracy of the mock catalogs (a.k.a. the forward model). While it's definitely 
-true that on small scales they break down, forward models in ABC suffers from the same issues.
-} 
-%%%
-Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix
-estimate that captures the sample variance of the data. While we are able to do this accurately 
-within the scope of the HOD framework, for more general LSS parameter inference situations, it 
-is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs,
-which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein). 
-Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a 
-covariance matrix estimate; hence it does not face these problems.  
-
-{\em ABC-PMC -- unlike the Gaussian-likelihood approach -- is agnostic about the functional form of the 
-underlying distribution of the summary 
-statistics} ($\xigg$ and $\gmf$). This may explain why we find less biased constraints from the
->>>>>>> afd43473184a6a4637881fb3504a38a867b27226
-ABC-PMC analysis compared to the Gaussian-likelihood analysis, when using $\gmf(N)$ as an observable 
-(Figures \ref{fig:hist_nbargmf} and \ref{fig:cont_nbargmf}).
-
 The ABC method of parameter inference has often been viewed as computationally infeasible due to the 
 fact that it necessitates a generative forward model for a large number of realizations. However, 
 by combining ABC with the PMC sampling method,
