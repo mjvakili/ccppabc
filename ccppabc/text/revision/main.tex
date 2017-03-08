@@ -923,15 +923,10 @@ Also, for us to say the following sentence, we need to talk about it more explic
 when discussing Figures 7,8,9, and 10. 
 }
 
-{\bf \color{dred}
-It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC. Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects. This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a singal-to-noise ratio cut. 
-}
-
-{\bf \color{dred}
-In standard likelihood analyses, these selection effects, if not accounted for, can lead to biases in the inferred parameters of interest. Hierarchical models can modify the likelihood functions through by taking into account the selection effects. Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the data that incorporates signal-to-noise ratio cuts, incompleteness, etc.
-}{\bf \color{darkgreen}
-MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ?
-}
+{\bf \color{dred} It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC. Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects. This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a signal-to-noise ratio cut.}  {\bf \color{dred} In standard likelihood analyses, these selection effects, if not accounted for, can lead to biases in the inferred parameters of interest. Methods that rely on a likelihood function may not correctly predict how the functional form of the likelihood is impacted by the presence of possible selection effects and systematic uncertainties.  
+%Hierarchical models can modify the likelihood functions through by %taking into account the selection effects. 
+Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the simulated data that incorporates signal-to-noise ratio cuts, incompleteness, systematic uncertainties etc. }{
+\bf \color{darkgreen} MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ? }
 %%%
 
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood 
@@ -1196,7 +1191,6 @@ pseudo-likelood method is biased compared to the ABC-PMC contours.
 This may be due to the fact that the true likelihood function that 
 describes $\gmf(N)$ deviates significantly from the assumed Gaussian 
 functional form.}
-}
 %\end{center}
 \end{figure*}
 
