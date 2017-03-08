@@ -961,15 +961,21 @@ observations.
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, accounts for sample variance. In principle, they also have the advantage that they can account for sources of systematic uncertainties in the observational data. 
 %Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix estimate that captures the sample variance of the data. While we are able to do this accurately within the scope of the HOD framework, for more general LSS parameter inference situations, it is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs, which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein).  Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a covariance matrix estimate; hence it does not face these problems.  
 
+{\bf \color{dred}
 Furthermore, {\em ABC-PMC -- unlike the Gaussian pseudo-likelihood approach -- 
 is agnostic about the functional form of the underlying distribution of the 
-summary statistics} 
-($\xigg$ and $\gmf$). 
+summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$). 
+}
 {\bf \color{darkgreen}
 CHH: Need a sentence here that reiterates that the Gaussian functional form 
 assumption is incorrect and especially incorrect for the GMF observable case.
-Also, for us to say the following sentence, we need to talk about it more explicitly 
-when discussing Figures 7,8,9, and 10. 
+}
+{\bf \color{dred}
+In the case where the observable $\gmf(N)$ is used as a summary statistic
+of a galaxy catalog, assuming a Gaussian functional form for the likelihood
+would clearly misreprenset the true likelihood function. In fact, this 
+discrepancy may explain the less biased constraints from the ABC-PMC analysis 
+compared to the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
 }
 
 {\bf \color{dred} It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC. Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects. This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a signal-to-noise ratio cut.}  {\bf \color{dred} In standard likelihood analyses, these selection effects, if not accounted for, can lead to biases in the inferred parameters of interest. Methods that rely on a likelihood function may not correctly predict how the functional form of the likelihood is impacted by the presence of possible selection effects and systematic uncertainties.  
@@ -1190,6 +1196,7 @@ pseudo-likelood method is biased compared to the ABC-PMC contours.
 This may be due to the fact that the true likelihood function that 
 describes $\gmf(N)$ deviates significantly from the assumed Gaussian 
 functional form.}
+}
 %\end{center}
 \end{figure*}
 
