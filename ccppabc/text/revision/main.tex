@@ -872,49 +872,57 @@ have been commented out. Not sure if it's meaningful to include such slight disc
 }
 %The uncertainty over the parameter $\log \mathcal{M}_\mathrm{min}$ is slightly smaller while the uncertainties of the parameters $\alpha$ and $\log M_{1}$ are slightly larger for our ABC-PMC results.  In Figure \ref{fig:hist_nbargmf}, when we use $\ngalaxy$ and $\gmf$ as observables, both methods produce consistent constraints with each other and ``true'' HOD parameters. The lower panel of Figure \ref{fig:hist_nbargmf} shows that the uncertainties from the two methods are comparable. The ABC-PMC constraints over $\alpha$ is slightly less biased and slightly less precise. 
 
-In Figures \ref{fig:cont_nbarxi} and \ref{fig:cont_nbargmf}, we plot the contours enclosing the $68\%$ 
-and $95\%$ confidence regions of the posterior probabilities of the two methods. Figure \ref{fig:cont_nbarxi}
-uses $\ngalaxy$ and $\xigg$ as observables, while Figure \ref{fig:cont_nbargmf} uses $\ngalaxy$ and $\gmf$ 
-as observables. 
-In both figures, the ``true'' HOD parameters are plotted as black stars. The overall shape of the contours 
-are generally in good agreement with each other. However, the contours for the ABC-PMC method are
-more elongated along $\alpha$. 
-
-%%%
-{\bf \color{dred} 
-Overall, the constraints from ABC-PMC are consistent with those from 
-the Gaussian pseudo-likelihood MCMC method; however, using ABC-PMC has a number of 
-advantages. ABC-PMC utilizes a forward generative model. Our forward generative model, 
-for instance, accounts for sample variance. Forward generative models also have the 
-advantage that they can account for sources of systematic uncertainties that affect 
-observational data.
+{\bf \color{dred}
+In Figures \ref{fig:cont_nbarxi} and \ref{fig:cont_nbargmf}, we plot the contours 
+enclosing the $68\%$ and $95\%$ confidence regions of the posterior probabilities of 
+the two methods using $[\ngalaxy, \xigg]$ and $[\ngalaxy, \gmf]$ as observables 
+respectively. In both figures, we mark the ``true'' HOD parameters (black star). The 
+overall shape of the contours are in agreement with each other. However, we note
+that the contours for the ABC-PMC method are more extended along $\alpha$. 
 }
-%%%
 
-%In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood 
-%MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using 
-%ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, 
-%accounts for sample variance. In principle, they also have the advantage that they can account for 
-%sources of systematic uncertainties in the observational data. 
+%%% RefReport #1 
+%%% CHH (3/8/2017): Made significant changes to the text in order to better emphasize
+%%%      the advantages of ABC over MCMC
+{\bf \color{dred} 
+Overall, the HOD parameter constraints from ABC-PMC are consistent with those from 
+the Gaussian pseudo-likelihood MCMC method; however, using ABC-PMC has a number of 
+advantages. For instance, ABC-PMC utilizes a forward generative model. Our forward 
+generative model accounts for sample variance. On the other hand, the Gaussian 
+pseudo-likelihood approach, as mentioned earlier this section, does not account 
+for sample variance in the model and relies on the covariance matrix estimate to 
+capture the sample variance of the data. 
+}
 
-%%%
-{\bf \color{darkgreen} 
-CHH: @MJV I'm not a big fan of this entire paragraph. The accuracy of the covariance
-matrix depends on the accuracy of the mock catalogs (a.k.a. the forward model). While it's definitely 
-true that on small scales they break down, forward models in ABC suffers from the same issues.
-} 
-%%%
-Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix
-estimate that captures the sample variance of the data. While we are able to do this accurately 
-within the scope of the HOD framework, for more general LSS parameter inference situations, it 
-is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs,
-which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein). 
-Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a 
-covariance matrix estimate; hence it does not face these problems.  
+{\bf \color{dred} 
+Accurate estimation of the covariance matrix 
+in LSS, however, faces a number of challenges. It is both labor and computationally 
+expensive and dependent on the accuracy of simulated mock catalogs, known to be 
+unreliable on small scales~(see \citealt{cosmiccode,nifty} and references therein). 
+In fact, as \cite{Sellentin:2016a} points out, using estimates of the covariance 
+matrix in the Gaussian psuedo-likelihood approach become further problematic. Even 
+when inferring parameters from a Gaussian-distributed data set, using covariance 
+matrix estimates rather than the {\em true} covariance matrix leads to a likelihood 
+function that is {\em no longer} Gaussian.
+ABC-PMC does not depend on a covariance matrix estimate; hence, it does not face 
+these problems. In principle, forward models of the ABC-PMC method also have the 
+advantage that they can account for sources of systematic uncertainties that affect 
+observations.
+}
+%In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, accounts for sample variance. In principle, they also have the advantage that they can account for sources of systematic uncertainties in the observational data. 
+%Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix estimate that captures the sample variance of the data. While we are able to do this accurately within the scope of the HOD framework, for more general LSS parameter inference situations, it is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs, which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein).  Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a covariance matrix estimate; hence it does not face these problems.  
 
-{\em ABC-PMC -- unlike the Gaussian-likelihood approach -- is agnostic about the functional form of the 
-underlying distribution of the summary 
-statistics} ($\xigg$ and $\gmf$). This may explain why we find less biased constraints from the
+Furthermore, {\em ABC-PMC -- unlike the Gaussian pseudo-likelihood approach -- 
+is agnostic about the functional form of the underlying distribution of the 
+summary statistics} 
+($\xigg$ and $\gmf$). 
+{\bf \color{darkgreen}
+CHH: Need a sentence here that reiterates that the Gaussian functional form 
+assumption is incorrect and especially incorrect for the GMF observable case.
+Also, for us to say the following sentence, we need to talk about it more explicitly 
+when discussing Figures 7,8,9, and 10. 
+}
+This may explain why we find less biased constraints from the
 ABC-PMC analysis compared to the Gaussian-likelihood analysis, when using $\gmf(N)$ as an observable 
 (Figures \ref{fig:hist_nbargmf} and \ref{fig:cont_nbargmf}).
 
