@@ -974,18 +974,19 @@ and confirm it's fine?
 {\bf \color{dred}
 Furthermore, {\em ABC-PMC -- unlike the Gaussian pseudo-likelihood approach -- 
 is agnostic about the functional form of the underlying distribution of the 
-summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$). 
+summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$). As we explain throughout 
+the paper, the likelihood function in LSS {\em cannot} be Gaussian. For $\xigg$, 
+the correlation function must satisfy non-trivial positive-definiteness requirements 
+and hence the Gaussian pseudo-likelihood function assumption is not correct 
+in detail. In the case $\gmf(N)$ is used as a summary statistic
+of a galaxy catalog, assuming a Gaussian functional form for the likelihood
+clearly misrepresents the true likelihood function. In fact, this incorrect 
+likelihood, may explain why the constraints on $\alpha$ are less biased for 
+the ABC-PMC analysis than the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
 }
 {\bf \color{darkgreen}
-CHH: Need a sentence here that reiterates that the Gaussian functional form 
-assumption is incorrect for 2PCF.
-}
-{\bf \color{dred}
-In the case where the observable $\gmf(N)$ is used as a summary statistic
-of a galaxy catalog, assuming a Gaussian functional form for the likelihood
-clearly misrepresents the true likelihood function. This incorrect likelihood, 
-may explain why the constraints on $\alpha$ are less biased for the ABC-PMC analysis 
-than the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
+CHH: @MJV, I parrot a lot of arguments made in the intro without providing much extra 
+'meat'. Let me know what you think. 
 }
 
 {\bf \color{dred} 
