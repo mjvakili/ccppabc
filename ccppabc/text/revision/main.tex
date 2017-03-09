@@ -978,24 +978,41 @@ summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$).
 }
 {\bf \color{darkgreen}
 CHH: Need a sentence here that reiterates that the Gaussian functional form 
-assumption is incorrect and especially incorrect for the GMF observable case.
+assumption is incorrect for 2PCF.
 }
 {\bf \color{dred}
 In the case where the observable $\gmf(N)$ is used as a summary statistic
 of a galaxy catalog, assuming a Gaussian functional form for the likelihood
-would clearly misreprenset the true likelihood function. In fact, this 
-discrepancy may explain the less biased constraints on $\alpha$ from the ABC-PMC analysis 
-compared to the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
-}{\bf \color{darkgreen} @CHH : added $\alpha$ to the previous sentence since the other constraints our consistent!}
+clearly misrepresents the true likelihood function. This incorrect likelihood, 
+may explain why the constraints on $\alpha$ are less biased for the ABC-PMC analysis 
+than the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
+}
 
-{\bf \color{dred} It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC. Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects. This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a signal-to-noise ratio cut.}  
+{\bf \color{dred} 
+Although in our comparison using simple mock observations, we find generally 
+consistent parameter constraints from both the ABC-PMC analysis and the standard 
+Gaussian pseudo-likelihood analysis, more realistic scenarios face mmany factors
+that can generate inconsistencies. Consider a typical galaxy catalog from 
+observations for LSS. These catalogs consist of objects with different data 
+qualities, signal-to-noise ratios, and systematic effects. For example, catalogs 
+are often incomplete beyond some luminosity/redshift or have some threshold 
+signal-to-noise ratio cut imposed on them.
+}  
 
-{\bf \color{dred} In standard likelihood analyses, these selection effects, if not accounted for, can lead to biases in the inferred parameters of interest. Methods that rely on a likelihood function may not correctly predict how the functional form of the likelihood is impacted by the presence of possible selection effects and systematic uncertainties.  
-%Hierarchical models can modify the likelihood functions through by %taking into account the selection effects. 
-Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the simulated data that incorporates signal-to-noise ratio cuts, incompleteness, systematic uncertainties etc. }{
-\bf \color{darkgreen} MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ? }
+%It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC.  Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects.  This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a signal-to-noise ratio cut.
+{\bf \color{dred} 
+These selection effects, coupled with the systematic effects mentioned above, 
+make correctly predicting the functional form of the likelihood difficult. 
+In the standard Gaussian pseudo-likelihood analysis, and other analysis that
+depend on writing down a likelihood function, these effects can siginficantly 
+bias the inferred parameters of interest. In these situations, employing
+ABC equipped with a generative forward model that incorproates selection and 
+systematic effects may produce less biased parameter constraints. 
+}
+%Methods that rely on a likelihood function may not correctly predict how the functional form of the likelihood is impacted by the presence of possible selection effects and systematic uncertainties.  
+%Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the simulated data that incorporates signal-to-noise ratio cuts, incompleteness, systematic uncertainties etc. }{
+%\bf \color{darkgreen} MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ? }
 %%%
-
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood 
 %MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using 
 %ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, 
