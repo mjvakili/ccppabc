@@ -50,7 +50,3 @@ As Hogg and MJ mentioned, examining galaxy clustering at large (BAO) scales woul
 Again, I'm a bit confused by the wording of this comment. Is the referee asking about the practical challenges of implementing ABC for parameter inference on real data? If so, I think the challenges would mainly be computational (i.e. the forward model). So the computation section should elaborate more on the caveats of scaling up our HOD forward model to a full blown cosmological one. 
 
 Besides the computation, MJ and I came to the conclusion that most of the difficulty would be in the accuracy of the forward model. For instance, how well the forward model reproduces systematic effects. In the case of fiber collisions (my personal favorite), on BOSS it would be straightforward. On DESI, forward modeling the fiber positioners may be not so much. I don't think these issues are relevant for implementing ABC, however, because they also plague the standard approach. The systematic effect either has to be "corrected out" of the observation or the theoretical predictions have to model them -- I literally had to fiber collide *thousands* of mocks. 
-
-@Andrew : Sample variance is definitely an issue in forward models. But like the systematic effects I mentioned above, I don't think it is an issue of ABC alone. 
-
-I'm not so sure how to address this comment. 

@@ -85,12 +85,20 @@ $^{6}$Department of Astronomy, Yale University, New Haven, CT
 
 % Abstract of the paper
 \begin{abstract}
-{\bf\color{darkgreen} MJV: @CHH: Since the referee asked us to emphasize the advantage of ABC in the abstract with a few phrases, I slightly reworded the first paragraph! Could you take a look at this?}
-
-{\bf \color{dred}The standard approaches to Bayesian parameter inference in large scale structure (LSS) rely on a Gaussian functional form (chi-squared form) for the likelihood.They are typically restricted to measurements such as the two point correlation function. Furthermore, they may not correctly predict the effects of uncertainties on the form of the likelihood and parameter constraints.}
-
-{\bf \color{dred} Likelihood free inferences such as Approximate Bayesian Computation (ABC) make inference possible without making any likelihood assumption, thereby relaxing the assumptions and restrictions of the standard approach.} Instead it relies on a forward generative model of the data and a metric for measuring the distance between the model and data. In this work, we demonstrate that ABC is feasible for LSS parameter inference by using it to constrain parameters of the halo occupation distribution (HOD) model for populating dark matter halos with galaxies.
-
+{\bf \color{dred}
+Standard approaches to Bayesian parameter inference in large scale 
+structure assume a Gaussian functional form (chi-squared form) 
+for the likelihood. They are also limited to analyzing measurements of   
+the two-point correlation function. These restrictions, in detail, cannot 
+be correct. Likelihood free inferences such as Approximate Bayesian Computation (ABC) 
+relax these restrictions and make inference possible without making any 
+assumptions on the likelihood.
+} 
+Instead it relies on a forward generative model of the data and a metric 
+for measuring the distance between the model and data. In this work, we 
+demonstrate that ABC is feasible for LSS parameter inference by using it 
+to constrain parameters of the halo occupation distribution (HOD) model 
+for populating dark matter halos with galaxies.
 
 Using specific implementation of ABC supplemented with Population Monte Carlo
 importance sampling, a generative forward model using HOD, and a distance metric 
@@ -1020,25 +1028,38 @@ systematic effects may produce less biased parameter constraints.
 %accounts for sample variance. In principle, they also have the advantage that they can account for 
 %sources of systematic uncertainties in the observational data. 
 
-The ABC method of parameter inference has often been viewed as computationally infeasible due to the 
-fact that it necessitates a generative forward model for a large number of realizations. However, 
-by combining ABC with the PMC sampling method,
-%of importance sampling {\bf [APH: the term "importance sampling" has not been defined]}, 
-we have a method that efficiently converges 
-to give us reliable posteriors of the model parameters. Furthermore, in our analysis, the computational resources 
-required for the ABC-PMC inference were comparable to those used in achieving convergence in the 
-MCMC Gaussian-Likelihood inference. This is excluding the typically computationally intensive step of 
-calculating a covariance matrix estimate. Therefore, we find that ABC-PMC offers a method for parameter
-inference in large scale structure studies with a number of advantages we describe above. 
-{\bf \color{darkgreen}
-Need discussion of applying ABC to real data. 
-\begin{itemize}
-\item Computational tractability caveats. The forward models in real data scenarios would have to be much bigger. 
-\item They would also have to be better than the ones that are currently used for covariance matrix estimation. 
-\item Complexity of systematic effects (mention DESI) 
-\item End with how there's still hope because there's developments in fast simulations
-\end{itemize}
+{\bf \color{dred}
+Despite the advantages of ABC, one obstactle for adopting it to parameter 
+inference has been the computational costs of generative forward models, a 
+key element of ABC. By combining ABC with the PMC sampling method, however, 
+ABC-PMC efficiently converges to give reliable posterior parameter constraints. 
+In fact, in our analysis, the total computational resources required for the 
+ABC-PMC analysis were {\em comparable} to the computational resources used 
+for the Gaussian pseudo-likelihood analysis with MCMC sampling.
 }
+
+{\bf \color{dred}
+Applying ABC-PMC beyond the analysis in this work, to broader LSS analyses 
+imposes some caveats. In this work, we focus on the galaxy-halo connection, so
+our generative forward model populates halos with galaxies. LSS analyses 
+for inferring cosmological parameters would require generating halos by 
+running cosmological simulations. The forward models also need to accurately 
+model the observation systematic effects of the latest observations. Hence, 
+accurate generative forward models in LSS analyses demand improvements in simulations 
+and significant computational resources in order to infer unbiased parameter 
+constraints. Recent cosmology simulations show promising improvements 
+in both accuracy and speed~\citep[\emph{e.g.}][]{fastpm}. Such developements
+will be crucial for applying ABC-PMC to broader LSS analyses and exploiting 
+the significant advantages that ABC-PMC offers.
+}
+
+%the ABC method of parameter inference has often been viewed as computationally infeasible due to the fact that it necessitates a generative forward model for a large number of realizations. However, by combining ABC with the PMC sampling method, we have a method that efficiently converges to give us reliable posteriors of the model parameters. Furthermore, in our analysis, the computational resources required for the ABC-PMC inference were comparable to those used in achieving convergence in the MCMC Gaussian-Likelihood inference. This is excluding the typically computationally intensive step of calculating a covariance matrix estimate.  Therefore, we find that ABC-PMC offers a method for parameter inference in large scale structure studies with a number of advantages we describe above. 
+%{\bf \color{darkgreen}
+%\begin{itemize}
+%\item distance metric 
+%\item End with how there's still hope because there's developments in fast simulations
+%\end{itemize}
+%}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Summary and Conclusion  
