@@ -1,5 +1,17 @@
 # MNRAS: MN-16-2332-MJ referee report
 ## ABC LSS paper
+
+Dear Editor,
+
+This was a very constructive report and we have made revision to the paper accordingly. 
+We think the comments have led to substantial improvement in quality of the paper.
+
+ChangHooh Hahn & Mohammadjavad Vakili (on behalf of the authors):
+
+We are very grateful to the constructructive comments made by the anonymous referee. 
+They have substantially improved the paper. In what follows, the referee comments are 
+indented and our responses are not indented.
+
 Reviewer's Comments:
 
 >The paper demonstrates how ABC can be used to constrain parameters of the HOD model.
@@ -31,6 +43,22 @@ estimate; hence it does not face these problems."
 
 I agree and I think it would be helpful to further motivate using ABC over MCMC, specifically in the context of cosmology. In other words, explicitly state in the abstract that the LF cannot actually be Gaussian and that an incorrect form of the LF can lead to biased parameter inference. This should also be further stressed in the intro with citations to papers such as  http://adsabs.harvard.edu/abs/2016MNRAS.456L.132S .
 
+Our response to the comment: We agree with the referee's comment and we think it is helpful to further 
+motivate ABC over MCMC, specially in the context of cosmology. In other words, we explicitly state in the 
+abstract that the likelihhod function cannot be Gaussian and that an incorrect form of the likelihood function can 
+lead to biased parameter inference. Therefore, we made significant changes to Section 3.4 (Comparison to MCMC analysis) in order to better emphasize the advantage of ABC over MCMC. In particular, we made made substantial changes to the paragraph mentioned in the referee's comment to address this:
+
+    """ Accurate estimation of the covariance matrix 
+      in LSS, however, faces a number of challenges. It is both labor and computationally 
+      expensive and dependent on the accuracy of simulated mock catalogs, known to be 
+      unreliable on small scales~(see Heitmann et al. 2008; Chuang et al. and references therein). 
+      In fact, as Sellentin & Heaven (2016) points out, using estimates of the covariance 
+      matrix in the Gaussian psuedo-likelihood approach become further problematic. Even 
+      when inferring parameters from a Gaussian-distributed data set, using covariance 
+      matrix estimates rather than the {\em true} covariance matrix leads to a likelihood 
+      function that is {\em no longer} Gaussian. ABC-PMC does not depend on a covariance 
+      matrix estimate; hence, it does not face these problems.
+    """    
 
 >2) if the Gaussian hypothesis underlying the standard approach are so unrealistic as stated in the text, why results are still consistent with the ABC ones? how likely it is that we will face a real data scenario which might lead to significantly different results?
 
