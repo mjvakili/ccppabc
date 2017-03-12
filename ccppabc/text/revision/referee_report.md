@@ -41,12 +41,12 @@ estimate; hence it does not face these problems."
 
 >   this might lead to confusion. Do the authors believe that ABC presents no advantage  in the specific case studied in this paper?
 
-I agree and I think it would be helpful to further motivate using ABC over MCMC, specifically in the context of cosmology. In other words, explicitly state in the abstract that the LF cannot actually be Gaussian and that an incorrect form of the LF can lead to biased parameter inference. This should also be further stressed in the intro with citations to papers such as  http://adsabs.harvard.edu/abs/2016MNRAS.456L.132S .
+Initial thoughts: I agree and I think it would be helpful to further motivate using ABC over MCMC, specifically in the context of cosmology. In other words, explicitly state in the abstract that the LF cannot actually be Gaussian and that an incorrect form of the LF can lead to biased parameter inference. This should also be further stressed in the intro with citations to papers such as  http://adsabs.harvard.edu/abs/2016MNRAS.456L.132S .
 
-Our response to the comment: We agree with the referee's comment and we think it is helpful to further 
+**Our response: We agree with the referee's comment and we think it is helpful to further 
 motivate ABC over MCMC, specially in the context of cosmology. In other words, we explicitly state in the 
 abstract that the likelihhod function cannot be Gaussian and that an incorrect form of the likelihood function can 
-lead to biased parameter inference. Therefore, we made significant changes to Section 3.4 (Comparison to MCMC analysis) in order to better emphasize the advantage of ABC over MCMC. In particular, we made made substantial changes to the paragraph mentioned in the referee's comment to address this:
+lead to biased parameter inference. Therefore, we made significant changes to Section 3.4 (Comparison to MCMC analysis) in order to better emphasize the advantage of ABC over MCMC. In particular, we made substantial changes to the paragraph mentioned in the referee's comment to address this comment. We added sentences to emphasize that the ABC-PMC method accounts for sample variance in the generative forward model, whereas the Pseudo-Gaussian likelihood method relies on the estimated covariance matrix to account for sample variance. But as it is pointed out in Sellentin & Heaven (2016), estimated covariance matrix leads to a likelihood function that is no longer Gaussian:
 
     """ Accurate estimation of the covariance matrix 
       in LSS, however, faces a number of challenges. It is both labor and computationally 
@@ -59,18 +59,57 @@ lead to biased parameter inference. Therefore, we made significant changes to Se
       function that is {\em no longer} Gaussian. ABC-PMC does not depend on a covariance 
       matrix estimate; hence, it does not face these problems.
     """    
+**We also add another sentences to the next paragraph to emphasize that the presence of systematics may impact the likelihood function, whereas the systematic errors can be simulated and marginalized out by the generative forward model of the ABC-PMC method.
+
+    """ In addition to not requiring accurate covariance matrix estimates, forward models 
+      of the ABC-PMC method, in principle, also have the advantage that they can account 
+      for sources of systematic uncertainties that affect observations. All observations 
+      suffer from significant systematic effects which are often difficult to correct. 
+      For instance, in SDSS-III BOSS (Dawson etal 2013), fiber collisions and redshift
+      failures siginifcantly bias measurements and analysis of observables such as 
+      $\xigg$ or the galaxy powerspectrum (Ross etal 2012, Guo et al 2012, Hahn et al 2017). 
+      In parameter inference, these systematics can affect the likelihood, and thus any 
+      analysis that requires writing down the likelihood, in unknown ways. With a forward generative model 
+      of the ABC-PMC method, the systematics can be simulated and marginalized out to achieve unbiased 
+      constraints. 
+    """
+**Furthermore, we added a sentence to the abstract to emphasize that assuming a Gaussian functional form 
+in the LSS analyses may lead to biases in paramter inference. 
 
 >2) if the Gaussian hypothesis underlying the standard approach are so unrealistic as stated in the text, why results are still consistent with the ABC ones? how likely it is that we will face a real data scenario which might lead to significantly different results?
 
 
 I think that this comment can be addressed in the discussion by emphasizing that the consistency we find in our comparison is *not* validation of the Gaussian LF assumption. Instead, it results from the fact that our comparison is apparently not the most sensitive to it. Smaller scales and larger scales (as MJ and Hogg mentioned) -- both of which are very likely in "real data scenarios" -- will likely be more discerning. 
 
-I also think this comment is important to address because readers might very well conclude from our paper, as it is now, that the Gaussian LF assumption is correct without understanding the nuanced conclusion.
+**Our response: I also think this comment is important to address because readers might very well conclude from our paper, as it is now, that the Gaussian likelihood function assumption is correct without understanding the nuanced conclusion. We added sentences throughout the text tho emphasize that assuming a Gaussian likelihood function for the two-point correlation function is wrong because the correlation function must satisfy non-trivial positive-definiteness requirements. We expect this to lead to more discrepancy on very large scales (e.g. BAO scale and beyond) where the 
+number of modes is small. However, investigation of the large-scale clustering is beyond the scope of this paper. 
+Additionally, we added a sentence emphasizing that the GMF cannot be Gaussian-distributed as it is the abundance of galaxy groups. We also added a sentence to argue that this incorect assumption about the GMF likelihood may explain why the constraints on the parameter alpha are less biased for the ABC-PMC analysis than the Gaussian-likelihood analysis
+as it can be noted from Figure 8. We deidcate the following paragraph to address this:
+    
+    """
+      Furthermore, {\em ABC-PMC -- unlike the Gaussian pseudo-likelihood approach -- 
+      is agnostic about the functional form of the underlying distribution of the 
+      summary statistics} (e.g. $\xigg$ and $\gmf$). As we explain throughout 
+      the paper, the likelihood function in LSS cannot be Gaussian. For $\xigg$, 
+      the correlation function must satisfy non-trivial positive-definiteness requirements 
+      and hence the Gaussian pseudo-likelihood function assumption is not correct 
+      in detail. In the case $\gmf(N)$ is used as a summary statistic
+      of a galaxy catalog, assuming a Gaussian functional form for the likelihood
+      clearly misrepresents the true likelihood function. In fact, this incorrect 
+      likelihood, may explain why the constraints on $\alpha$ are less biased for 
+      the ABC-PMC analysis than the Gaussian-likelihood analysis in Figure 8.
+    """
+**@CHH: I'm not sure if we should talk about the follwoing sentence or not: But I know that Uros Seljak, Yu Feng, Rachael Mandelbaum, and Tim Eifler are working on this: 
+In general, it should be noted that study of the functional form of LSS likelihoods 
+(galaxy-galaxy and shear-shear 2PCFs) from a large number of accurate mocks is a subject of ongoing 
+investigations.
 
 >3) is it possible to simulate an extreme data situation where the results from the standard analysis are not consistent with the ABC ones? if so,  how realistic it is?
 
 As Hogg and MJ mentioned, examining galaxy clustering at large (BAO) scales would be one possible way. I'm confused by the wording of this comment ... but that would be a *very* realistic scenario. This comparison would require a different approach than the scope of our paper. 
 
+**Our response: 
+We added the two paragraphs to the text to address this. We added sentences to explain that in LSS analyses many factors such as incompleteness beyond certain luminosity or redshift, selection functions, or observational systematics in a galaxy catalog can may change the likelihod function in an unknown way. As a result, these factors can lead to significant biases in a likelihood analysis if we do not modify the likelihood function. In the ABC-PMC method however, these selection effects and systematics can be accounted for in the generative forward model of the simulated data without having to write down a likelihood function. 
 
 >4) what caveats one would face in trying to  apply this kind of analysis in real data? How can they affect the final results and how can they be circumvented?
 
