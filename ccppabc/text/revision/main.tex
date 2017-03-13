@@ -971,10 +971,7 @@ analysis that requires writing down the likelihood, in unknown ways. With a forw
 method, the systematics can be simulated and marginalized out to achieve unbiased 
 constraints. 
 } 
-{\bf \color{darkgreen} 
-CHH: @MJV I incorporated the sentence into the paragraph. Can you check it out
-and confirm it's fine?
-} 
+%{\bf \color{darkgreen} CHH: @MJV I incorporated the sentence into the paragraph. Can you check it out and confirm it's fine?  } 
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, accounts for sample variance. In principle, they also have the advantage that they can account for sources of systematic uncertainties in the observational data. 
 %Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix estimate that captures the sample variance of the data. While we are able to do this accurately within the scope of the HOD framework, for more general LSS parameter inference situations, it is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs, which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein).  Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a covariance matrix estimate; hence it does not face these problems.  
 
@@ -985,16 +982,13 @@ summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$). As we explain throughout
 the paper, the likelihood function in LSS {\em cannot} be Gaussian. For $\xigg$, 
 the correlation function must satisfy non-trivial positive-definiteness requirements 
 and hence the Gaussian pseudo-likelihood function assumption is not correct 
-in detail. In the case $\gmf(N)$ is used as a summary statistic
-of a galaxy catalog, assuming a Gaussian functional form for the likelihood
-clearly misrepresents the true likelihood function. In fact, this incorrect 
+in detail. In the case of $\gmf(N)$, assuming a Gaussian functional form for 
+the likelihood, which in reality is more likely Poisson, misrepresents the true 
+likelihood function. In fact, this incorrect 
 likelihood, may explain why the constraints on $\alpha$ are less biased for 
 the ABC-PMC analysis than the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
 }
-{\bf \color{darkgreen}
-CHH: @MJV, I parrot a lot of arguments made in the intro without providing much extra 
-'meat'. Let me know what you think. 
-}
+%{\bf \color{darkgreen} CHH: @MJV, I parrot a lot of arguments made in the intro without providing much extra 'meat'. Let me know what you think.  }
 
 {\bf \color{dred} 
 Although in our comparison using simple mock observations, we find generally 
