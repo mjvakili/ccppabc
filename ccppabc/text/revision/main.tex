@@ -85,13 +85,14 @@ $^{6}$Department of Astronomy, Yale University, New Haven, CT
 
 % Abstract of the paper
 \begin{abstract}
-
+{\bf \color{dred}
 Standard approaches to Bayesian parameter inference in large scale 
 structure assume a Gaussian functional form (chi-squared form) 
 for the likelihood. This assumption, in detail, cannot %They are also limited to analyzing measurements of the two-point correlation function. 
 be correct. Likelihood free inferences such as Approximate Bayesian Computation (ABC) 
 relax these restrictions and make inference possible without making any 
-assumptions on the likelihood. Instead ABC relies on a forward generative model of the data and a metric 
+assumptions on the likelihood.
+} Instead ABC relies on a forward generative model of the data and a metric 
 for measuring the distance between the model and data. In this work, we 
 demonstrate that ABC is feasible for LSS parameter inference by using it 
 to constrain parameters of the halo occupation distribution (HOD) model 
@@ -851,21 +852,25 @@ for parameter inference in large scale structure.} % boom mic drop.
 %%%%%%%%%%%%%%%%%%%%%%% SECTION: %%%%%%%%%%%%%%%%%%%%%%%
 % SECTION: Comparison to MCMC analysis  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Comparison to the Gaussian Pseudo-Likelihood MCMC Analysis} \label{sec:abcvsmcmc}
+\subsection{Comparison to the Gaussian {\color{dred} Pseudo - Likelihood} MCMC Analysis} \label{sec:abcvsmcmc}
 In order to assess the quality of the parameter inference described in the previous section, 
-we compare the ABC-PMC results with the HOD parameter constraints from
+we compare the ABC-PMC results with the HOD parameter constraints 
+{\bf \color{dred} from}
 assuming a Gaussian likelihood 
 function. The model used for the Gaussian likelihood analysis is different than the forward 
 generative model adopted for the ABC-PMC algorithm, to be consistent with the standard approach.
 
 In the ABC analysis, the model accounts for sample variance by randomly sampling a subvolume to be 
-populated with galaxies. Instead, in the Gaussian pseudo-likelihood analysis, the covariance matrix is assumed to capture the
+populated with galaxies. 
+{\bf \color{dred} %%%
+Instead, in the Gaussian pseudo-likelihood analysis, the covariance matrix is assumed to capture the
 uncertainties from sample variance. Hence, in the model for the Gaussian pseudo-likelihood analysis, 
 we populate halos of the {\em entire} $\mathtt{MultiDark}$ simulation rather than a subvolume.
 We describe the Gaussian pseudo-likelihood analysis below.
-
+}
 %The Gaussian likelihood analysis assumes a covariance matrix that captures the uncertainties from the sample variance, and therefore in the model, we populate the halos of the entire $\mathtt{MultiDark}$ simulation rather than a subvolume. 
 
+{\bf \color{dred}
 To write down the Gaussian pseudo-likelihood, we first introduce the vector $\mathbf{x}$: 
 a combination of the summary statistics (observables) for a galaxy catalog. 
 When we use $\ngalaxy$ and $\xigg(r)$ as observables in the analysis: $\mathbf{x} = [\ngalaxy , \xigg]$;
@@ -894,7 +899,9 @@ We note that in $\widehat{C}$ the dependence on the HOD parameters is neglected,
 so the second term in the expression of Eq.~\ref{loglike} can be neglected. 
 Finally, using this pseudo-likelihood, we sample from the posterior distribution 
 given the prior distribution using the MCMC sampler $\mathtt{emcee}$ (\citealt{emcee}). 
+}
 
+{\bf \color{dred}
 In Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, we compare the results from
 ABC-PMC and Gaussian pseudo-likelihood MCMC analyses using $[\ngalaxy, \xigg]$ and 
 $[\ngalaxy, \gmf]$ as observables, respectively. The top panels in each figure 
@@ -903,30 +910,31 @@ $\{\log \mathcal{M}_{\rm min}, \alpha, \log\mathcal{M}_1\}$. The lower panels in
 figure compares the $68\%$ and $95\%$ confidence intervals of the constraints 
 derived from the two inference methods as a box plot. The ``true'' HOD parameters
 are marked by vertical dashed lines in each panel. 
+}
 
-
-
+{\bf \color{dred}
 In both Figures~\ref{fig:hist_nbarxi} and \ref{fig:hist_nbargmf}, the marginalized 
 posteriors for each of the parameters from both inference methods are comparable 
 and consistent with the ``true'' HOD parameters. However, we note that there are 
 minor discrepancies between the maringalized posterior distributions. In particular, 
 the distribution for $\alpha$ derived from ABC-PMC is less biased than the $\alpha$ 
 constraints from the Gaussian pseudo-likelihood approach. 
-
+}
 %The uncertainty over the parameter $\log \mathcal{M}_\mathrm{min}$ is slightly smaller while the uncertainties of the parameters $\alpha$ and $\log M_{1}$ are slightly larger for our ABC-PMC results.  In Figure \ref{fig:hist_nbargmf}, when we use $\ngalaxy$ and $\gmf$ as observables, both methods produce consistent constraints with each other and ``true'' HOD parameters. The lower panel of Figure \ref{fig:hist_nbargmf} shows that the uncertainties from the two methods are comparable. The ABC-PMC constraints over $\alpha$ is slightly less biased and slightly less precise. 
 
-
+{\bf \color{dred}
 In Figures \ref{fig:cont_nbarxi} and \ref{fig:cont_nbargmf}, we plot the contours 
 enclosing the $68\%$ and $95\%$ confidence regions of the posterior probabilities of 
 the two methods using $[\ngalaxy, \xigg]$ and $[\ngalaxy, \gmf]$ as observables 
 respectively. In both figures, we mark the ``true'' HOD parameters (black star). The 
 overall shape of the contours are in agreement with each other. However, we note
 that the contours for the ABC-PMC method are more extended along $\alpha$. 
+}
 
 %%% RefReport #1 
 %%% CHH (3/8/2017): Made significant changes to the text in order to better emphasize
 %%%      the advantages of ABC over MCMC
-
+{\bf \color{dred} 
 Overall, the HOD parameter constraints from ABC-PMC are consistent with those from 
 the Gaussian pseudo-likelihood MCMC method; however, using ABC-PMC has a number of 
 advantages. For instance, ABC-PMC utilizes a forward generative model. Our forward 
@@ -934,8 +942,9 @@ generative model accounts for sample variance. On the other hand, the Gaussian
 pseudo-likelihood approach, as mentioned earlier this section, does not account 
 for sample variance in the model and relies on the covariance matrix estimate to 
 capture the sample variance of the data. 
+}
 
-
+{\bf \color{dred} 
 Accurate estimation of the covariance matrix 
 in LSS, however, faces a number of challenges. It is both labor and computationally 
 expensive and dependent on the accuracy of simulated mock catalogs, known to be 
@@ -946,8 +955,9 @@ when inferring parameters from a Gaussian-distributed data set, using covariance
 matrix estimates rather than the {\em true} covariance matrix leads to a likelihood 
 function that is {\em no longer} Gaussian. ABC-PMC does not depend on a covariance 
 matrix estimate; hence, it does not face these problems.
+}
 
-
+{\bf \color{dred}
 In addition to not requiring accurate covariance matrix estimates, forward models 
 of the ABC-PMC method, in principle, also have the advantage that they can account 
 for sources of systematic uncertainties that affect observations. All observations 
@@ -959,12 +969,12 @@ In parameter inference, these systematics can affect the likelihood, and thus an
 analysis that requires writing down the likelihood, in unknown ways. With a forward generative model of the ABC-PMC 
 method, the systematics can be simulated and marginalized out to achieve unbiased 
 constraints. 
-
+} 
 %{\bf \color{darkgreen} CHH: @MJV I incorporated the sentence into the paragraph. Can you check it out and confirm it's fine?  } 
 %In general, we find that the constraints from ABC-PMC are consistent with those from the Gaussian-likelihood MCMC method both in terms of accuracy and precision. However, we emphasize some advantages of using ABC-PMC. ABC-PMC utilizes a forward generative model. Our forward generative model, for instance, accounts for sample variance. In principle, they also have the advantage that they can account for sources of systematic uncertainties in the observational data. 
 %Furthermore, the Gaussian-likelihood  approach relies on constructing an accurate covariance matrix estimate that captures the sample variance of the data. While we are able to do this accurately within the scope of the HOD framework, for more general LSS parameter inference situations, it is both labor and computationally expensive and dependent on the accuracy of simulated mock catalogs, which are known to be unreliable on small scales (see \citealt{cosmiccode,nifty} and references therein).  Since ABC-PMC utilizes a forward model to account for sample variance, it does not depend on a covariance matrix estimate; hence it does not face these problems.  
 
-
+{\bf \color{dred}
 Furthermore, {\em ABC-PMC -- unlike the Gaussian pseudo-likelihood approach -- 
 is agnostic about the functional form of the underlying distribution of the 
 summary statistics} (\emph{e.g.} $\xigg$ and $\gmf$). As we explain throughout 
@@ -976,9 +986,10 @@ the likelihood, which in reality is more likely Poisson, misrepresents the true
 likelihood function. In fact, this incorrect 
 likelihood, may explain why the constraints on $\alpha$ are less biased for 
 the ABC-PMC analysis than the Gaussian-likelihood analysis in \ref{fig:cont_nbargmf}.
-
+}
 %{\bf \color{darkgreen} CHH: @MJV, I parrot a lot of arguments made in the intro without providing much extra 'meat'. Let me know what you think.  }
 
+{\bf \color{dred} 
 Although in our comparison using simple mock observations, we find generally 
 consistent parameter constraints from both the ABC-PMC analysis and the standard 
 Gaussian pseudo-likelihood analysis, more realistic scenarios present many factors
@@ -987,9 +998,10 @@ LSS observations. These catalogs consist of objects with different data
 qualities, signal-to-noise ratios, and systematic effects. For example, catalogs 
 are often incomplete beyond some luminosity/redshift or have some threshold 
 signal-to-noise ratio cut imposed on them.
+}  
 
 %It is possible to consider a scenario in which the results from the standard analysis are inconsistent with the results from the ABC.  Let us consider a dataset---from a galaxy survey---consisting of objects with different data qualities, signal-to-noise ratios, and systematic effects.  This could be a catalog of galaxies which is incomplete beyond a certain luminosity or redshift. Another example could be a catalog with a signal-to-noise ratio cut.
-
+{\bf \color{dred} 
 These selection effects, coupled with the systematic effects earlier this section, 
 make correctly predicting the likelihood intractable. In the standard Gaussian 
 pseudo-likelihood analysis, and other analysis that require writing down a 
@@ -997,7 +1009,7 @@ likelihood function, these effects can significantly
 bias the inferred parameter constraints. In these situations, employing
 ABC equipped with a generative forward model that incorproates selection and 
 systematic effects may produce less biased parameter constraints. 
-
+}
 %Methods that rely on a likelihood function may not correctly predict how the functional form of the likelihood is impacted by the presence of possible selection effects and systematic uncertainties.  
 %Alternatively, one could alleviate this issue by employing ABC equipped with a generative forward model of the simulated data that incorporates signal-to-noise ratio cuts, incompleteness, systematic uncertainties etc. }{
 %\bf \color{darkgreen} MJV: @CHH Can you read the two paragraphs above and see if they address referee's concern about the extreme data situation that could lead to discrepancy ? }
@@ -1008,6 +1020,7 @@ systematic effects may produce less biased parameter constraints.
 %accounts for sample variance. In principle, they also have the advantage that they can account for 
 %sources of systematic uncertainties in the observational data. 
 
+{\bf \color{dred}
 Despite the advantages of ABC, one obstactle for adopting it to parameter 
 inference has been the computational costs of generative forward models, a 
 key element of ABC. By combining ABC with the PMC sampling method, however, 
@@ -1015,8 +1028,9 @@ ABC-PMC efficiently converges to give reliable posterior parameter constraints.
 In fact, in our analysis, the total computational resources required for the 
 ABC-PMC analysis were {\em comparable} to the computational resources used 
 for the Gaussian pseudo-likelihood analysis with MCMC sampling.
+}
 
-
+{\bf \color{dred}
 Applying ABC-PMC beyond the analysis in this work, to broader LSS analyses 
 imposes some caveats. In this work, we focus on the galaxy-halo connection, so
 our generative forward model populates halos with galaxies. LSS analyses 
@@ -1029,7 +1043,7 @@ constraints. Recent cosmology simulations show promising improvements
 in both accuracy and speed~\citep[\emph{e.g.}][]{fastpm}. Such developements
 will be crucial for applying ABC-PMC to broader LSS analyses and exploiting 
 the significant advantages that ABC-PMC offers.
-
+}
 
 %the ABC method of parameter inference has often been viewed as computationally infeasible due to the fact that it necessitates a generative forward model for a large number of realizations. However, by combining ABC with the PMC sampling method, we have a method that efficiently converges to give us reliable posteriors of the model parameters. Furthermore, in our analysis, the computational resources required for the ABC-PMC inference were comparable to those used in achieving convergence in the MCMC Gaussian-Likelihood inference. This is excluding the typically computationally intensive step of calculating a covariance matrix estimate.  Therefore, we find that ABC-PMC offers a method for parameter inference in large scale structure studies with a number of advantages we describe above. 
 %{\bf \color{darkgreen}
@@ -1169,6 +1183,7 @@ predictions.}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbarxi.pdf}
 \caption{\label{fig:hist_nbarxi} 
+{\bf \color{dred}
 We compare the $\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$ parameter 
 constraints from ABC-PMC (orange) to constraints from the Gaussian pseudo-ikelihood MCMC (blue) 
 using $\ngalaxy$ and $\xigg(r)$ as observables. The \emph{top} panels compares the two methods' 
@@ -1180,6 +1195,7 @@ obtained from the two methods are consistent with each other. The ABC-PMC and Ga
 constraints are generally consistent for $\log \mathcal{M}_{\rm min}$ and $\log \mathcal{M}_{1}$. 
 The ABC-PMC constraint for $\alpha$ is slightly less biased and has slightly larger uncertainty
 then the constraint from Gaussian pseudo-likelihood analysis.} 
+}
 %\end{center}
 \end{figure*}
 
@@ -1187,6 +1203,7 @@ then the constraint from Gaussian pseudo-likelihood analysis.}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_nbargmf.pdf}
 \caption{\label{fig:hist_nbargmf} 
+{\bf \color{dred}
 Same as Figure \ref{fig:hist_nbarxi}, but both the ABC-PMC
 analysis and the Gaussian pseudo-likelihood MCMC analysis use $\ngalaxy$ and $\gmf(N)$ as 
 observables. Both methods derive constraints consistent with the ``true'' HOD parameters 
@@ -1194,6 +1211,7 @@ and infer the region of allowed values to similar precision. We note that the MC
 on $\alpha$ is slightly more biased compared to ABC-PMC estimate. This discrepancy may stem 
 from the fact that the use of Gaussian pseudo-likelihood and its associated assumptions is more 
 spurious when modeling the group multiplicity function.}
+}
 %\end{center}
 \end{figure*}
 
@@ -1204,13 +1222,16 @@ spurious when modeling the group multiplicity function.}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbarxi.pdf}
 \caption{\label{fig:cont_nbarxi}
+{\bf \color{dred}
 We compare the ABC-PMC (orange) and the Gaussian pseudo-likelihood MCMC (blue)
 predictions of the 68\% and 95\% posterior confidence regions over the HOD 
 parameters ($\log \mathcal{M}_{\rm min}$, $\alpha$, and $\log \mathcal{M}_{1}$) 
 using $\ngalaxy$ and $\xigg(r)$ as observables. In each panel, the black star
 represents the ``true'' HOD parameters used to generate the mock observations. 
 Both inference methods derive confidence regions consistent with the ``true'' 
-HOD parameters.}
+HOD parameters.
+}
+}
 %\end{center}
 \end{figure*}
 
@@ -1218,6 +1239,7 @@ HOD parameters.}
 %\begin{center}
 \includegraphics[width=1.\textwidth]{figs/paper_ABCvsMCMC_contour_nbargmf.pdf}
 \caption{\label{fig:cont_nbargmf} 
+{\bf \color{dred}
 Same as Figure \ref{fig:cont_nbarxi}, but using $\ngalaxy$ and $\gmf(N)$ as 
 observables. Again, the confidence regions derived from both methods are 
 consistent with the ``true'' HOD parameters used to generate the mock 
@@ -1226,6 +1248,7 @@ pseudo-likelood method is biased compared to the ABC-PMC contours.
 This may be due to the fact that the true likelihood function that 
 describes $\gmf(N)$ deviates significantly from the assumed Gaussian 
 functional form.}
+}
 %\end{center}
 \end{figure*}
 
